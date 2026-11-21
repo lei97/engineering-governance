@@ -1,0 +1,6 @@
+id: REQ-005
+kind: requirement
+title: 没有验收条件
+status: proposed
+statement: 该需求缺少可供判定完成条件的验收标准。
+origin: SRC-001

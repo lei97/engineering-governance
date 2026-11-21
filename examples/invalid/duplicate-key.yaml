@@ -1,0 +1,9 @@
+id: REQ-002
+id: REQ-003
+kind: requirement
+title: 重复键示例
+status: proposed
+statement: 两个 ID 会被常规解析器悄悄覆盖，必须拒绝。
+origin: SRC-001
+acceptance:
+  - 明确拒绝包含重复键的需求记录。

@@ -1,0 +1,7 @@
+id: SRC-001
+kind: source
+title: 探索功能讨论记录
+status: accepted
+statement: |
+  由项目维护者保存的需求讨论摘要，仅作为需求来源，不代表实现完成。
+location: docs/exploration-notes.md

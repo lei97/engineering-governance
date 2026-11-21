@@ -1,0 +1,6 @@
+id: TEST-001
+kind: test
+title: 取消探索回归测试
+status: proposed
+statement: |
+  对比取消前后的正式作品快照，检查内容一致性。

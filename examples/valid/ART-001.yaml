@@ -1,0 +1,7 @@
+id: ART-001
+kind: artifact
+title: 探索取消操作实现
+status: proposed
+statement: |
+  假定由探索会话控制器撤销候选修改；这里只记录候选实现位置。
+location: src/exploration-session.rs

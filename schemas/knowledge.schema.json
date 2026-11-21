@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/engineering-governance/v0.1/knowledge.schema.json",
+  "title": "Engineering knowledge record v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "kind",
+    "title",
+    "status",
+    "statement"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^(REQ|SRC|CON|ART|TEST|OBS)-[0-9]{3,}$"
+    },
+    "kind": {
+      "enum": [
+        "requirement",
+        "source",
+        "contract",
+        "artifact",
+        "test",
+        "observation"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 120
+    },
+    "status": {
+      "enum": [
+        "proposed",
+        "accepted",
+        "deprecated"
+      ]
+    },
+    "statement": {
+      "type": "string",
+      "minLength": 12
+    },
+    "origin": {
+      "type": "string",
+      "pattern": "^SRC-[0-9]{3,}$"
+    },
+    "location": {
+      "type": "string",
+      "minLength": 2
+    },
+    "acceptance": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 8
+      }
+    },
+    "relations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "refined_by": {
+          "$ref": "#/$defs/idList"
+        },
+        "implemented_by": {
+          "$ref": "#/$defs/idList"
+        },
+        "verified_by": {
+          "$ref": "#/$defs/idList"
+        },
+        "derived_from": {
+          "$ref": "#/$defs/idList"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "requirement"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "origin",
+          "acceptance"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "source"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "location"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "observation"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "origin"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "idList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(REQ|SRC|CON|ART|TEST|OBS)-[0-9]{3,}$"
+      }
+    }
+  }
+}

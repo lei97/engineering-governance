@@ -1,0 +1,15 @@
+name: Validate governance records
+on:
+  push:
+  pull_request:
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python scripts/validate_truth.py examples/valid
+      - run: python -m unittest discover -s tests -v

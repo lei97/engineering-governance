@@ -1,0 +1,8 @@
+id: REQ-004
+kind: requirement
+title: 不存在的引用
+status: proposed
+statement: 此需求通过引用一个不存在的来源来测试跨文件检查。
+origin: SRC-999
+acceptance:
+  - 校验器应报告来源引用不存在。

@@ -1,0 +1,15 @@
+id: REQ-001
+kind: requirement
+title: 取消探索不得修改正式作品
+status: accepted
+statement: |
+  用户取消当前探索后，正式作品内容应与探索开始前保持一致。
+origin: SRC-001
+acceptance:
+  - 取消探索后正式作品内容不发生变化。
+  - 未提交的候选修改不出现在正式作品中。
+relations:
+  implemented_by:
+    - ART-001
+  verified_by:
+    - TEST-001

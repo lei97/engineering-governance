@@ -1,8 +1,8 @@
 # Engineering Governance — v0.1 (experimental)
 
-面向人和 Agent 参与的软件工程：用可审查的约束、最小真源记录和可重复的实验，维持工程活动的透明性、连续性与可恢复性。
+Engineering Governance 是供需求作者和 Agent 共用的工程治理 Skill。v0.1 首先检验，在需求已经确认的前提下，用简洁、受约束的 YAML 管理需求真源，能否减少解读时的隐含假设、歧义和遗漏。
 
-**状态：探索性原型，不是已验证的行业规范。** 不承诺 YAML 能消除自然语言歧义，也不默认代码能够从需求无损再生。
+**当前为实验原型。** 首轮在标准模式下比较同一需求的自然语言与 YAML 表述。原包的结构校验已在本地复核，作者和 Agent 的解释一致性待实测。
 
 ## 快速验证
 
@@ -23,7 +23,7 @@ python -m unittest discover -s tests -v
 - `schemas/knowledge.schema.json`：真源记录的结构契约。
 - 本仓库已确认的目标与首轮范围存于 `truth/`，各自引用作者原话。[表达目标 REQ-100](truth/REQ-100.yaml) · [首轮范围 REQ-101](truth/REQ-101.yaml)
 - `examples/valid/` 与 `examples/invalid/`：正反样例。
-- `experiments/E001/`：人工 + Agent 对照验证协议。
+- E001 首轮的任务、评阅方法和记录模板见[需求解释对照](experiments/E001/README.md)。
 - `scripts/validate_truth.py`：确定性检查，不调用 LLM。
 - `research/references.md`：外部资料与采用边界。
 
@@ -37,7 +37,7 @@ python -m unittest discover -s tests -v
 - 真实任务必须先识别约束和工作区状态，保护未提交改动。
 - `accepted` 仅代表需求获授权确认，不代表已实现或已通过测试。
 - 逆向得到的是行为观察或推断，不能直接升级为正式需求。
-- E001 没有预设获胜方案：比较 YAML、Markdown 与无显式索引方案。
+- 原包比较 Markdown、YAML 与代码及零散注释的三组协议已保留，供后续研究真源识别与冲突处理。[原三组协议](experiments/E001/truth-identification/README.md)
 
 ## 后续候选
 

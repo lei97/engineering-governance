@@ -8,6 +8,7 @@
 
 ```bash
 python -m pip install -r requirements.txt
+python scripts/validate_truth.py truth
 python scripts/validate_truth.py examples/valid
 python scripts/validate_truth.py examples/invalid  # 应当失败
 python -m unittest discover -s tests -v
@@ -20,6 +21,7 @@ python -m unittest discover -s tests -v
 - `skills/engineering-governance/SKILL.md`：可移植 Skill 入口；根据任务按需读取五种模式。
 - `specifications/`：权威规范草案，Skill 不重复定义规则。
 - `schemas/knowledge.schema.json`：真源记录的结构契约。
+- 本仓库已确认的目标与首轮范围存于 `truth/`，各自引用作者原话。[表达目标 REQ-100](truth/REQ-100.yaml) · [首轮范围 REQ-101](truth/REQ-101.yaml)
 - `examples/valid/` 与 `examples/invalid/`：正反样例。
 - `experiments/E001/`：人工 + Agent 对照验证协议。
 - `scripts/validate_truth.py`：确定性检查，不调用 LLM。

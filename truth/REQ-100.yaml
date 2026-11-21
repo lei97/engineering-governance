@@ -1,0 +1,10 @@
+id: REQ-100
+kind: requirement
+title: 已确认需求的表述须能核对理解
+status: accepted
+origin: SRC-100
+statement: |
+  对已确认的需求，以 YAML 管理真源。用简洁的表述写明影响行为的必要前提，使作者和 Agent 可以核对彼此对需求的理解。
+acceptance:
+  - 作者能直接阅读同一份需求描述，核对 Agent 复述的行为是否符合其意图。
+  - 对照作者与 Agent 的复述，可以定位遗漏的前提、额外假设或相互冲突的解释。

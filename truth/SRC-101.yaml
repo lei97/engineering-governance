@@ -1,0 +1,7 @@
+id: SRC-101
+kind: source
+title: 维护者确认 v0.1 首轮实验范围
+status: accepted
+statement: |
+  在本次 v0.1 梳理中，维护者选择“优先做需求解释对照，保留原三组协议供后续使用”。
+location: codex://threads/01a1feac-b19d-7fe2-8e02-7d79bb0ae832

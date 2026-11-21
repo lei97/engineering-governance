@@ -1,0 +1,13 @@
+id: REQ-101
+kind: requirement
+title: v0.1 首轮优先比较需求解释
+status: accepted
+origin: SRC-101
+statement: |
+  v0.1 首轮比较读者对同一条已确认需求的解释。原包的三组真源识别协议保留供后续使用。
+acceptance:
+  - 首轮协议以同一需求的自然语言版和受约束 YAML 版为输入，比较读者的解释。
+  - 后续可单独查阅原三组协议的实验条件、任务和记录模板。
+relations:
+  derived_from:
+    - REQ-100

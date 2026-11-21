@@ -1,0 +1,7 @@
+id: SRC-100
+kind: source
+title: 需求作者重申 YAML 真源的目的
+status: accepted
+statement: |
+  作者在关联对话最后一轮写道“我再重申一下原因及目的（yaml作为真源管理），因为在确定的需求下，我想让隐含假设尽可能少，让作者和agent 的描述简洁，没有歧义，具有一致性的保障”。
+location: chatgpt-conversation://6b0141a3-4e6c-83ec-8546-2139db0306b6

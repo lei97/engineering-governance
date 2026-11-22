@@ -1,0 +1,6 @@
+id: OBS-003
+kind: observation
+title: 来源实际是产物
+status: proposed
+statement: 这条观察所引用的编号对应的是一条产物记录。
+origin: SRC-010

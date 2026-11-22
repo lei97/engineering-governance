@@ -1,0 +1,8 @@
+id: ART-903
+kind: artifact
+title: 验证目标不存在
+status: proposed
+statement: 这条记录的验证关系指向不存在的测试记录。
+relations:
+  verified_by:
+    - TEST-999

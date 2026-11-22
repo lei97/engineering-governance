@@ -10,6 +10,28 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
 from validate_truth import validate_path, load_restricted
 ROOT = Path(__file__).resolve().parents[1]
 
+INVALID_DIAGNOSTICS = {
+    '00-support/SRC-001.yaml': [],
+    'alias.yaml': ['YAML aliases forbidden'],
+    'anchor.yaml': ['YAML anchors forbidden'],
+    'complex-mapping-key.yaml': ['complex mapping keys forbidden'],
+    'dangling-reference.yaml': ['missing origin SRC-999'],
+    'duplicate-id.yaml': ['duplicate id SRC-001'],
+    'duplicate-key.yaml': ['duplicate mapping key: id'],
+    'explicit-tag.yaml': ['explicit YAML tags forbidden'],
+    'invalid-relation-target.yaml': ['invalid verified_by target SRC-001'],
+    'mismatched-id-kind.yaml': ['mismatched id and kind'],
+    'missing-acceptance.yaml': ["[root]: 'acceptance' is a required property"],
+    'missing-relation-target.yaml': ['missing relation target TEST-999'],
+    'multiple-documents.yaml': ['expected exactly one YAML document'],
+    'origin-not-source.yaml': ['origin must be source'],
+    'relation-self.yaml': ['self reference'],
+    'relations-string.yaml': ["[relations]: 'REQ-001' is not of type 'object'"],
+    'self-origin.yaml': ['self origin'],
+    'top-level-sequence.yaml': ['top-level mapping required'],
+}
+
+
 class ValidationTests(unittest.TestCase):
     def test_valid(self):
         errors, count = validate_path(ROOT/'examples/valid')
@@ -17,28 +39,40 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual(count, 5)
 
     def test_invalid(self):
-        errors, count = validate_path(ROOT/'examples/invalid')
-        self.assertEqual(count, 5)
-        for term in ('duplicate mapping key', 'anchors forbidden', 'missing origin', 'acceptance'):
-            self.assertTrue(any(term in e for e in errors), (term, errors))
+        self.assert_invalid_examples(ROOT / 'examples/invalid')
 
-    def test_reject_alias(self):
-        with tempfile.TemporaryDirectory() as d:
-            p=Path(d)/'test.yaml';p.write_text('a: &x hello\nb: *x\n')
-            with self.assertRaisesRegex(ValueError,'anchors|aliases'):
-                load_restricted(p)
+    def assert_invalid_examples(self, directory):
+        files = [path.relative_to(directory).as_posix() for path in directory.rglob('*.yaml')]
+        self.assertCountEqual(files, INVALID_DIAGNOSTICS.keys())
+        errors, count = validate_path(directory)
+        self.assertEqual(count, len(files))
+        for filename, expected in INVALID_DIAGNOSTICS.items():
+            path = str(directory / filename)
+            prefixes = (f'{path}: ', f'{path} [')
+            diagnostics = [
+                error[len(path):].removeprefix(': ').removeprefix(' ')
+                for error in errors if error.startswith(prefixes)
+            ]
+            self.assertEqual(diagnostics, expected, filename)
+        self.assertEqual(len(errors), sum(map(len, INVALID_DIAGNOSTICS.values())), errors)
 
-    def test_reject_tags(self):
-        with tempfile.TemporaryDirectory() as d:
-            p=Path(d)/'test.yaml';p.write_text('a: !!str hello\n')
-            with self.assertRaisesRegex(ValueError,'tags'):
-                load_restricted(p)
+    def test_repaired_acceptance_fails_negative_assertion(self):
+        with tempfile.TemporaryDirectory() as temp:
+            examples = Path(temp) / 'invalid'
+            shutil.copytree(ROOT / 'examples/invalid', examples)
+            path = examples / 'missing-acceptance.yaml'
+            record = load_restricted(path)
+            record['acceptance'] = ['校验器可以读取补齐的验收条件。']
+            path.write_text(yaml.safe_dump(record, allow_unicode=True), encoding='utf-8')
 
-    def test_reject_multiple_docs(self):
-        with tempfile.TemporaryDirectory() as d:
-            p=Path(d)/'test.yaml';p.write_text('a: hello\n---\na: world\n')
-            with self.assertRaisesRegex(ValueError,'exactly one'):
-                load_restricted(p)
+            with self.assertRaisesRegex(self.failureException, "'acceptance' is a required property"):
+                self.assert_invalid_examples(examples)
+
+            record['origin'] = 'SRC-998'
+            path.write_text(yaml.safe_dump(record, allow_unicode=True), encoding='utf-8')
+
+            with self.assertRaisesRegex(self.failureException, 'missing origin SRC-998'):
+                self.assert_invalid_examples(examples)
 
 
 class BatchDiagnosticsTests(unittest.TestCase):

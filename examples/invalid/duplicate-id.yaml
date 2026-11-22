@@ -1,0 +1,6 @@
+id: SRC-001
+kind: source
+title: 重复的来源编号
+status: proposed
+statement: 这条来源记录与共用来源使用了相同的编号。
+location: README.md

@@ -1,0 +1,7 @@
+id: TEST-002
+kind: test
+title: 快照比较的需求关联
+status: proposed
+statement: |
+  这项测试通过正式作品的快照检查取消探索后的结果。
+relations: REQ-001

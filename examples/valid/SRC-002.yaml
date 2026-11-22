@@ -1,0 +1,7 @@
+id: SRC-002
+kind: source
+title: 取消探索的快照比较说明
+status: proposed
+statement: |
+  测试记录描述了如何比较取消操作前后的正式作品快照。
+location: examples/valid/TEST-001.yaml

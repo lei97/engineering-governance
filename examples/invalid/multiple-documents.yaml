@@ -1,0 +1,11 @@
+id: ART-904
+kind: artifact
+title: 第一个 YAML 文档
+status: proposed
+statement: 这条产物记录位于同一个文件的第一个文档中。
+---
+id: ART-905
+kind: artifact
+title: 第二个 YAML 文档
+status: proposed
+statement: 这条产物记录位于同一个文件的第二个文档中。

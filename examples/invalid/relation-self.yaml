@@ -1,0 +1,8 @@
+id: CON-001
+kind: contract
+title: 细化关系指向自身
+status: proposed
+statement: 这条契约把自己当作细化关系的目标记录。
+relations:
+  refined_by:
+    - CON-001

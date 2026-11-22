@@ -1,0 +1,5 @@
+id: ART-901
+kind: artifact
+title: 使用显式标签
+status: proposed
+statement: !!str 这条记录显式标记了陈述字段的数据类型。

@@ -1,0 +1,6 @@
+id: SRC-001
+kind: source
+title: 反例共用的来源
+status: proposed
+statement: 这条来源记录供反例验证引用类型和存在性。
+location: README.md

@@ -1,6 +1,6 @@
-id: OBS-001
+id: OBS-002
 kind: observation
 title: 使用别名
 status: proposed
-statement: &s 这是一个用锚点复用的观察描述，profile 禁止这样的做法。
+statement: *s
 origin: SRC-001

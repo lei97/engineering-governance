@@ -1,0 +1,8 @@
+id: ART-902
+kind: artifact
+title: 验证关系指向来源
+status: proposed
+statement: 这条记录把来源记录当作验证关系的目标。
+relations:
+  verified_by:
+    - SRC-001

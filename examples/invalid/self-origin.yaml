@@ -1,0 +1,7 @@
+id: SRC-011
+kind: source
+title: 来源指向自身
+status: proposed
+statement: 这条来源记录把自己作为记录的来源。
+location: README.md
+origin: SRC-011

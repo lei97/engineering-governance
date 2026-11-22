@@ -1,0 +1,5 @@
+id: SRC-010
+kind: artifact
+title: 编号与类型不匹配
+status: proposed
+statement: 这条产物记录使用了只适用于来源的编号前缀。

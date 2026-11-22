@@ -48,7 +48,9 @@ def validate_path(directory):
     schema = json.loads((ROOT/'schemas/knowledge.schema.json').read_text(encoding='utf-8'))
     validator = Draft202012Validator(schema)
     files = sorted(directory.rglob('*.yaml'))
-    errors, records = [], {}
+    errors = []
+    records = []
+    kind_by_id = {}
     if not files:
         return ['no .yaml files found'], 0
     for path in files:
@@ -59,26 +61,34 @@ def validate_path(directory):
             continue
         for err in validator.iter_errors(record):
             errors.append(f'{path} [{"/".join(map(str,err.path)) or "root"}]: {err.message}')
+        records.append((path, record))
         ident = record.get('id')
-        kind = record.get('kind')
         if not isinstance(ident, str):
             continue
-        if ident in records:
+        kind = record.get('kind')
+        if not isinstance(kind, str) or kind not in PREFIX:
+            # The ID still resolves even when the kind cannot be checked.
+            kind = None
+        if ident in kind_by_id:
             errors.append(f'{path}: duplicate id {ident}')
         else:
-            records[ident] = (path, record)
-        if kind in PREFIX and not ident.startswith(PREFIX[kind]+'-'):
+            kind_by_id[ident] = kind
+        if kind is not None and not ident.startswith(PREFIX[kind] + '-'):
             errors.append(f'{path}: mismatched id and kind')
-    for ident, (path, record) in records.items():
+    for path, record in records:
+        ident = record.get('id')
         origin = record.get('origin')
         if isinstance(origin, str):
             if origin == ident:
                 errors.append(f'{path}: self origin')
-            elif origin not in records:
+            elif origin not in kind_by_id:
                 errors.append(f'{path}: missing origin {origin}')
-            elif records[origin][1].get('kind') != 'source':
+            elif kind_by_id[origin] not in (None, 'source'):
                 errors.append(f'{path}: origin must be source')
-        for rel, targets in (record.get('relations') or {}).items():
+        relations = record.get('relations')
+        if not isinstance(relations, dict):
+            continue
+        for rel, targets in relations.items():
             if rel not in TARGETS or not isinstance(targets, list):
                 continue
             for target in targets:
@@ -86,7 +96,7 @@ def validate_path(directory):
                     continue
                 if target == ident:
                     errors.append(f'{path}: self reference')
-                elif target not in records:
+                elif target not in kind_by_id:
                     errors.append(f'{path}: missing relation target {target}')
                 elif target.split('-')[0] not in TARGETS[rel]:
                     errors.append(f'{path}: invalid {rel} target {target}')

@@ -1,0 +1,6 @@
+id: SRC-201
+kind: source
+title: E002 合成案例的作者裁定
+status: proposed
+statement: 2026年11月22日，作者确认四项业务口径，用于 E002 的取消探索合成案例。
+location: experiments/E002/README.md

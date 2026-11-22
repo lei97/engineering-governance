@@ -1,0 +1,38 @@
+id: REQ-201
+kind: requirement
+title: 取消探索对正式作品正文的约束
+status: proposed
+origin: SRC-201
+case_scope: 仅用于 E002 合成案例
+events:
+  explore: 同一正式作品的探索开始
+  start: 系统开始处理本次取消请求
+  success: 本次取消请求报告成功
+temporal_scope:
+  applies_to: 报告成功的同一取消请求
+  start_inclusive: start
+  end_exclusive: success
+state_references:
+  object: 同一正式作品的正文值
+  outside_scope: 版本号、时间戳等其他属性
+  before_explore: {before: explore}
+  before_cancel: {before: start}
+  after_cancel: {after: success}
+  observations:
+    - compare: [after_cancel, before_explore]
+    - compare: [after_cancel, before_cancel]
+concurrent_edits:
+  during: [探索期间, 取消处理期间]
+  allowed: 独立且合法的其他编辑修改同一正式作品
+attribution:
+  direct_write: 归属于实际执行写入的操作
+  causal_change: 取消触发的下游正文变化计入该取消的因果影响
+constraints:
+  scope: temporal_scope
+  rules:
+    - 取消操作不得直接写入正式作品正文，包括写入同一正文值。
+    - 取消操作不得直接或间接造成正式作品正文变化，包括随后被恢复的变化。
+unspecified:
+  - 超时后的回滚
+  - 超时后的重试
+  - 报告成功后的延迟写入

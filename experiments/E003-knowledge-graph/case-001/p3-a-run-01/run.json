@@ -1,0 +1,57 @@
+{
+  "snapshot_commit": "307ff57ba10dfb7f6c4773053f6b9dc6be0aec48",
+  "checker_sha256": "f4b34078ca14c9e44e7be8ca6865b156a79b8cbac72f258249b2a401919f7002",
+  "last_receipt_marker": "2026-11-23T22:05:58+08:00",
+  "assignment": [
+    {
+      "order": 1,
+      "group": "B",
+      "id": 479,
+      "dispatch_marker": "2026-11-23T21:55:31+08:00",
+      "report_mtime": "2026-11-23T22:00:23+08:00",
+      "elapsed_to_report_seconds": 292,
+      "input_chars": 6469
+    },
+    {
+      "order": 2,
+      "group": "A",
+      "id": 391,
+      "dispatch_marker": "2026-11-23T21:55:31+08:00",
+      "report_mtime": "2026-11-23T22:00:25+08:00",
+      "elapsed_to_report_seconds": 294,
+      "input_chars": 5398
+    },
+    {
+      "order": 3,
+      "group": "B",
+      "id": 494,
+      "dispatch_marker": "2026-11-23T21:55:31+08:00",
+      "report_mtime": "2026-11-23T22:00:21+08:00",
+      "elapsed_to_report_seconds": 290,
+      "input_chars": 6469
+    },
+    {
+      "order": 4,
+      "group": "A",
+      "id": 700,
+      "dispatch_marker": "2026-11-23T22:00:44+08:00",
+      "report_mtime": "2026-11-23T22:05:24+08:00",
+      "elapsed_to_report_seconds": 280,
+      "input_chars": 5398
+    }
+  ],
+  "clock_scope": "dispatch-wave marker to submission file mtime, includes scheduling and environment time",
+  "access_scope": "separate directories and procedural no-network/no-history instruction; no enforced sandbox or complete access trace",
+  "author_review_and_maintenance_time": null,
+  "token_counts": null,
+  "tool_call_counts": null,
+  "model_config": "Inherited gpt-6.2-sol defaults in each isolated conversation; exact backend snapshot unavailable",
+  "dispatch_template": "独立完成一份工程修复任务。你的分配目录是 <path>。只读取该目录中 inputs/ 分发的所有文件和 snapshot/ 内的代码，按 inputs/reuse-task.md 完成。只在 snapshot/ 中修改代码或测试，使用目录顶层的 python 包装器执行 Python 验证（例如 ./python -m unittest discover -s tests -v）。请勿查看其它目录、仓库历史、其它会话或联网。完成时在分配目录顶层写 submission.md，记录改动文件、与实际动作对应的证据位置（或材料中的主张 ID）、舍弃或未证实的假设、运行的测试及结果，以及有无读取分配目录外的内容或联网。然后报告结果。",
+  "distribution_paths": {
+    "479": "/private/tmp/eg-p3-a-yatxyldd/479",
+    "391": "/private/tmp/eg-p3-a-yatxyldd/391",
+    "494": "/private/tmp/eg-p3-a-yatxyldd/494",
+    "700": "/private/tmp/eg-p3-a-yatxyldd/700"
+  },
+  "blinded_reasoning_input_sha256": "31cdf6e3953d73564ca9931c166806debaada84d436cad7fcc46c93dbdb49ce6"
+}

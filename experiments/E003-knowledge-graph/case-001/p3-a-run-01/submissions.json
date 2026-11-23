@@ -1,0 +1,306 @@
+[
+  {
+    "id": 391,
+    "changed_files": [
+      "tests/test_validation.py"
+    ],
+    "patch": "--- a/tests/test_validation.py\n+++ b/tests/test_validation.py\n@@ -17,10 +17,18 @@\n         self.assertEqual(count, 5)\n \n     def test_invalid(self):\n-        errors, count = validate_path(ROOT/'examples/invalid')\n+        invalid = ROOT / 'examples/invalid'\n+        errors, count = validate_path(invalid)\n         self.assertEqual(count, 5)\n-        for term in ('duplicate mapping key', 'anchors forbidden', 'missing origin', 'acceptance'):\n-            self.assertTrue(any(term in e for e in errors), (term, errors))\n+        expected = {\n+            'alias.yaml': ': YAML anchors forbidden',\n+            'duplicate-key.yaml': ': duplicate mapping key: id',\n+            'dangling-reference.yaml': ': missing origin SRC-999',\n+            'missing-acceptance.yaml': \" [root]: 'acceptance' is a required property\",\n+        }\n+        for filename, diagnostic in expected.items():\n+            with self.subTest(filename=filename):\n+                self.assertIn(f'{invalid / filename}{diagnostic}', errors)\n \n     def test_reject_alias(self):\n         with tempfile.TemporaryDirectory() as d:\n",
+    "submission": "# Case 001 · #13 修复提交\n\n## 改动\n\n代码补丁仅涉及 `snapshot/tests/test_validation.py:19–31`。保留 5 个反例文件的数量检查，对四项目标诊断逐一核对完整错误条目。用子测试标识对应文件。校验器、Schema 和 YAML 样例均保持原样。\n\n## 依据与动作\n\n| 依据 | 实际动作 |\n| --- | --- |\n| D1（85–97）、D2（19–23）、D4（1–6）、D5（1–6） | 复刻分发记录中的假通过。在快照内的临时副本给 `missing-acceptance.yaml` 添加合法的验收项。原测试通过，错误列表仍包含 `missing origin SRC-001`，缺少目标诊断。 |\n| D3（62–63、78–87）、D6（81–99）及 `schemas/knowledge.schema.json:53–60` | 为 `missing-acceptance.yaml` 匹配完整的 `[root]: 'acceptance' is a required property` 诊断。用符合字段约束的验收项单独消除目标诊断，验证测试仍然能分辨同文件的缺失来源错误。 |\n| `scripts/validate_truth.py:17–37,56–60,80–85` 及 `examples/invalid/duplicate-key.yaml:1–2`、`examples/invalid/alias.yaml:5`、`examples/invalid/dangling-reference.yaml:6` | 把原来另外三条子串断言分别绑定到重复 `id`、YAML 锚点以及缺少 `SRC-999` 的反例文件，并逐项验证缺少相应诊断时子测试会失败。 |\n| D2（19–23）及 `tests/test_validation.py:83–86` | 保留批次文件数断言。沿用现有的 `test_relations_string` 检查 `relations` 字段诊断。 |\n\n## 舍弃的假设和局限\n\n- 实验推翻了“任意错误字符串出现 `acceptance` 就说明校验器报告了验收字段缺失”的假设。\n- 不采用给反例补 `SRC-001` 或调整校验器行为的做法。D3、D4 和实际输出表明缺失来源是独立诊断，完整条目匹配足以消除干扰。\n- 完整条目断言取决于校验器当前的诊断格式，包括 `jsonschema` 的必填字段文案。仅验证了分发运行环境，未验证依赖允许范围内的其他版本。基线修订号采用分发材料记录，未单独检查仓库历史。\n\n## 实际验证\n\n- 修复前运行 `./python -m unittest discover -s tests -v`，10 项通过。单独在临时副本补齐 `acceptance` 后调用原 `ValidationTests.test_invalid`，确认目标诊断缺失时原测试仍通过。\n- 修复后运行 `./python -m unittest discover -s tests -v`，10 项通过。\n- `./python scripts/validate_truth.py truth` 通过，4 条记录、0 个错误。`./python scripts/validate_truth.py examples/valid` 通过，5 条记录、0 个错误。\n- 修复前后运行 `./python scripts/validate_truth.py examples/invalid`，均按预期返回退出码 1、5 条记录、6 条相同诊断。\n- 通过 `./python -` 逐一验证四份临时反例副本。分别移除锚点、移除重复键、把 `SRC-999` 替换为 `SRC-001`、补入合法验收项。每份副本仍有 5 个 YAML 文件。每次均确认目标诊断消失，且仅对应子测试断言失败。补齐验收项的副本仍报告缺失 `SRC-001`。\n- 在快照内临时重建修复前的测试文件。用 `patch -p1` 应用下方补丁，结果与提交的测试文件逐字节一致。\n- 未主动查阅分配目录外的任务材料、代码或仓库历史，未联网。指定包装器调用了其配置的解释器和依赖。原有测试首次使用系统临时目录读写自行生成的 YAML，随后把临时目录设在快照中重跑，10 项通过。\n\n## 可应用补丁\n\n在修复前快照根目录以 `patch -p1` 应用以下统一差异。\n\n```diff\n--- a/tests/test_validation.py\n+++ b/tests/test_validation.py\n@@ -17,10 +17,18 @@\n         self.assertEqual(count, 5)\n \n     def test_invalid(self):\n-        errors, count = validate_path(ROOT/'examples/invalid')\n+        invalid = ROOT / 'examples/invalid'\n+        errors, count = validate_path(invalid)\n         self.assertEqual(count, 5)\n-        for term in ('duplicate mapping key', 'anchors forbidden', 'missing origin', 'acceptance'):\n-            self.assertTrue(any(term in e for e in errors), (term, errors))\n+        expected = {\n+            'alias.yaml': ': YAML anchors forbidden',\n+            'duplicate-key.yaml': ': duplicate mapping key: id',\n+            'dangling-reference.yaml': ': missing origin SRC-999',\n+            'missing-acceptance.yaml': \" [root]: 'acceptance' is a required property\",\n+        }\n+        for filename, diagnostic in expected.items():\n+            with self.subTest(filename=filename):\n+                self.assertIn(f'{invalid / filename}{diagnostic}', errors)\n \n     def test_reject_alias(self):\n         with tempfile.TemporaryDirectory() as d:\n```\n",
+    "evaluation": {
+      "applied": true,
+      "gates": {
+        "normal_tests_and_valid_fixtures": true,
+        "prior_batch_regressions": true,
+        "independent_diagnostics_preserved": true,
+        "restored": true,
+        "wrong_diagnostic": true
+      },
+      "passed": true,
+      "probes": {
+        "original": {
+          "test": {
+            "exit": 0,
+            "stdout": "",
+            "stderr": "test_invalid (test_validation.ValidationTests.test_invalid) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nOK\n"
+          },
+          "tests_run": 1,
+          "validation_exit": 1,
+          "related_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property",
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+          ],
+          "common_diagnostics_preserved": true
+        },
+        "restored": {
+          "test": {
+            "exit": 1,
+            "stdout": "",
+            "stderr": "test_invalid (test_validation.ValidationTests.test_invalid) ... \n  test_invalid (test_validation.ValidationTests.test_invalid) (filename='missing-acceptance.yaml') ... FAIL\n\n======================================================================\nFAIL: test_invalid (test_validation.ValidationTests.test_invalid) (filename='missing-acceptance.yaml')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/tests/test_validation.py\", line 31, in test_invalid\n    self.assertIn(f'{invalid / filename}{diagnostic}', errors)\nAssertionError: \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property\" not found in ['/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/examples/invalid/alias.yaml: YAML anchors forbidden', '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/examples/invalid/duplicate-key.yaml: duplicate mapping key: id', \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/examples/invalid/relations-string.yaml [relations]: 'REQ-001' is not of type 'object'\", '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/examples/invalid/dangling-reference.yaml: missing origin SRC-999', '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/examples/invalid/missing-acceptance.yaml: missing origin SRC-001']\n\n----------------------------------------------------------------------\nRan 1 test in 0.006s\n\nFAILED (failures=1)\n"
+          },
+          "tests_run": 1,
+          "validation_exit": 1,
+          "related_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+          ],
+          "common_diagnostics_preserved": true
+        },
+        "wrong_diagnostic": {
+          "test": {
+            "exit": 1,
+            "stdout": "",
+            "stderr": "test_invalid (test_validation.ValidationTests.test_invalid) ... \n  test_invalid (test_validation.ValidationTests.test_invalid) (filename='missing-acceptance.yaml') ... FAIL\n\n======================================================================\nFAIL: test_invalid (test_validation.ValidationTests.test_invalid) (filename='missing-acceptance.yaml')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/tests/test_validation.py\", line 31, in test_invalid\n    self.assertIn(f'{invalid / filename}{diagnostic}', errors)\nAssertionError: \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property\" not found in ['/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/examples/invalid/alias.yaml: YAML anchors forbidden', '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/examples/invalid/duplicate-key.yaml: duplicate mapping key: id', \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/examples/invalid/relations-string.yaml [relations]: 'REQ-001' is not of type 'object'\", '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/examples/invalid/dangling-reference.yaml: missing origin SRC-999', '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ulqdry2k/snapshot/examples/invalid/missing-acceptance.yaml: missing origin SRC-998']\n\n----------------------------------------------------------------------\nRan 1 test in 0.004s\n\nFAILED (failures=1)\n"
+          },
+          "tests_run": 1,
+          "validation_exit": 1,
+          "related_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-998"
+          ],
+          "common_diagnostics_preserved": true
+        }
+      },
+      "normal_suite": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\ntest_invalid (test_validation.ValidationTests.test_invalid) ... ok\ntest_reject_alias (test_validation.ValidationTests.test_reject_alias) ... ok\ntest_reject_multiple_docs (test_validation.ValidationTests.test_reject_multiple_docs) ... ok\ntest_reject_tags (test_validation.ValidationTests.test_reject_tags) ... ok\ntest_valid (test_validation.ValidationTests.test_valid) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.110s\n\nOK\n"
+      },
+      "positive_validation": {
+        "exit": 0,
+        "stdout": "PASS: 5 YAML records; 0 errors\n",
+        "stderr": ""
+      },
+      "batch_regression": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.042s\n\nOK\n"
+      }
+    }
+  },
+  {
+    "id": 479,
+    "changed_files": [
+      "tests/test_validation.py"
+    ],
+    "patch": "--- a/tests/test_validation.py\n+++ b/tests/test_validation.py\n@@ -17,10 +17,17 @@\n         self.assertEqual(count, 5)\n \n     def test_invalid(self):\n-        errors, count = validate_path(ROOT/'examples/invalid')\n+        examples = ROOT / 'examples/invalid'\n+        errors, count = validate_path(examples)\n         self.assertEqual(count, 5)\n-        for term in ('duplicate mapping key', 'anchors forbidden', 'missing origin', 'acceptance'):\n-            self.assertTrue(any(term in e for e in errors), (term, errors))\n+        self.assertCountEqual(errors, [\n+            f\"{examples / 'alias.yaml'}: YAML anchors forbidden\",\n+            f\"{examples / 'duplicate-key.yaml'}: duplicate mapping key: id\",\n+            f\"{examples / 'dangling-reference.yaml'}: missing origin SRC-999\",\n+            f\"{examples / 'missing-acceptance.yaml'} [root]: 'acceptance' is a required property\",\n+            f\"{examples / 'missing-acceptance.yaml'}: missing origin SRC-001\",\n+            f\"{examples / 'relations-string.yaml'} [relations]: 'REQ-001' is not of type 'object'\",\n+        ])\n \n     def test_reject_alias(self):\n         with tempfile.TemporaryDirectory() as d:\n",
+    "submission": "# Case 001 · #13 修复\n\n## 改动及依据\n\n| 位置 | 行动 | 依据 |\n| --- | --- | --- |\n| `snapshot/tests/test_validation.py:19–30` | 保留五个反例的文件数量断言。用 `assertCountEqual` 核对六条带完整文件路径、诊断字段和消息的错误，顺序可以变化。 | C02（D2:19–23）定位目录级子串断言。D3:56–64、78–85 和快照 CLI 输出确认诊断格式和归属。 |\n| `snapshot/tests/test_validation.py:26–29` | 分别核对 `dangling-reference.yaml` 的 `SRC-999`、`missing-acceptance.yaml` 的必需属性与 `SRC-001` 来源诊断，以及 `relations-string.yaml` 的字段类型诊断。 | C01（D6:83–97）确定必需属性。C04、C05、C07 解释同一个文件的第二条错误。C08 提供变异验证步骤。字段类型诊断见快照 CLI 输出和 `snapshot/scripts/validate_truth.py:62–63`。 |\n\n## 观察和证据边界\n\n- 在临时副本中只给 `missing-acceptance.yaml` 增加合法的 `acceptance` 列表，保留原文件名、`origin` 和其他反例。真实校验输出省去了必需属性诊断，仍有五条错误，其中包括该文件的 `missing origin SRC-001`。旧版 `test_invalid` 完整执行并通过，复现了 D1:94–97 和 C08 描述的路径。修复版在相同变异下因缺少该诊断而失败。\n- C05 的清单范围是分发材料所列快照目录，`SRC-001` 的可解析性取决于当前批次的索引。这里观察的是原五文件批次。保留其双重诊断，使基线与修复后的覆盖可直接比较。\n- 采用当前运行环境中的完整诊断文本比较。依赖版本间的消息文字兼容性尚未验证。六项逐条缺失实验使用替换后的返回值，验证测试的判别能力。上述 `acceptance` 变异另外经真实校验器运行。\n\n## 验证\n\n在分配目录顶层使用 `./python` 包装器。\n\n| 操作 | 结果 |\n| --- | --- |\n| `./python -m unittest discover -s tests -v` | 修改前后各 10 项通过。 |\n| `./python scripts/validate_truth.py examples/invalid` | 修改前后均为退出码 1，5 个文件和相同的 6 条完整诊断。 |\n| `./python scripts/validate_truth.py examples/valid` | 退出码 0，5 个文件，0 个错误。 |\n| `./python scripts/validate_truth.py truth` | 退出码 0，4 个文件，0 个错误。 |\n| `./python -` 临时副本变异，用 `unittest.mock.patch.object` 将测试模块的 `ROOT` 指向该副本 | 合法补齐 `acceptance` 后，旧测试通过，修复后确实触发缺失必需属性诊断的断言错误。临时副本已清理。 |\n| `./python -` 逐项从校验器返回的六条错误中删去一条，保留文件计数，并将结果传给 `test_invalid` | 六种缺失情形均触发断言错误。 |\n| 在临时副本通过 `git apply --no-index` 反向应用补丁，再正向应用 | 两次均成功，结果与提交的快照测试文件逐字节一致。 |\n\n仅检查分配目录中的材料和快照，并使用分配的 Python 运行环境。未主动读取分配目录外资料，未查询仓库历史，未联网。\n\n## 补丁\n\n在原快照根目录应用以下统一 diff。\n\n```diff\n--- a/tests/test_validation.py\n+++ b/tests/test_validation.py\n@@ -17,11 +17,18 @@\n         self.assertEqual(count, 5)\n \n     def test_invalid(self):\n-        errors, count = validate_path(ROOT/'examples/invalid')\n+        examples = ROOT / 'examples/invalid'\n+        errors, count = validate_path(examples)\n         self.assertEqual(count, 5)\n-        for term in ('duplicate mapping key', 'anchors forbidden', 'missing origin', 'acceptance'):\n-            self.assertTrue(any(term in e for e in errors), (term, errors))\n+        self.assertCountEqual(errors, [\n+            f\"{examples / 'alias.yaml'}: YAML anchors forbidden\",\n+            f\"{examples / 'duplicate-key.yaml'}: duplicate mapping key: id\",\n+            f\"{examples / 'dangling-reference.yaml'}: missing origin SRC-999\",\n+            f\"{examples / 'missing-acceptance.yaml'} [root]: 'acceptance' is a required property\",\n+            f\"{examples / 'missing-acceptance.yaml'}: missing origin SRC-001\",\n+            f\"{examples / 'relations-string.yaml'} [relations]: 'REQ-001' is not of type 'object'\",\n+        ])\n \n     def test_reject_alias(self):\n         with tempfile.TemporaryDirectory() as d:\n             p=Path(d)/'test.yaml';p.write_text('a: &x hello\\nb: *x\\n')\n```\n",
+    "evaluation": {
+      "applied": true,
+      "gates": {
+        "normal_tests_and_valid_fixtures": true,
+        "prior_batch_regressions": true,
+        "independent_diagnostics_preserved": true,
+        "restored": true,
+        "wrong_diagnostic": true
+      },
+      "passed": true,
+      "probes": {
+        "original": {
+          "test": {
+            "exit": 0,
+            "stdout": "",
+            "stderr": "test_invalid (test_validation.ValidationTests.test_invalid) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nOK\n"
+          },
+          "tests_run": 1,
+          "validation_exit": 1,
+          "related_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property",
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+          ],
+          "common_diagnostics_preserved": true
+        },
+        "restored": {
+          "test": {
+            "exit": 1,
+            "stdout": "",
+            "stderr": "test_invalid (test_validation.ValidationTests.test_invalid) ... FAIL\n\n======================================================================\nFAIL: test_invalid (test_validation.ValidationTests.test_invalid)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-479pqubv/snapshot/tests/test_validation.py\", line 23, in test_invalid\n    self.assertCountEqual(errors, [\nAssertionError: Element counts were not equal:\nFirst has 0, Second has 1:  \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-479pqubv/snapshot/examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property\"\n\n----------------------------------------------------------------------\nRan 1 test in 0.006s\n\nFAILED (failures=1)\n"
+          },
+          "tests_run": 1,
+          "validation_exit": 1,
+          "related_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+          ],
+          "common_diagnostics_preserved": true
+        },
+        "wrong_diagnostic": {
+          "test": {
+            "exit": 1,
+            "stdout": "",
+            "stderr": "test_invalid (test_validation.ValidationTests.test_invalid) ... FAIL\n\n======================================================================\nFAIL: test_invalid (test_validation.ValidationTests.test_invalid)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-479pqubv/snapshot/tests/test_validation.py\", line 23, in test_invalid\n    self.assertCountEqual(errors, [\nAssertionError: Element counts were not equal:\nFirst has 1, Second has 0:  '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-479pqubv/snapshot/examples/invalid/missing-acceptance.yaml: missing origin SRC-998'\nFirst has 0, Second has 1:  \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-479pqubv/snapshot/examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property\"\nFirst has 0, Second has 1:  '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-479pqubv/snapshot/examples/invalid/missing-acceptance.yaml: missing origin SRC-001'\n\n----------------------------------------------------------------------\nRan 1 test in 0.004s\n\nFAILED (failures=1)\n"
+          },
+          "tests_run": 1,
+          "validation_exit": 1,
+          "related_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-998"
+          ],
+          "common_diagnostics_preserved": true
+        }
+      },
+      "normal_suite": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\ntest_invalid (test_validation.ValidationTests.test_invalid) ... ok\ntest_reject_alias (test_validation.ValidationTests.test_reject_alias) ... ok\ntest_reject_multiple_docs (test_validation.ValidationTests.test_reject_multiple_docs) ... ok\ntest_reject_tags (test_validation.ValidationTests.test_reject_tags) ... ok\ntest_valid (test_validation.ValidationTests.test_valid) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.109s\n\nOK\n"
+      },
+      "positive_validation": {
+        "exit": 0,
+        "stdout": "PASS: 5 YAML records; 0 errors\n",
+        "stderr": ""
+      },
+      "batch_regression": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.043s\n\nOK\n"
+      }
+    }
+  },
+  {
+    "id": 494,
+    "changed_files": [
+      "tests/test_validation.py"
+    ],
+    "patch": "--- a/tests/test_validation.py\n+++ b/tests/test_validation.py\n@@ -17,10 +17,18 @@\n         self.assertEqual(count, 5)\n \n     def test_invalid(self):\n-        errors, count = validate_path(ROOT/'examples/invalid')\n+        invalid = ROOT / 'examples/invalid'\n+        errors, count = validate_path(invalid)\n         self.assertEqual(count, 5)\n-        for term in ('duplicate mapping key', 'anchors forbidden', 'missing origin', 'acceptance'):\n-            self.assertTrue(any(term in e for e in errors), (term, errors))\n+        expected_diagnostics = {\n+            'duplicate-key.yaml': ': duplicate mapping key: id',\n+            'alias.yaml': ': YAML anchors forbidden',\n+            'dangling-reference.yaml': ': missing origin SRC-999',\n+            'missing-acceptance.yaml': \" [root]: 'acceptance' is a required property\",\n+        }\n+        for filename, diagnostic in expected_diagnostics.items():\n+            with self.subTest(filename=filename):\n+                self.assertIn(f'{invalid / filename}{diagnostic}', errors)\n \n     def test_reject_alias(self):\n         with tempfile.TemporaryDirectory() as d:\n",
+    "submission": "# Case 001 · #13 修复提交\n\n改动文件为 `snapshot/tests/test_validation.py:19–31`。`test_invalid` 仍检查 5 个文件，并要求四项目标诊断各自与反例路径、诊断位置（如 `[root]`）和完整消息匹配。子测试按文件名标出缺少的诊断。此次补丁只修改测试。\n\n## 依据与动作\n\n- C02（D2:19–23）记录了原来对整批诊断搜索子串的断言。改为按反例文件逐项检查完整诊断。`snapshot/scripts/validate_truth.py:20–21,30–32,58–63,78–85` 提供解析、Schema 和来源诊断的输出格式。`examples/invalid/duplicate-key.yaml:1–2`、`alias.yaml:5` 和 `dangling-reference.yaml:6` 分别定位前三项目标。\n- C01（D6:83–97）规定 `requirement` 必须有 `acceptance`。在 `snapshot/tests/test_validation.py:27` 要求 `missing-acceptance.yaml` 的根路径出现缺字段诊断。C04、C05 和 C07 解释原例为何还会报缺失来源。临时副本补齐合法 `acceptance` 后，我实际运行了修复前后的测试，证实 C08 在这份快照成立。\n- D1:92 的“总会”限于 `SRC-001` 未进入本次索引且记录能进入来源检查的情形。C05 只覆盖分发记录中的反例清单。我未据此推及其他输入或修订。保留了原反例和校验器，因此正常运行仍会报告 `REQ-005` 缺失来源。\n- 完整消息来自分发环境的实际输出。未验证依赖范围内所有版本的消息措辞。若依赖更改文案，测试可能需要同步更新。\n\n## 实际验证\n\n- 修复前以 `./python -m unittest discover -s tests -v` 运行，10 项通过。首次按分配目录层级传入 `snapshot/tests`，因包装器已切换至 `snapshot/` 而未发现测试，改用 `tests` 后成功执行。\n- 复制反例目录至快照下的临时目录，给 `missing-acceptance.yaml` 添加符合 Schema 的 `acceptance`。实际校验仍处理 5 个文件，必填字段诊断消失，缺失来源诊断仍在。旧 `test_invalid` 通过，新测试只在 `missing-acceptance.yaml` 子测试报缺少目标诊断。临时副本已自动清理。\n- 在实际校验输出中逐一移除四个目标诊断，保留文件计数和其他诊断。每次运行新 `test_invalid` 都仅在对应反例子测试失败，包括移除 `SRC-999` 缺失来源诊断且仍有 `SRC-001` 缺失来源诊断的情况。\n- 修复后以 `TMPDIR=\"$PWD\" ./python -m unittest discover -s tests -v` 运行，10 项通过。两个 CLI 检查分别运行 `./python scripts/validate_truth.py examples/valid`（退出码 0，5 个文件、0 条错误）及 `./python scripts/validate_truth.py examples/invalid`（预期退出码 1，5 个文件、6 条错误，与基线一致）。\n- 在修复后的快照中对下方统一补丁运行 `patch --dry-run --reverse -p1`，成功匹配。\n\n未主动读取分配目录外的项目材料、Git 历史或其他会话，未联网。Python 包装器使用分配运行环境的解释器和依赖。首次基线测试使用运行环境的系统临时目录，读写该次测试自行生成的用例。后续验证将临时目录设在分配目录内。\n\n## 补丁\n\n将下面的统一补丁应用到修复前快照根目录（`patch -p1`）。\n\n```diff\n--- a/tests/test_validation.py\n+++ b/tests/test_validation.py\n@@ -17,10 +17,18 @@\n         self.assertEqual(count, 5)\n \n     def test_invalid(self):\n-        errors, count = validate_path(ROOT/'examples/invalid')\n+        invalid = ROOT / 'examples/invalid'\n+        errors, count = validate_path(invalid)\n         self.assertEqual(count, 5)\n-        for term in ('duplicate mapping key', 'anchors forbidden', 'missing origin', 'acceptance'):\n-            self.assertTrue(any(term in e for e in errors), (term, errors))\n+        expected_diagnostics = {\n+            'duplicate-key.yaml': ': duplicate mapping key: id',\n+            'alias.yaml': ': YAML anchors forbidden',\n+            'dangling-reference.yaml': ': missing origin SRC-999',\n+            'missing-acceptance.yaml': \" [root]: 'acceptance' is a required property\",\n+        }\n+        for filename, diagnostic in expected_diagnostics.items():\n+            with self.subTest(filename=filename):\n+                self.assertIn(f'{invalid / filename}{diagnostic}', errors)\n \n     def test_reject_alias(self):\n         with tempfile.TemporaryDirectory() as d:\n```\n",
+    "evaluation": {
+      "applied": true,
+      "gates": {
+        "normal_tests_and_valid_fixtures": true,
+        "prior_batch_regressions": true,
+        "independent_diagnostics_preserved": true,
+        "restored": true,
+        "wrong_diagnostic": true
+      },
+      "passed": true,
+      "probes": {
+        "original": {
+          "test": {
+            "exit": 0,
+            "stdout": "",
+            "stderr": "test_invalid (test_validation.ValidationTests.test_invalid) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nOK\n"
+          },
+          "tests_run": 1,
+          "validation_exit": 1,
+          "related_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property",
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+          ],
+          "common_diagnostics_preserved": true
+        },
+        "restored": {
+          "test": {
+            "exit": 1,
+            "stdout": "",
+            "stderr": "test_invalid (test_validation.ValidationTests.test_invalid) ... \n  test_invalid (test_validation.ValidationTests.test_invalid) (filename='missing-acceptance.yaml') ... FAIL\n\n======================================================================\nFAIL: test_invalid (test_validation.ValidationTests.test_invalid) (filename='missing-acceptance.yaml')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/tests/test_validation.py\", line 31, in test_invalid\n    self.assertIn(f'{invalid / filename}{diagnostic}', errors)\nAssertionError: \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property\" not found in ['/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/examples/invalid/alias.yaml: YAML anchors forbidden', '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/examples/invalid/duplicate-key.yaml: duplicate mapping key: id', \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/examples/invalid/relations-string.yaml [relations]: 'REQ-001' is not of type 'object'\", '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/examples/invalid/dangling-reference.yaml: missing origin SRC-999', '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/examples/invalid/missing-acceptance.yaml: missing origin SRC-001']\n\n----------------------------------------------------------------------\nRan 1 test in 0.006s\n\nFAILED (failures=1)\n"
+          },
+          "tests_run": 1,
+          "validation_exit": 1,
+          "related_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+          ],
+          "common_diagnostics_preserved": true
+        },
+        "wrong_diagnostic": {
+          "test": {
+            "exit": 1,
+            "stdout": "",
+            "stderr": "test_invalid (test_validation.ValidationTests.test_invalid) ... \n  test_invalid (test_validation.ValidationTests.test_invalid) (filename='missing-acceptance.yaml') ... FAIL\n\n======================================================================\nFAIL: test_invalid (test_validation.ValidationTests.test_invalid) (filename='missing-acceptance.yaml')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/tests/test_validation.py\", line 31, in test_invalid\n    self.assertIn(f'{invalid / filename}{diagnostic}', errors)\nAssertionError: \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property\" not found in ['/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/examples/invalid/alias.yaml: YAML anchors forbidden', '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/examples/invalid/duplicate-key.yaml: duplicate mapping key: id', \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/examples/invalid/relations-string.yaml [relations]: 'REQ-001' is not of type 'object'\", '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/examples/invalid/dangling-reference.yaml: missing origin SRC-999', '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-ux5ijjtt/snapshot/examples/invalid/missing-acceptance.yaml: missing origin SRC-998']\n\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nFAILED (failures=1)\n"
+          },
+          "tests_run": 1,
+          "validation_exit": 1,
+          "related_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-998"
+          ],
+          "common_diagnostics_preserved": true
+        }
+      },
+      "normal_suite": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\ntest_invalid (test_validation.ValidationTests.test_invalid) ... ok\ntest_reject_alias (test_validation.ValidationTests.test_reject_alias) ... ok\ntest_reject_multiple_docs (test_validation.ValidationTests.test_reject_multiple_docs) ... ok\ntest_reject_tags (test_validation.ValidationTests.test_reject_tags) ... ok\ntest_valid (test_validation.ValidationTests.test_valid) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.111s\n\nOK\n"
+      },
+      "positive_validation": {
+        "exit": 0,
+        "stdout": "PASS: 5 YAML records; 0 errors\n",
+        "stderr": ""
+      },
+      "batch_regression": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.042s\n\nOK\n"
+      }
+    }
+  },
+  {
+    "id": 700,
+    "changed_files": [
+      "tests/test_validation.py"
+    ],
+    "patch": "--- a/tests/test_validation.py\n+++ b/tests/test_validation.py\n@@ -17,10 +17,18 @@\n         self.assertEqual(count, 5)\n \n     def test_invalid(self):\n-        errors, count = validate_path(ROOT/'examples/invalid')\n+        directory = ROOT / 'examples/invalid'\n+        errors, count = validate_path(directory)\n         self.assertEqual(count, 5)\n-        for term in ('duplicate mapping key', 'anchors forbidden', 'missing origin', 'acceptance'):\n-            self.assertTrue(any(term in e for e in errors), (term, errors))\n+        expected_diagnostics = {\n+            'duplicate-key.yaml': ': duplicate mapping key: id',\n+            'alias.yaml': ': YAML anchors forbidden',\n+            'dangling-reference.yaml': ': missing origin SRC-999',\n+            'missing-acceptance.yaml': \" [root]: 'acceptance' is a required property\",\n+        }\n+        for filename, diagnostic in expected_diagnostics.items():\n+            with self.subTest(filename=filename):\n+                self.assertIn(f'{directory / filename}{diagnostic}', errors)\n \n     def test_reject_alias(self):\n         with tempfile.TemporaryDirectory() as d:\n",
+    "submission": "# Case 001 · #13 修复提交\n\n按分配任务，修复前快照的反例测试需要在指定诊断消失时失败，同时保留现有校验行为。唯一提交改动在 `snapshot/tests/test_validation.py:19–31`。\n\n## 依据与动作\n\n| 依据 | 对应动作 |\n| --- | --- |\n| D1 第 84–97 行、D2 第 19–23 行 | 复现目录级子串断言误判，将其改为按文件逐项检查完整诊断。保留原来的 5 文件计数断言。 |\n| D3 第 62–65、78–87、103 行，快照 `scripts/validate_truth.py:23–24,33–37,56–63` | 使用现有诊断格式，分别要求重复键 `id`、禁止 YAML 锚点、`dangling-reference.yaml` 的 `missing origin SRC-999`，以及 `missing-acceptance.yaml` 的根节点必填字段诊断。用子测试标出缺失诊断对应的文件。 |\n| D4 第 1–6 行、D5 第 1–6 行、D6 第 81–99 行，快照 `schemas/knowledge.schema.json:53–60` | 仅在临时副本中为 `missing-acceptance.yaml` 补上合法 `acceptance`，保留缺失的来源引用和五个反例文件，检验原测试与修复后的测试能否区分两种诊断。 |\n\n## 舍弃的假设和证据范围\n\n- 舍弃了“文件名中的 `acceptance` 可以证明目标诊断出现”的假设。变异实测中，目标诊断消失后，路径仍能触发原断言。\n- 舍弃了“目录内任意 `missing origin` 都能说明预期的悬空引用已被检出”的假设。实测基线中 `SRC-001` 和 `SRC-999` 分别出现在不同文件的诊断里。\n- 完整匹配使用分配运行环境实际生成的 `jsonschema` 文案。当前结果仅覆盖该运行环境。各支持版本的文案一致性尚无实测证据。\n\n## 实际验证\n\n- 修改前后分别通过顶层包装器运行 `../python -m unittest discover -s tests -v`，两次都通过 10 项测试。\n- 用 `../python -` 执行临时副本的变异验证。只给 `missing-acceptance.yaml` 补入有效列表 `acceptance: [\"This acceptance criterion is valid.\"]` 后，该文件仅产生 `missing origin SRC-001`。原 `test_invalid` 仍通过。修复后的同一测试在 `missing-acceptance.yaml` 子测试上按预期失败，原因是缺少 `[root]: 'acceptance' is a required property`。脚本确认恰有这一个断言失败。\n- 通过 `../python scripts/validate_truth.py` 分别校验 `truth`、`examples/valid` 和 `examples/invalid`。实测分别为 4 个文件零错误、5 个文件零错误，以及 5 个文件 6 条诊断（预期退出码 1）。\n- 在临时副本上对下列差异执行 `patch -p1`，并逐字节比对生成的测试文件与提交改动，验证补丁可应用。\n\n只读取了分配目录内的任务材料和快照文件。Python 验证使用了分配的顶层包装器。未读取其他工作目录或仓库历史，未联网。\n\n## 补丁\n\n```diff\n--- a/tests/test_validation.py\n+++ b/tests/test_validation.py\n@@ -17,10 +17,18 @@\n         self.assertEqual(count, 5)\n \n     def test_invalid(self):\n-        errors, count = validate_path(ROOT/'examples/invalid')\n+        directory = ROOT / 'examples/invalid'\n+        errors, count = validate_path(directory)\n         self.assertEqual(count, 5)\n-        for term in ('duplicate mapping key', 'anchors forbidden', 'missing origin', 'acceptance'):\n-            self.assertTrue(any(term in e for e in errors), (term, errors))\n+        expected_diagnostics = {\n+            'duplicate-key.yaml': ': duplicate mapping key: id',\n+            'alias.yaml': ': YAML anchors forbidden',\n+            'dangling-reference.yaml': ': missing origin SRC-999',\n+            'missing-acceptance.yaml': \" [root]: 'acceptance' is a required property\",\n+        }\n+        for filename, diagnostic in expected_diagnostics.items():\n+            with self.subTest(filename=filename):\n+                self.assertIn(f'{directory / filename}{diagnostic}', errors)\n \n     def test_reject_alias(self):\n         with tempfile.TemporaryDirectory() as d:\n```\n",
+    "evaluation": {
+      "applied": true,
+      "gates": {
+        "normal_tests_and_valid_fixtures": true,
+        "prior_batch_regressions": true,
+        "independent_diagnostics_preserved": true,
+        "restored": true,
+        "wrong_diagnostic": true
+      },
+      "passed": true,
+      "probes": {
+        "original": {
+          "test": {
+            "exit": 0,
+            "stdout": "",
+            "stderr": "test_invalid (test_validation.ValidationTests.test_invalid) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nOK\n"
+          },
+          "tests_run": 1,
+          "validation_exit": 1,
+          "related_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property",
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+          ],
+          "common_diagnostics_preserved": true
+        },
+        "restored": {
+          "test": {
+            "exit": 1,
+            "stdout": "",
+            "stderr": "test_invalid (test_validation.ValidationTests.test_invalid) ... \n  test_invalid (test_validation.ValidationTests.test_invalid) (filename='missing-acceptance.yaml') ... FAIL\n\n======================================================================\nFAIL: test_invalid (test_validation.ValidationTests.test_invalid) (filename='missing-acceptance.yaml')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/tests/test_validation.py\", line 31, in test_invalid\n    self.assertIn(f'{directory / filename}{diagnostic}', errors)\nAssertionError: \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property\" not found in ['/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/examples/invalid/alias.yaml: YAML anchors forbidden', '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/examples/invalid/duplicate-key.yaml: duplicate mapping key: id', \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/examples/invalid/relations-string.yaml [relations]: 'REQ-001' is not of type 'object'\", '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/examples/invalid/dangling-reference.yaml: missing origin SRC-999', '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/examples/invalid/missing-acceptance.yaml: missing origin SRC-001']\n\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nFAILED (failures=1)\n"
+          },
+          "tests_run": 1,
+          "validation_exit": 1,
+          "related_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+          ],
+          "common_diagnostics_preserved": true
+        },
+        "wrong_diagnostic": {
+          "test": {
+            "exit": 1,
+            "stdout": "",
+            "stderr": "test_invalid (test_validation.ValidationTests.test_invalid) ... \n  test_invalid (test_validation.ValidationTests.test_invalid) (filename='missing-acceptance.yaml') ... FAIL\n\n======================================================================\nFAIL: test_invalid (test_validation.ValidationTests.test_invalid) (filename='missing-acceptance.yaml')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/tests/test_validation.py\", line 31, in test_invalid\n    self.assertIn(f'{directory / filename}{diagnostic}', errors)\nAssertionError: \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property\" not found in ['/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/examples/invalid/alias.yaml: YAML anchors forbidden', '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/examples/invalid/duplicate-key.yaml: duplicate mapping key: id', \"/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/examples/invalid/relations-string.yaml [relations]: 'REQ-001' is not of type 'object'\", '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/examples/invalid/dangling-reference.yaml: missing origin SRC-999', '/private/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/e003-p3-check-8nog5zet/snapshot/examples/invalid/missing-acceptance.yaml: missing origin SRC-998']\n\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nFAILED (failures=1)\n"
+          },
+          "tests_run": 1,
+          "validation_exit": 1,
+          "related_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-998"
+          ],
+          "common_diagnostics_preserved": true
+        }
+      },
+      "normal_suite": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\ntest_invalid (test_validation.ValidationTests.test_invalid) ... ok\ntest_reject_alias (test_validation.ValidationTests.test_reject_alias) ... ok\ntest_reject_multiple_docs (test_validation.ValidationTests.test_reject_multiple_docs) ... ok\ntest_reject_tags (test_validation.ValidationTests.test_reject_tags) ... ok\ntest_valid (test_validation.ValidationTests.test_valid) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.041s\n\nOK\n"
+      },
+      "positive_validation": {
+        "exit": 0,
+        "stdout": "PASS: 5 YAML records; 0 errors\n",
+        "stderr": ""
+      },
+      "batch_regression": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.033s\n\nOK\n"
+      }
+    }
+  }
+]

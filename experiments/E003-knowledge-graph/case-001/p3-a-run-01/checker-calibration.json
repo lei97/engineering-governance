@@ -1,0 +1,19 @@
+{
+  "checker_sha256": "f4b34078ca14c9e44e7be8ca6865b156a79b8cbac72f258249b2a401919f7002",
+  "controls": {
+    "historical-fix": {
+      "normal_tests_and_valid_fixtures": true,
+      "prior_batch_regressions": true,
+      "independent_diagnostics_preserved": true,
+      "restored": true,
+      "wrong_diagnostic": true
+    },
+    "non-behavioral-control": {
+      "normal_tests_and_valid_fixtures": true,
+      "prior_batch_regressions": true,
+      "independent_diagnostics_preserved": true,
+      "restored": false,
+      "wrong_diagnostic": false
+    }
+  }
+}

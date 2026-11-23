@@ -63,4 +63,6 @@ python -B experiments/E003-knowledge-graph/baseline/replay.py /path/to/cookbook/
 
 两组使用相同的修复前代码、任务与来源。实验组增加作者确认的知识摘录。该设计观察知识结构、提前整理和人工筛选共同提供的辅助。留出验收已用历史修复校准，六条主张和两条关系已由作者确认为本轮输入。 [对照协议](case-001/reuse-protocol.md) · [知识摘录](case-001/reuse-knowledge.md) · [验收校准](case-001/reuse-calibration.json)
 
+首轮两组各两份补丁通过全部留出检查。B 组报告中的知识引用可对到实际改动和验证动作。当前同案未观察到通过率差异。 [运行与结果](case-001/p3-a-run-01/README.md)
+
 P3-B 单独对照跨任务复用。新案例为尚未解决且机制相关的任务，使用在选定新任务前固定的知识，案例仍待选。 [跨任务复用范围](case-001/reuse-protocol.md#p3-b--跨任务知识复用)

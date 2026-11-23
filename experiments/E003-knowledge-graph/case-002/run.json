@@ -102,5 +102,45 @@
       "605": "Codex session usage limit, only test and fixture drafts, no final patch or report"
     },
     "review": "Independent patch-review agent hit the same limit. The experiment coordinator reviewed the received patches and reports, with group assignments visible."
+  },
+  "refill": {
+    "status": "both_submissions_replayed",
+    "dispatch_marker_at": "2026-11-23T23:14:52+08:00",
+    "conditions": "Fresh independent sessions replayed the same wave-2 assignments from the verified frozen snapshot. No interrupted draft entered the retry packets.",
+    "ids": [
+      "770",
+      "605"
+    ],
+    "received_by_group": {
+      "A": 1,
+      "B": 1
+    },
+    "evaluable_across_waves": {
+      "A": 2,
+      "B": 2
+    },
+    "reviews": {
+      "patch": {
+        "status": "complete",
+        "condition": "An independent reviewer received anonymous patches in two packets with no group assignments or participant reports.",
+        "aliases": {
+          "H": "872",
+          "G": "689",
+          "J": "770",
+          "E": "605"
+        }
+      },
+      "report": {
+        "status": "complete",
+        "condition": "A separate reviewer checked the original reports against the frozen materials. Group assignments were withheld and source references remained visible.",
+        "aliases": {
+          "M": "605",
+          "Q": "872",
+          "R": "770",
+          "V": "689"
+        }
+      },
+      "path": "review.md"
+    }
   }
 }

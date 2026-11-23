@@ -226,6 +226,210 @@
           "historical_substring_predicate": true
         }
       ]
+    },
+    "872": {
+      "description": "复核时由实验组织者重放 872 补丁，使用与 689 相同的冻结反例和三步改名检查。此结果来自补录复跑，872 原始报告未记录这一验证。",
+      "results": [
+        {
+          "renamed_sources": [],
+          "yaml_count": 18,
+          "target_diagnostics": [],
+          "historical_substring_predicate": false
+        },
+        {
+          "renamed_sources": [
+            "00-support/SRC-001.yaml"
+          ],
+          "yaml_count": 17,
+          "target_diagnostics": [],
+          "historical_substring_predicate": false
+        },
+        {
+          "renamed_sources": [
+            "00-support/SRC-001.yaml",
+            "duplicate-id.yaml"
+          ],
+          "yaml_count": 16,
+          "target_diagnostics": [
+            "missing-acceptance.yaml: missing origin SRC-001"
+          ],
+          "historical_substring_predicate": true
+        }
+      ]
     }
-  }
+  },
+  "refill_submissions": [
+    {
+      "id": "770",
+      "status": "replayed",
+      "files_changed": [
+        "examples/invalid/01-suffix/SRC-999.yml",
+        "examples/valid/SRC-003.yaml",
+        "scripts/validate_truth.py",
+        "tests/test_validation.py"
+      ],
+      "dispatch_to_report_seconds": 342.7,
+      "holdout": {
+        "passed": true,
+        "batches": {
+          "yaml-only": {
+            "checks": {
+              "exit": true,
+              "yaml_count": true,
+              "no_errors": true
+            },
+            "exit": 0,
+            "stdout": "PASS: 1 YAML records; 0 errors\n",
+            "stderr": ""
+          },
+          "mixed": {
+            "checks": {
+              "exit": true,
+              "yaml_count": true,
+              "reject:north/SRC-002.yml": true,
+              "reject:south/deeper/SRC-002.yml": true
+            },
+            "exit": 1,
+            "stdout": "FAIL: 1 YAML records; 2 errors\n",
+            "stderr": "ERROR: mixed/north/SRC-002.yml: unsupported .yml file extension (use .yaml)\nERROR: mixed/south/deeper/SRC-002.yml: unsupported .yml file extension (use .yaml)\n"
+          },
+          "yml-only": {
+            "checks": {
+              "exit": true,
+              "yaml_count": true,
+              "reject:children/SRC-001.yml": true
+            },
+            "exit": 1,
+            "stdout": "FAIL: 0 YAML records; 2 errors\n",
+            "stderr": "ERROR: yml-only/children/SRC-001.yml: unsupported .yml file extension (use .yaml)\nERROR: no .yaml files found\n"
+          },
+          "continue-validation": {
+            "checks": {
+              "exit": true,
+              "yaml_count": true,
+              "reject:first/SRC-002.yml": true,
+              "validate:later/REQ-004.yaml": true
+            },
+            "exit": 1,
+            "stdout": "FAIL: 1 YAML records; 2 errors\n",
+            "stderr": "ERROR: continue-validation/first/SRC-002.yml: unsupported .yml file extension (use .yaml)\nERROR: continue-validation/later/REQ-004.yaml: missing origin SRC-999\n"
+          },
+          "exclude-rejected-source-from-index": {
+            "checks": {
+              "exit": true,
+              "yaml_count": true,
+              "reject:source/SRC-001.yml": true,
+              "validate:REQ-001.yaml": true
+            },
+            "exit": 1,
+            "stdout": "FAIL: 3 YAML records; 2 errors\n",
+            "stderr": "ERROR: exclude-rejected-source-from-index/source/SRC-001.yml: unsupported .yml file extension (use .yaml)\nERROR: exclude-rejected-source-from-index/REQ-001.yaml: missing origin SRC-001\n"
+          }
+        },
+        "regression": {
+          "exit": 0,
+          "stdout": "",
+          "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\ntest_mixed_batch_reports_each_yml_file_and_fails (test_validation.FileSuffixTests.test_mixed_batch_reports_each_yml_file_and_fails) ... ok\ntest_mixed_batch_still_validates_yaml_and_excludes_yml_from_index (test_validation.FileSuffixTests.test_mixed_batch_still_validates_yaml_and_excludes_yml_from_index) ... ok\ntest_only_yml_reports_file_path (test_validation.FileSuffixTests.test_only_yml_reports_file_path) ... ok\ntest_invalid (test_validation.ValidationTests.test_invalid) ... ok\ntest_repaired_acceptance_fails_negative_assertion (test_validation.ValidationTests.test_repaired_acceptance_fails_negative_assertion) ... ok\ntest_valid (test_validation.ValidationTests.test_valid) ... ok\n\n----------------------------------------------------------------------\nRan 11 tests in 0.363s\n\nOK\n"
+        }
+      },
+      "original_suite": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\ntest_invalid (test_validation.ValidationTests.test_invalid) ... ok\ntest_repaired_acceptance_fails_negative_assertion (test_validation.ValidationTests.test_repaired_acceptance_fails_negative_assertion) ... ok\ntest_valid (test_validation.ValidationTests.test_valid) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.067s\n\nOK\n"
+      },
+      "submitted_tests_with_baseline_validator": {
+        "exit": 1,
+        "stdout": "",
+        "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\ntest_mixed_batch_reports_each_yml_file_and_fails (test_validation.FileSuffixTests.test_mixed_batch_reports_each_yml_file_and_fails) ... FAIL\ntest_mixed_batch_still_validates_yaml_and_excludes_yml_from_index (test_validation.FileSuffixTests.test_mixed_batch_still_validates_yaml_and_excludes_yml_from_index) ... FAIL\ntest_only_yml_reports_file_path (test_validation.FileSuffixTests.test_only_yml_reports_file_path) ... FAIL\ntest_invalid (test_validation.ValidationTests.test_invalid) ... FAIL\ntest_repaired_acceptance_fails_negative_assertion (test_validation.ValidationTests.test_repaired_acceptance_fails_negative_assertion) ... FAIL\ntest_valid (test_validation.ValidationTests.test_valid) ... ok\n\n======================================================================\nFAIL: test_mixed_batch_reports_each_yml_file_and_fails (test_validation.FileSuffixTests.test_mixed_batch_reports_each_yml_file_and_fails)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/privatetest-control/tests/test_validation.py\", line 110, in test_mixed_batch_reports_each_yml_file_and_fails\n    self.assertEqual(result.returncode, 1, result)\nAssertionError: 0 != 1 : CompletedProcess(args=['/Users/lei/.local/share/uv/python/cpython-3.12-macos-aarch64-none/bin/python3.12', '-B', '/privatetest-control/scripts/validate_truth.py', '/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/tmp3mvefm6v'], returncode=0, stdout='PASS: 1 YAML records; 0 errors\\n', stderr='')\n\n======================================================================\nFAIL: test_mixed_batch_still_validates_yaml_and_excludes_yml_from_index (test_validation.FileSuffixTests.test_mixed_batch_still_validates_yaml_and_excludes_yml_from_index)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/privatetest-control/tests/test_validation.py\", line 136, in test_mixed_batch_still_validates_yaml_and_excludes_yml_from_index\n    self.assertCountEqual(errors, [\nAssertionError: Element counts were not equal:\nFirst has 0, Second has 1:  '/var/folders/5g/p1vk9lr52zjf24vxx8j4yrgr0000gn/T/tmp__6tzke8/nested.yml/SRC-999.yml: unsupported .yml file extension (use .yaml)'\n\n======================================================================\nFAIL: test_only_yml_reports_file_path (test_validation.FileSuffixTests.test_only_yml_reports_file_path)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/privatetest-control/tests/test_validation.py\", line 121, in test_only_yml_reports_file_path\n    self.assertEqual(result.stdout, 'FAIL: 0 YAML records; 2 errors\\n')\nAssertionError: 'FAIL: 0 YAML records; 1 errors\\n' != 'FAIL: 0 YAML records; 2 errors\\n'\n- FAIL: 0 YAML records; 1 errors\n?                       ^\n+ FAIL: 0 YAML records; 2 errors\n?                       ^\n\n\n======================================================================\nFAIL: test_invalid (test_validation.ValidationTests.test_invalid)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/privatetest-control/tests/test_validation.py\", line 45, in test_invalid\n    self.assert_invalid_examples(ROOT / 'examples/invalid')\n  File \"/privatetest-control/tests/test_validation.py\", line 65, in assert_invalid_examples\n    self.assertEqual(diagnostics, expected, filename)\nAssertionError: Lists differ: [] != ['unsupported .yml file extension (use .yaml)']\n\nSecond list contains 1 additional elements.\nFirst extra element 0:\n'unsupported .yml file extension (use .yaml)'\n\n- []\n+ ['unsupported .yml file extension (use .yaml)'] : 01-suffix/SRC-999.yml\n\n======================================================================\nFAIL: test_repaired_acceptance_fails_negative_assertion (test_validation.ValidationTests.test_repaired_acceptance_fails_negative_assertion)\n----------------------------------------------------------------------\nAssertionError: Lists differ: [] != ['unsupported .yml file extension (use .yaml)']\n\nSecond list contains 1 additional elements.\nFirst extra element 0:\n'unsupported .yml file extension (use .yaml)'\n\n- []\n+ ['unsupported .yml file extension (use .yaml)'] : 01-suffix/SRC-999.yml\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/privatetest-control/tests/test_validation.py\", line 77, in test_repaired_acceptance_fails_negative_assertion\n    with self.assertRaisesRegex(self.failureException, \"'acceptance' is a required property\"):\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: \"'acceptance' is a required property\" does not match \"Lists differ: [] != ['unsupported .yml file extension (use .yaml)']\n\nSecond list contains 1 additional elements.\nFirst extra element 0:\n'unsupported .yml file extension (use .yaml)'\n\n- []\n+ ['unsupported .yml file extension (use .yaml)'] : 01-suffix/SRC-999.yml\"\n\n----------------------------------------------------------------------\nRan 11 tests in 0.334s\n\nFAILED (failures=5)\n"
+      },
+      "patch": "diff --git a/examples/invalid/01-suffix/SRC-999.yml b/examples/invalid/01-suffix/SRC-999.yml\nnew file mode 100644\nindex 0000000..5fcccbb\n--- /dev/null\n+++ b/examples/invalid/01-suffix/SRC-999.yml\n@@ -0,0 +1,6 @@\n+id: SRC-999\n+kind: source\n+title: 记录文件后缀反例\n+status: proposed\n+statement: 记录内容符合结构要求，文件名使用了不受支持的后缀。\n+location: specifications/yaml-profile.md\ndiff --git a/examples/valid/SRC-003.yaml b/examples/valid/SRC-003.yaml\nnew file mode 100644\nindex 0000000..7008395\n--- /dev/null\n+++ b/examples/valid/SRC-003.yaml\n@@ -0,0 +1,6 @@\n+id: SRC-003\n+kind: source\n+title: 记录文件后缀正例\n+status: proposed\n+statement: 记录使用规范要求的文件后缀，供校验器发现和读取。\n+location: specifications/yaml-profile.md\ndiff --git a/scripts/validate_truth.py b/scripts/validate_truth.py\nindex aa894c6..8381041 100644\n--- a/scripts/validate_truth.py\n+++ b/scripts/validate_truth.py\n@@ -48,11 +48,16 @@ def validate_path(directory):\n     schema = json.loads((ROOT/'schemas/knowledge.schema.json').read_text(encoding='utf-8'))\n     validator = Draft202012Validator(schema)\n     files = sorted(directory.rglob('*.yaml'))\n-    errors = []\n+    errors = [\n+        f'{path}: unsupported .yml file extension (use .yaml)'\n+        for path in sorted(directory.rglob('*.yml'))\n+        if path.name.endswith('.yml') and path.is_file()\n+    ]\n     records = []\n     kind_by_id = {}\n     if not files:\n-        return ['no .yaml files found'], 0\n+        errors.append('no .yaml files found')\n+        return errors, 0\n     for path in files:\n         try:\n             record = load_restricted(path)\ndiff --git a/tests/test_validation.py b/tests/test_validation.py\nindex e5176a6..fcd9290 100644\n--- a/tests/test_validation.py\n+++ b/tests/test_validation.py\n@@ -1,4 +1,5 @@\n import shutil\n+import subprocess\n import sys\n import tempfile\n import unittest\n@@ -10,8 +11,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))\n from validate_truth import validate_path, load_restricted\n ROOT = Path(__file__).resolve().parents[1]\n \n+UNSUPPORTED_YML = 'unsupported .yml file extension (use .yaml)'\n INVALID_DIAGNOSTICS = {\n     '00-support/SRC-001.yaml': [],\n+    '01-suffix/SRC-999.yml': [UNSUPPORTED_YML],\n     'alias.yaml': ['YAML aliases forbidden'],\n     'anchor.yaml': ['YAML anchors forbidden'],\n     'complex-mapping-key.yaml': ['complex mapping keys forbidden'],\n@@ -36,16 +39,22 @@ class ValidationTests(unittest.TestCase):\n     def test_valid(self):\n         errors, count = validate_path(ROOT/'examples/valid')\n         self.assertEqual(errors, [])\n-        self.assertEqual(count, 5)\n+        self.assertEqual(count, 6)\n \n     def test_invalid(self):\n         self.assert_invalid_examples(ROOT / 'examples/invalid')\n \n     def assert_invalid_examples(self, directory):\n-        files = [path.relative_to(directory).as_posix() for path in directory.rglob('*.yaml')]\n-        self.assertCountEqual(files, INVALID_DIAGNOSTICS.keys())\n+        files = [\n+            path for path in directory.rglob('*')\n+            if path.is_file() and path.suffix in {'.yaml', '.yml'}\n+        ]\n+        self.assertCountEqual(\n+            [path.relative_to(directory).as_posix() for path in files],\n+            INVALID_DIAGNOSTICS.keys(),\n+        )\n         errors, count = validate_path(directory)\n-        self.assertEqual(count, len(files))\n+        self.assertEqual(count, sum(path.suffix == '.yaml' for path in files))\n         for filename, expected in INVALID_DIAGNOSTICS.items():\n             path = str(directory / filename)\n             prefixes = (f'{path}: ', f'{path} [')\n@@ -75,6 +84,62 @@ class ValidationTests(unittest.TestCase):\n                 self.assert_invalid_examples(examples)\n \n \n+class FileSuffixTests(unittest.TestCase):\n+    def setUp(self):\n+        temp = tempfile.TemporaryDirectory()\n+        self.addCleanup(temp.cleanup)\n+        self.batch = Path(temp.name)\n+        self.unsupported = self.batch / 'nested.yml' / 'SRC-999.yml'\n+        self.unsupported.parent.mkdir()\n+        shutil.copyfile(ROOT / 'examples/invalid/01-suffix/SRC-999.yml', self.unsupported)\n+\n+    def run_validator(self):\n+        return subprocess.run(\n+            [sys.executable, '-B', str(ROOT / 'scripts/validate_truth.py'), str(self.batch)],\n+            capture_output=True,\n+            text=True,\n+        )\n+\n+    def test_mixed_batch_reports_each_yml_file_and_fails(self):\n+        shutil.copyfile(ROOT / 'examples/valid/SRC-003.yaml', self.batch / 'SRC-003.yaml')\n+        malformed = self.batch / 'malformed.yml'\n+        malformed.write_text('[', encoding='utf-8')\n+\n+        result = self.run_validator()\n+\n+        self.assertEqual(result.returncode, 1, result)\n+        self.assertEqual(result.stdout, 'FAIL: 1 YAML records; 2 errors\\n')\n+        self.assertCountEqual(result.stderr.splitlines(), [\n+            f'ERROR: {self.unsupported}: {UNSUPPORTED_YML}',\n+            f'ERROR: {malformed}: {UNSUPPORTED_YML}',\n+        ])\n+\n+    def test_only_yml_reports_file_path(self):\n+        result = self.run_validator()\n+\n+        self.assertEqual(result.returncode, 1, result)\n+        self.assertEqual(result.stdout, 'FAIL: 0 YAML records; 2 errors\\n')\n+        self.assertCountEqual(result.stderr.splitlines(), [\n+            f'ERROR: {self.unsupported}: {UNSUPPORTED_YML}',\n+            'ERROR: no .yaml files found',\n+        ])\n+\n+    def test_mixed_batch_still_validates_yaml_and_excludes_yml_from_index(self):\n+        dangling = self.batch / 'dangling-reference.yaml'\n+        duplicate_key = self.batch / 'duplicate-key.yaml'\n+        shutil.copyfile(ROOT / 'examples/invalid/dangling-reference.yaml', dangling)\n+        shutil.copyfile(ROOT / 'examples/invalid/duplicate-key.yaml', duplicate_key)\n+\n+        errors, count = validate_path(self.batch)\n+\n+        self.assertEqual(count, 2)\n+        self.assertCountEqual(errors, [\n+            f'{self.unsupported}: {UNSUPPORTED_YML}',\n+            f'{dangling}: missing origin SRC-999',\n+            f'{duplicate_key}: duplicate mapping key: id',\n+        ])\n+\n+\n class BatchDiagnosticsTests(unittest.TestCase):\n     def setUp(self):\n         temp = tempfile.TemporaryDirectory()\n",
+      "report": "# YAML 记录后缀诊断修复\n\n## 定位依据\n\n任务明确要求校验器报告批次内每个小写 `.yml` 文件，同时校验全部 `.yaml` 文件。`specifications/yaml-profile.md` 的 MUST 条目规定记录文件以 `.yaml` 结尾。修复前，`validate_path` 只通过 `rglob('*.yaml')` 发现记录，随后在候选为空时返回 `no .yaml files found`。`main` 据错误列表生成摘要和退出码。\n\n我在临时目录放入有效的 `SRC-001.yaml` 和由有效记录复制而来的 `nested/SRC-002.yml`。旧命令退出 0，输出 `PASS: 1 YAML records; 0 errors`。删除 `SRC-001.yaml` 后，旧命令退出 1，仅报 `ERROR: no .yaml files found`，摘要为 `FAIL: 0 YAML records; 1 errors`。\n\n由代码路径和复现可以排除以下解释。\n\n- **内容解析或 Schema 漏报。** 旧扫描在调用解析器前就排除了 `.yml`。修复后的改名对照也表明，原先收到后缀诊断的记录只改成 `.yaml` 即可通过内容校验。\n- **CLI 汇总错误。** 旧代码的退出码与错误列表一致。混合批次漏掉的是文件发现阶段的诊断，强制修改摘要或退出码仍会丢失文件路径。\n- **仅在没有 `.yaml` 时检测后缀就足够。** 混合目录的退出 0 直接复现了反例。将 `.yml` 加入 `.yaml` 处理列表也会破坏计数和 ID 索引的要求。\n\n## 实际改动\n\n- `repo/scripts/validate_truth.py:47–60` 在进入原有 `.yaml` 校验前收集逐文件诊断，按路径排序，对小写 `.yml` 文件提示 `unsupported .yml file extension (use .yaml)`。`.yml` 的发现与 `.yaml` 候选列表独立，因此前者只进入错误列表，后者继续完成解析、Schema 和跨文件检查。\n- `repo/examples/valid/SRC-003.yaml` 提供合规后缀样例。`repo/examples/invalid/01-suffix/SRC-999.yml` 提供内容合法而后缀不合规的嵌套样例，ID 可用于检验该文件是否意外满足其他记录的来源引用。\n- `repo/tests/test_validation.py` 扩展按文件路径检查的反例清单，并添加三个回归测试，覆盖原本会通过的混合批次、仅含 `.yml` 的批次、混合批次中的解析及跨文件诊断。混合批次测试也检查两个不同位置的 `.yml` 均收到诊断，语法异常的 `.yml` 只得到后缀诊断，名为 `nested.yml` 的目录本身不产生诊断。\n\n我保留了没有发现 `.yaml` 时的原有诊断，所以只有 `.yml` 的批次除了逐文件提示，还会报告 `no .yaml files found`。stderr 的 `ERROR:` 和 stdout 的 `PASS/FAIL` 摘要沿用现行格式。\n\n## 验证\n\n从 `repo/` 执行。以下函数省去实际命令中重复的解释器与环境变量前缀。\n\n```sh\nrun_python() {\n  PYTHONPATH=/private/tmp/eg-e003-d9mgm2cy/deps /Users/lei/.local/share/uv/python/cpython-3.12-macos-aarch64-none/bin/python3.12 -B \"$@\"\n}\nrun_python -m unittest discover -s tests -v\nrun_python scripts/validate_truth.py examples/valid\nrun_python scripts/validate_truth.py examples/invalid\nrun_python scripts/validate_truth.py examples/invalid/01-suffix\n```\n\n| 验证 | 实验结果 |\n| --- | --- |\n| 修改前运行完整测试 | 8 项通过，退出 0 |\n| 加入样例和测试后，用旧校验器运行完整测试 | 11 项中 5 项失败，退出 1。三个新测试分别捕获混合批次误报 PASS、漏报逐文件诊断和仅含 `.yml` 时的诊断缺失。反例清单测试及其自检也因新反例缺失后缀诊断而失败。 |\n| 实现修复后运行完整测试 | 11 项通过，退出 0 |\n| CLI 校验正例目录 | 退出 0，`PASS: 6 YAML records; 0 errors` |\n| CLI 校验反例目录 | 退出 1，`FAIL: 18 YAML records; 18 errors`，含路径明确的后缀诊断、缺失来源和其他原有反例诊断 |\n| CLI 校验仅含 `.yml` 的反例子目录 | 退出 1，`FAIL: 0 YAML records; 2 errors`，两条诊断分别指出文件路径和没有 `.yaml` |\n\n我另在临时目录复制 `dangling-reference.yaml` 和 `SRC-999.yml`，用同一解释器执行 `scripts/validate_truth.py <临时批次目录>`。第一次退出 1，统计 1 条记录、2 条错误，分别为后缀和 `missing origin SRC-999`。仅将 `SRC-999.yml` 改名为 `SRC-999.yaml` 再运行，退出 0，统计 2 条记录、0 条错误。由这一对照可以判定，该样例的来源 ID 只在受支持后缀下参与解析。混合错误回归测试另外检查同批独立的重复键诊断仍然出现。\n\n## 既有工程知识\n\n`prior-sources.json` 的 D1、D2 记录了旧版反例测试的误通过机制。测试搜索整个错误字符串，因而可从文件名 `missing-acceptance.yaml` 命中 `acceptance`，即使实际诊断只是来源缺失。D3 展示文件路径如何进入诊断，D4、D5 解释该快照的来源为何缺失，D6 给出 Schema 的验收条件要求。这组材料支持按文件定位并匹配具体诊断的做法，其误通过结论适用于旧断言和当时的反例布置。\n\n当前快照的 `assert_invalid_examples` 已经分离路径和诊断内容，缺失验收条件自检在修改前后均通过。此次观察到的覆盖缺口另有一层，旧反例清单的盘点只看 `.yaml`，内容断言不会触及扫描排除的 `.yml`。建议保留按文件核对诊断的旧结论，并补充适用范围。涉及输入发现规则的反例还需验证发现结果、计数和索引，有批次聚合要求时应在同一次调用里检查独立错误能否同时报告。这是基于本次证据的建议，未登记为已接受的工程规范。\n\n## 边界\n\n项目依据来自分配目录中的 `task.md`、`prior-sources.json` 和代码快照。执行使用宿主已安装的 Python 3.12.15、PyYAML 6.0.4、jsonschema 4.26.0 和本地技能流程说明。临时批次由测试和对照实验建立并清理。本次未访问其他项目、Git 历史、其他会话或网络。验证限于 macOS 上提供的运行时和任务所要求的小写 `.yml`，大小写变体、其他扩展名及跨平台文件系统行为未纳入试验。\n"
+    },
+    {
+      "id": "605",
+      "status": "replayed",
+      "files_changed": [
+        "examples/invalid/extension/SRC-999.yml",
+        "examples/valid/extension/SRC-010.yaml",
+        "scripts/validate_truth.py",
+        "tests/test_validation.py"
+      ],
+      "dispatch_to_report_seconds": 387.0,
+      "holdout": {
+        "passed": true,
+        "batches": {
+          "yaml-only": {
+            "checks": {
+              "exit": true,
+              "yaml_count": true,
+              "no_errors": true
+            },
+            "exit": 0,
+            "stdout": "PASS: 1 YAML records; 0 errors\n",
+            "stderr": ""
+          },
+          "mixed": {
+            "checks": {
+              "exit": true,
+              "yaml_count": true,
+              "reject:north/SRC-002.yml": true,
+              "reject:south/deeper/SRC-002.yml": true
+            },
+            "exit": 1,
+            "stdout": "FAIL: 1 YAML records; 2 errors\n",
+            "stderr": "ERROR: mixed/north/SRC-002.yml: unsupported file extension .yml (use .yaml)\nERROR: mixed/south/deeper/SRC-002.yml: unsupported file extension .yml (use .yaml)\n"
+          },
+          "yml-only": {
+            "checks": {
+              "exit": true,
+              "yaml_count": true,
+              "reject:children/SRC-001.yml": true
+            },
+            "exit": 1,
+            "stdout": "FAIL: 0 YAML records; 2 errors\n",
+            "stderr": "ERROR: yml-only/children/SRC-001.yml: unsupported file extension .yml (use .yaml)\nERROR: no .yaml files found\n"
+          },
+          "continue-validation": {
+            "checks": {
+              "exit": true,
+              "yaml_count": true,
+              "reject:first/SRC-002.yml": true,
+              "validate:later/REQ-004.yaml": true
+            },
+            "exit": 1,
+            "stdout": "FAIL: 1 YAML records; 2 errors\n",
+            "stderr": "ERROR: continue-validation/first/SRC-002.yml: unsupported file extension .yml (use .yaml)\nERROR: continue-validation/later/REQ-004.yaml: missing origin SRC-999\n"
+          },
+          "exclude-rejected-source-from-index": {
+            "checks": {
+              "exit": true,
+              "yaml_count": true,
+              "reject:source/SRC-001.yml": true,
+              "validate:REQ-001.yaml": true
+            },
+            "exit": 1,
+            "stdout": "FAIL: 3 YAML records; 2 errors\n",
+            "stderr": "ERROR: exclude-rejected-source-from-index/source/SRC-001.yml: unsupported file extension .yml (use .yaml)\nERROR: exclude-rejected-source-from-index/REQ-001.yaml: missing origin SRC-001\n"
+          }
+        },
+        "regression": {
+          "exit": 0,
+          "stdout": "",
+          "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\ntest_mixed_batch_fails_without_counting_duplicate_yml_id (test_validation.ExtensionTests.test_mixed_batch_fails_without_counting_duplicate_yml_id) ... ok\ntest_yml_only_reports_each_file_including_nested_file (test_validation.ExtensionTests.test_yml_only_reports_each_file_including_nested_file) ... ok\ntest_invalid (test_validation.ValidationTests.test_invalid) ... ok\ntest_repaired_acceptance_fails_negative_assertion (test_validation.ValidationTests.test_repaired_acceptance_fails_negative_assertion) ... ok\ntest_valid (test_validation.ValidationTests.test_valid) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.348s\n\nOK\n"
+        }
+      },
+      "original_suite": {
+        "exit": 0,
+        "stdout": "",
+        "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\ntest_invalid (test_validation.ValidationTests.test_invalid) ... ok\ntest_repaired_acceptance_fails_negative_assertion (test_validation.ValidationTests.test_repaired_acceptance_fails_negative_assertion) ... ok\ntest_valid (test_validation.ValidationTests.test_valid) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.067s\n\nOK\n"
+      },
+      "submitted_tests_with_baseline_validator": {
+        "exit": 1,
+        "stdout": "",
+        "stderr": "test_id_mapping_preserves_outgoing_checks (test_validation.BatchDiagnosticsTests.test_id_mapping_preserves_outgoing_checks) ... ok\ntest_kind_list_on_referenced_source (test_validation.BatchDiagnosticsTests.test_kind_list_on_referenced_source) ... ok\ntest_origin_list_preserves_relation_check (test_validation.BatchDiagnosticsTests.test_origin_list_preserves_relation_check) ... ok\ntest_relations_list_preserves_origin_check (test_validation.BatchDiagnosticsTests.test_relations_list_preserves_origin_check) ... ok\ntest_relations_string (test_validation.BatchDiagnosticsTests.test_relations_string) ... ok\ntest_mixed_batch_fails_without_counting_duplicate_yml_id (test_validation.ExtensionTests.test_mixed_batch_fails_without_counting_duplicate_yml_id) ... FAIL\ntest_yml_only_reports_each_file_including_nested_file (test_validation.ExtensionTests.test_yml_only_reports_each_file_including_nested_file) ... FAIL\ntest_invalid (test_validation.ValidationTests.test_invalid) ... FAIL\ntest_repaired_acceptance_fails_negative_assertion (test_validation.ValidationTests.test_repaired_acceptance_fails_negative_assertion) ... FAIL\ntest_valid (test_validation.ValidationTests.test_valid) ... ok\n\n======================================================================\nFAIL: test_mixed_batch_fails_without_counting_duplicate_yml_id (test_validation.ExtensionTests.test_mixed_batch_fails_without_counting_duplicate_yml_id)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/privatetest-control/tests/test_validation.py\", line 100, in test_mixed_batch_fails_without_counting_duplicate_yml_id\n    self.assertEqual(result.returncode, 1)\nAssertionError: 0 != 1\n\n======================================================================\nFAIL: test_yml_only_reports_each_file_including_nested_file (test_validation.ExtensionTests.test_yml_only_reports_each_file_including_nested_file)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/privatetest-control/tests/test_validation.py\", line 119, in test_yml_only_reports_each_file_including_nested_file\n    self.assertEqual(result.stdout, 'FAIL: 0 YAML records; 3 errors\\n')\nAssertionError: 'FAIL: 0 YAML records; 1 errors\\n' != 'FAIL: 0 YAML records; 3 errors\\n'\n- FAIL: 0 YAML records; 1 errors\n?                       ^\n+ FAIL: 0 YAML records; 3 errors\n?                       ^\n\n\n======================================================================\nFAIL: test_invalid (test_validation.ValidationTests.test_invalid)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/privatetest-control/tests/test_validation.py\", line 45, in test_invalid\n    self.assert_invalid_examples(ROOT / 'examples/invalid')\n  File \"/privatetest-control/tests/test_validation.py\", line 60, in assert_invalid_examples\n    self.assertEqual(diagnostics, expected, filename)\nAssertionError: Lists differ: [] != ['unsupported file extension .yml (use .yaml)']\n\nSecond list contains 1 additional elements.\nFirst extra element 0:\n'unsupported file extension .yml (use .yaml)'\n\n- []\n+ ['unsupported file extension .yml (use .yaml)'] : extension/SRC-999.yml\n\n======================================================================\nFAIL: test_repaired_acceptance_fails_negative_assertion (test_validation.ValidationTests.test_repaired_acceptance_fails_negative_assertion)\n----------------------------------------------------------------------\nAssertionError: Lists differ: [] != ['unsupported file extension .yml (use .yaml)']\n\nSecond list contains 1 additional elements.\nFirst extra element 0:\n'unsupported file extension .yml (use .yaml)'\n\n- []\n+ ['unsupported file extension .yml (use .yaml)'] : extension/SRC-999.yml\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/privatetest-control/tests/test_validation.py\", line 72, in test_repaired_acceptance_fails_negative_assertion\n    with self.assertRaisesRegex(self.failureException, \"'acceptance' is a required property\"):\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: \"'acceptance' is a required property\" does not match \"Lists differ: [] != ['unsupported file extension .yml (use .yaml)']\n\nSecond list contains 1 additional elements.\nFirst extra element 0:\n'unsupported file extension .yml (use .yaml)'\n\n- []\n+ ['unsupported file extension .yml (use .yaml)'] : extension/SRC-999.yml\"\n\n----------------------------------------------------------------------\nRan 10 tests in 0.329s\n\nFAILED (failures=4)\n"
+      },
+      "patch": "diff --git a/examples/invalid/extension/SRC-999.yml b/examples/invalid/extension/SRC-999.yml\nnew file mode 100644\nindex 0000000..66d08a4\n--- /dev/null\n+++ b/examples/invalid/extension/SRC-999.yml\n@@ -0,0 +1,6 @@\n+id: SRC-999\n+kind: source\n+title: 后缀校验的示例来源\n+status: proposed\n+statement: 此记录用于验证目录扫描时采用的 YAML 文件后缀。\n+location: specifications/yaml-profile.md\ndiff --git a/examples/valid/extension/SRC-010.yaml b/examples/valid/extension/SRC-010.yaml\nnew file mode 100644\nindex 0000000..c925181\n--- /dev/null\n+++ b/examples/valid/extension/SRC-010.yaml\n@@ -0,0 +1,6 @@\n+id: SRC-010\n+kind: source\n+title: 后缀校验的示例来源\n+status: proposed\n+statement: 此记录用于验证目录扫描时采用的 YAML 文件后缀。\n+location: specifications/yaml-profile.md\ndiff --git a/scripts/validate_truth.py b/scripts/validate_truth.py\nindex aa894c6..6882040 100644\n--- a/scripts/validate_truth.py\n+++ b/scripts/validate_truth.py\n@@ -48,11 +48,16 @@ def validate_path(directory):\n     schema = json.loads((ROOT/'schemas/knowledge.schema.json').read_text(encoding='utf-8'))\n     validator = Draft202012Validator(schema)\n     files = sorted(directory.rglob('*.yaml'))\n-    errors = []\n+    errors = [\n+        f'{path}: unsupported file extension .yml (use .yaml)'\n+        for path in sorted(directory.rglob('*.yml'))\n+        if path.name.endswith('.yml') and path.is_file()\n+    ]\n     records = []\n     kind_by_id = {}\n     if not files:\n-        return ['no .yaml files found'], 0\n+        errors.append('no .yaml files found')\n+        return errors, 0\n     for path in files:\n         try:\n             record = load_restricted(path)\ndiff --git a/tests/test_validation.py b/tests/test_validation.py\nindex e5176a6..d664579 100644\n--- a/tests/test_validation.py\n+++ b/tests/test_validation.py\n@@ -1,4 +1,5 @@\n import shutil\n+import subprocess\n import sys\n import tempfile\n import unittest\n@@ -9,6 +10,7 @@ import yaml\n sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))\n from validate_truth import validate_path, load_restricted\n ROOT = Path(__file__).resolve().parents[1]\n+EXTENSION_EXAMPLE = Path('extension/SRC-999.yml')\n \n INVALID_DIAGNOSTICS = {\n     '00-support/SRC-001.yaml': [],\n@@ -19,6 +21,7 @@ INVALID_DIAGNOSTICS = {\n     'duplicate-id.yaml': ['duplicate id SRC-001'],\n     'duplicate-key.yaml': ['duplicate mapping key: id'],\n     'explicit-tag.yaml': ['explicit YAML tags forbidden'],\n+    EXTENSION_EXAMPLE.as_posix(): ['unsupported file extension .yml (use .yaml)'],\n     'invalid-relation-target.yaml': ['invalid verified_by target SRC-001'],\n     'mismatched-id-kind.yaml': ['mismatched id and kind'],\n     'missing-acceptance.yaml': [\"[root]: 'acceptance' is a required property\"],\n@@ -36,14 +39,15 @@ class ValidationTests(unittest.TestCase):\n     def test_valid(self):\n         errors, count = validate_path(ROOT/'examples/valid')\n         self.assertEqual(errors, [])\n-        self.assertEqual(count, 5)\n+        self.assertEqual(count, 6)\n \n     def test_invalid(self):\n         self.assert_invalid_examples(ROOT / 'examples/invalid')\n \n     def assert_invalid_examples(self, directory):\n         files = [path.relative_to(directory).as_posix() for path in directory.rglob('*.yaml')]\n-        self.assertCountEqual(files, INVALID_DIAGNOSTICS.keys())\n+        unsupported = [path.relative_to(directory).as_posix() for path in directory.rglob('*.yml')]\n+        self.assertCountEqual(files + unsupported, INVALID_DIAGNOSTICS.keys())\n         errors, count = validate_path(directory)\n         self.assertEqual(count, len(files))\n         for filename, expected in INVALID_DIAGNOSTICS.items():\n@@ -75,6 +79,54 @@ class ValidationTests(unittest.TestCase):\n                 self.assert_invalid_examples(examples)\n \n \n+class ExtensionTests(unittest.TestCase):\n+    def run_cli(self, directory):\n+        return subprocess.run(\n+            [sys.executable, '-B', str(ROOT / 'scripts/validate_truth.py'), str(directory)],\n+            capture_output=True,\n+            text=True,\n+        )\n+\n+    def test_mixed_batch_fails_without_counting_duplicate_yml_id(self):\n+        with tempfile.TemporaryDirectory() as temp:\n+            directory = Path(temp)\n+            valid = ROOT / 'examples/valid/extension/SRC-010.yaml'\n+            shutil.copyfile(valid, directory / valid.name)\n+            unsupported = directory / valid.with_suffix('.yml').name\n+            shutil.copyfile(valid, unsupported)\n+\n+            result = self.run_cli(directory)\n+\n+            self.assertEqual(result.returncode, 1)\n+            self.assertEqual(result.stdout, 'FAIL: 1 YAML records; 1 errors\\n')\n+            self.assertEqual(\n+                result.stderr,\n+                f'ERROR: {unsupported}: unsupported file extension .yml (use .yaml)\\n',\n+            )\n+\n+    def test_yml_only_reports_each_file_including_nested_file(self):\n+        with tempfile.TemporaryDirectory() as temp:\n+            directory = Path(temp)\n+            unsupported = directory / 'broken.yml'\n+            unsupported.write_text('[', encoding='utf-8')\n+            nested = directory / 'container.yml' / EXTENSION_EXAMPLE.name\n+            nested.parent.mkdir()\n+            shutil.copyfile(ROOT / 'examples/invalid' / EXTENSION_EXAMPLE, nested)\n+\n+            result = self.run_cli(directory)\n+\n+            self.assertEqual(result.returncode, 1)\n+            self.assertEqual(result.stdout, 'FAIL: 0 YAML records; 3 errors\\n')\n+            self.assertEqual(\n+                result.stderr.splitlines(),\n+                [\n+                    f'ERROR: {unsupported}: unsupported file extension .yml (use .yaml)',\n+                    f'ERROR: {nested}: unsupported file extension .yml (use .yaml)',\n+                    'ERROR: no .yaml files found',\n+                ],\n+            )\n+\n+\n class BatchDiagnosticsTests(unittest.TestCase):\n     def setUp(self):\n         temp = tempfile.TemporaryDirectory()\n",
+      "report": "# YAML 记录校验的后缀诊断\n\n## 任务要求与定位\n\n任务要求递归报告小写 `.yml` 文件的路径并提示改用 `.yaml`。发现 `.yml` 后命令应失败，仍须校验批内所有 `.yaml`，且 `.yml` 不参与计数和 ID 索引。`repo/specifications/yaml-profile.md:7` 已规定记录文件必须以 `.yaml` 结尾。\n\n- **实际观察。** 修改前的 `validate_path` 只收集 `directory.rglob('*.yaml')` 的结果。将同一有效来源记录复制到临时目录，用 `.yml` 保存于子目录时，命令以 1 退出，只报 `ERROR: no .yaml files found`。加入同内容的 `.yaml` 后退出 0，摘要为 `PASS: 1 YAML records; 0 errors`。原有 8 项单元测试均通过。\n- **排除解析器或 Schema 拒绝记录内容的解释。** `.yml` 路径在该快照中未进入读取、解析和 Schema 检查。纯 `.yml` 的旧错误来自空候选列表。修复后把同一份 `.yml` 反例复制到空目录，仅改后缀即可从 `FAIL: 0 YAML records; 2 errors` 变成 `PASS: 1 YAML records; 0 errors`，内容保持相同。\n- **排除 CLI 漏打印错误或返回码错误的解释。** `repo/scripts/validate_truth.py:110–120` 逐条打印 `validate_path` 返回的错误，按错误列表是否为空设置摘要及退出码。修复只改变扫描阶段收集的错误。使用 `.yml` 解析记录也不符合任务规定，因为这种做法会让错误后缀的记录有机会参与计数和索引。\n\n## 改动与覆盖\n\n- `repo/scripts/validate_truth.py:47–60` 保留现有 `.yaml` 候选列表，另递归收集小写 `.yml` 文件并按路径排序。每个 `.yml` 生成一条 `<路径>: unsupported file extension .yml (use .yaml)`。目录名以 `.yml` 结尾时仍可扫描其子文件。没有 `.yaml` 时在这些路径诊断之后保留 `no .yaml files found`。原有记录解析、索引、引用检查及 CLI 输出流程照常运行。\n- `repo/examples/valid/extension/SRC-010.yaml` 增加一个可通过的嵌套样例。`repo/examples/invalid/extension/SRC-999.yml` 的内容是合法来源记录，后缀构成拒绝原因。反例批内的 `dangling-reference.yaml` 仍报告 `missing origin SRC-999`，直接检查 `.yml` 中的独有 ID 无法补齐该引用。\n- `repo/tests/test_validation.py:38–61` 对每个反例路径核对完整诊断，另核对 `.yaml` 计数及错误总数。`:82–127` 通过实际 CLI 覆盖混合有效 `.yaml` 和同 ID `.yml` 的退出状态、标准输出、标准错误及计数。纯 `.yml` 用例覆盖根目录、子目录、`.yml` 目录名以及含不可解析内容的 `.yml` 文件，并核对每个文件各报一次后缀错误。\n\n## 验证\n\n从分配的 `repo/` 运行。命令均使用任务指定的 Python 3.12 与预装依赖，下面的函数表示同一命令前缀。\n\n```sh\npy_validation() {\n    PYTHONPATH=/private/tmp/eg-e003-d9mgm2cy/deps /Users/lei/.local/share/uv/python/cpython-3.12-macos-aarch64-none/bin/python3.12 -B \"$@\"\n}\npy_validation -m unittest discover -s tests -v -k ExtensionTests\npy_validation -m unittest discover -s tests -v\npy_validation scripts/validate_truth.py examples/valid\npy_validation scripts/validate_truth.py examples/invalid\n```\n\n| 阶段与命令 | 实际结果 |\n| --- | --- |\n| 修改前，全量 `unittest` | 8 项通过。 |\n| 新回归测试就位后、修代码前，`unittest -k ExtensionTests` | 2 项均按预期失败。混合输入实际退出 0，纯 `.yml` 输入的摘要只有 1 条错误。 |\n| 修复后，全量 `unittest` | 10 项通过。 |\n| CLI 验证 `examples/valid` | 退出 0，`PASS: 6 YAML records; 0 errors`。 |\n| CLI 验证 `examples/invalid` | 退出 1，`FAIL: 18 YAML records; 18 errors`。stderr 有 1 条 `.yml` 路径诊断和 17 条 `.yaml` 诊断，覆盖解析、Schema、重复 ID 和引用错误。 |\n\n另用 `py_validation -` 运行临时目录探针，子进程调用 `scripts/validate_truth.py <临时目录>`。空目录维持 `FAIL: 0 YAML records; 1 errors`。只放 `SRC-999.yml` 得到 0 条记录、2 条错误。原地改名为 `SRC-999.yaml` 后退出 0，得到 1 条记录、0 条错误。\n\n## 工程知识与适用范围\n\n- **历史材料。** `prior-knowledge.md` 的 C05 只描述材料提供的旧批次 ID 清单。C08 还依赖原子串断言及指定记录持续产生路径诊断。`prior-sources.json` 的 D2 展示原断言，D3–D5 给出缺失来源诊断、包含 `acceptance` 的路径及旧批次 ID 清单。保留这些历史结论及其条件。\n- **当前观察。** `repo/examples/invalid/00-support/SRC-001.yaml` 提供当前 `missing-acceptance.yaml` 的来源。在反例目录的临时副本中补上合法 `acceptance` 后，该路径无诊断，旧式 `any('acceptance' in error for error in errors)` 为 `False`。再把来源改为 `SRC-998` 后，该路径仅产生 `missing origin SRC-998`，旧式子串为 `True`，当前按路径比较完整诊断的断言仍拒绝该变化。此探针使用 `py_validation -`，调用 `validate_path` 并核对两次结果。本次没有运行旧快照。\n- **建议补充的候选知识。** 验证索引的证据应包括候选文件是否进入记录集合。当前新反例的 `SRC-999.yml` 已被扫描和报告，但其中的 `SRC-999` 仍无法解析 `dangling-reference.yaml` 的来源引用。对包含路径的诊断，保留按文件核对消息正文的做法，并独立检查 CLI 的退出码与记录数。这是依据本次观察提出的测试设计建议。\n\n## 失败与局限\n\n- 首次新增正例时使用了 `SRC-999`，使复制整个正例目录的五项批量测试意外解析了原本应悬空的来源。将正例改用 `SRC-010` 后恢复这些测试的含义。历史行为探针首次使用的补齐文本太短，产生了 Schema 长度错误，随后改用仓库测试中的有效文本重跑并核对诊断。\n- `git status --short` 返回快照无 Git 仓库元数据，无法据此核对工作树。修改前通过文件清单及目标文件内容检查任务边界，修改限制在校验器、测试和新增样例。验证覆盖所要求的小写 `.yml` 和 `.yaml`。大小写变体和其他后缀未扩展验证。\n- 实际使用的材料为分配目录中的任务说明、代码快照及两份历史摘录。运行环境使用指定的 Python、预装 PyYAML/JSON Schema 依赖及测试临时目录。未查询其他项目、Git 历史或网络。\n"
+    }
+  ]
 }

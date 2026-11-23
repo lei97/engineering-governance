@@ -1,0 +1,135 @@
+{
+  "revisions": {
+    "old": "9c38156fa8c277507ab30529af6d0480e8cbf833",
+    "new": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf"
+  },
+  "batches": {
+    "1": {
+      "inputs": {
+        "REQ-004.yaml": "acceptance:\n- 校验器应报告来源引用不存在。\nid: REQ-004\nkind: requirement\norigin: SRC-999\nstatement: 此需求通过引用一个不存在的来源来测试跨文件检查。\nstatus: proposed\ntitle: 不存在的引用\n"
+      },
+      "results": {
+        "old": {
+          "exit_code": 1,
+          "stdout": "FAIL: 1 YAML records; 1 errors\n",
+          "stderr": "ERROR: REQ-004.yaml: missing origin SRC-999\n"
+        },
+        "new": {
+          "exit_code": 1,
+          "stdout": "FAIL: 1 YAML records; 1 errors\n",
+          "stderr": "ERROR: REQ-004.yaml: missing origin SRC-999\n"
+        }
+      }
+    },
+    "2": {
+      "inputs": {
+        "a/SRC-001.yaml": "id: SRC-001\nkind: source\nlocation: docs/exploration-notes.md\nrelations: REQ-002\nstatement: '由项目维护者保存的需求讨论摘要，仅作为需求来源，不代表实现完成。\n\n  '\nstatus: accepted\ntitle: 探索功能讨论记录\n",
+        "z/REQ-004.yaml": "acceptance:\n- 校验器应报告来源引用不存在。\nid: REQ-004\nkind: requirement\norigin: SRC-999\nstatement: 此需求通过引用一个不存在的来源来测试跨文件检查。\nstatus: proposed\ntitle: 不存在的引用\n"
+      },
+      "results": {
+        "old": {
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"scripts/validate_truth.py\", line 108, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File \"scripts/validate_truth.py\", line 101, in main\n    errors, count = validate_path(args.directory)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"scripts/validate_truth.py\", line 81, in validate_path\n    for rel, targets in (record.get('relations') or {}).items():\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'str' object has no attribute 'items'\n"
+        },
+        "new": {
+          "exit_code": 1,
+          "stdout": "FAIL: 2 YAML records; 2 errors\n",
+          "stderr": "ERROR: a/SRC-001.yaml [relations]: 'REQ-002' is not of type 'object'\nERROR: z/REQ-004.yaml: missing origin SRC-999\n"
+        }
+      }
+    },
+    "3": {
+      "inputs": {
+        "a/SRC-001.yaml": "id: SRC-001\nkind:\n- source\nlocation: docs/exploration-notes.md\nstatement: '由项目维护者保存的需求讨论摘要，仅作为需求来源，不代表实现完成。\n\n  '\nstatus: accepted\ntitle: 探索功能讨论记录\n",
+        "b/REQ-005.yaml": "acceptance:\n- 测试来源仍可解析。\nid: REQ-005\nkind: requirement\norigin: SRC-001\nstatement: 该需求缺少可供判定完成条件的验收标准。\nstatus: proposed\ntitle: 没有验收条件\n",
+        "z/REQ-004.yaml": "acceptance:\n- 校验器应报告来源引用不存在。\nid: REQ-004\nkind: requirement\norigin: SRC-999\nstatement: 此需求通过引用一个不存在的来源来测试跨文件检查。\nstatus: proposed\ntitle: 不存在的引用\n"
+      },
+      "results": {
+        "old": {
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"scripts/validate_truth.py\", line 108, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File \"scripts/validate_truth.py\", line 101, in main\n    errors, count = validate_path(args.directory)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"scripts/validate_truth.py\", line 70, in validate_path\n    if kind in PREFIX and not ident.startswith(PREFIX[kind]+'-'):\n       ^^^^^^^^^^^^^^\nTypeError: unhashable type: 'list'\n"
+        },
+        "new": {
+          "exit_code": 1,
+          "stdout": "FAIL: 3 YAML records; 2 errors\n",
+          "stderr": "ERROR: a/SRC-001.yaml [kind]: ['source'] is not one of ['requirement', 'source', 'contract', 'artifact', 'test', 'observation']\nERROR: z/REQ-004.yaml: missing origin SRC-999\n"
+        }
+      }
+    },
+    "4": {
+      "inputs": {
+        "b/REQ-005.yaml": "acceptance:\n- 测试来源仍可解析。\nid: REQ-005\nkind: requirement\norigin: SRC-001\nstatement: 该需求缺少可供判定完成条件的验收标准。\nstatus: proposed\ntitle: 没有验收条件\n",
+        "z/REQ-004.yaml": "acceptance:\n- 校验器应报告来源引用不存在。\nid: REQ-004\nkind: requirement\norigin: SRC-999\nstatement: 此需求通过引用一个不存在的来源来测试跨文件检查。\nstatus: proposed\ntitle: 不存在的引用\n"
+      },
+      "results": {
+        "old": {
+          "exit_code": 1,
+          "stdout": "FAIL: 2 YAML records; 2 errors\n",
+          "stderr": "ERROR: b/REQ-005.yaml: missing origin SRC-001\nERROR: z/REQ-004.yaml: missing origin SRC-999\n"
+        },
+        "new": {
+          "exit_code": 1,
+          "stdout": "FAIL: 2 YAML records; 2 errors\n",
+          "stderr": "ERROR: b/REQ-005.yaml: missing origin SRC-001\nERROR: z/REQ-004.yaml: missing origin SRC-999\n"
+        }
+      }
+    },
+    "5": {
+      "inputs": {
+        "a/SRC-001.yaml": "id: SRC-001\nkind: source\nlocation: docs/exploration-notes.md\nrelations: []\nstatement: '由项目维护者保存的需求讨论摘要，仅作为需求来源，不代表实现完成。\n\n  '\nstatus: accepted\ntitle: 探索功能讨论记录\n",
+        "z/REQ-004.yaml": "acceptance:\n- 校验器应报告来源引用不存在。\nid: REQ-004\nkind: requirement\norigin: SRC-999\nstatement: 此需求通过引用一个不存在的来源来测试跨文件检查。\nstatus: proposed\ntitle: 不存在的引用\n"
+      },
+      "results": {
+        "old": {
+          "exit_code": 1,
+          "stdout": "FAIL: 2 YAML records; 2 errors\n",
+          "stderr": "ERROR: a/SRC-001.yaml [relations]: [] is not of type 'object'\nERROR: z/REQ-004.yaml: missing origin SRC-999\n"
+        },
+        "new": {
+          "exit_code": 1,
+          "stdout": "FAIL: 2 YAML records; 2 errors\n",
+          "stderr": "ERROR: a/SRC-001.yaml [relations]: [] is not of type 'object'\nERROR: z/REQ-004.yaml: missing origin SRC-999\n"
+        }
+      }
+    },
+    "6": {
+      "inputs": {
+        "a/SRC-001.yaml": "id: SRC-001\nkind: source\nlocation: docs/exploration-notes.md\nrelations:\n- REQ-002\nstatement: '由项目维护者保存的需求讨论摘要，仅作为需求来源，不代表实现完成。\n\n  '\nstatus: accepted\ntitle: 探索功能讨论记录\n",
+        "z/REQ-004.yaml": "acceptance:\n- 校验器应报告来源引用不存在。\nid: REQ-004\nkind: requirement\norigin: SRC-999\nstatement: 此需求通过引用一个不存在的来源来测试跨文件检查。\nstatus: proposed\ntitle: 不存在的引用\n"
+      },
+      "results": {
+        "old": {
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"scripts/validate_truth.py\", line 108, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File \"scripts/validate_truth.py\", line 101, in main\n    errors, count = validate_path(args.directory)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"scripts/validate_truth.py\", line 81, in validate_path\n    for rel, targets in (record.get('relations') or {}).items():\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'list' object has no attribute 'items'\n"
+        },
+        "new": {
+          "exit_code": 1,
+          "stdout": "FAIL: 2 YAML records; 2 errors\n",
+          "stderr": "ERROR: a/SRC-001.yaml [relations]: ['REQ-002'] is not of type 'object'\nERROR: z/REQ-004.yaml: missing origin SRC-999\n"
+        }
+      }
+    },
+    "7": {
+      "inputs": {
+        "a/SRC-001.yaml": "id:\n  bad: SRC-001\nkind: source\nlocation: docs/exploration-notes.md\norigin: SRC-998\nstatement: '由项目维护者保存的需求讨论摘要，仅作为需求来源，不代表实现完成。\n\n  '\nstatus: accepted\ntitle: 探索功能讨论记录\n",
+        "b/REQ-005.yaml": "acceptance:\n- 测试来源仍可解析。\nid: REQ-005\nkind: requirement\norigin: SRC-001\nstatement: 该需求缺少可供判定完成条件的验收标准。\nstatus: proposed\ntitle: 没有验收条件\n",
+        "z/REQ-004.yaml": "acceptance:\n- 校验器应报告来源引用不存在。\nid: REQ-004\nkind: requirement\norigin: SRC-999\nstatement: 此需求通过引用一个不存在的来源来测试跨文件检查。\nstatus: proposed\ntitle: 不存在的引用\n"
+      },
+      "results": {
+        "old": {
+          "exit_code": 1,
+          "stdout": "FAIL: 3 YAML records; 3 errors\n",
+          "stderr": "ERROR: a/SRC-001.yaml [id]: {'bad': 'SRC-001'} is not of type 'string'\nERROR: b/REQ-005.yaml: missing origin SRC-001\nERROR: z/REQ-004.yaml: missing origin SRC-999\n"
+        },
+        "new": {
+          "exit_code": 1,
+          "stdout": "FAIL: 3 YAML records; 4 errors\n",
+          "stderr": "ERROR: a/SRC-001.yaml [id]: {'bad': 'SRC-001'} is not of type 'string'\nERROR: a/SRC-001.yaml: missing origin SRC-998\nERROR: b/REQ-005.yaml: missing origin SRC-001\nERROR: z/REQ-004.yaml: missing origin SRC-999\n"
+        }
+      }
+    }
+  }
+}

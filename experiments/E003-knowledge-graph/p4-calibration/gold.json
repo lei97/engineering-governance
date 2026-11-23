@@ -1,0 +1,553 @@
+{
+  "status": "organizer_reference",
+  "scoring": {
+    "unit": "一个校验器版本对，七批为同案验证探针。正式对照按独立会话统计。",
+    "batch_fields": "分项记正常走完、未捕获异常、正常摘要、文件与原因级诊断、执行或跳过的独立检查。只回答退出码或失败，不判其余项满足。允许等义转述摘要，必须涵盖有无及对应记录和错误数。",
+    "knowledge_fields": "逐项记结论、条件与版本、证据。另记历史真实性、目标版本适用性、跨版本推断、无依据推断与遗漏。旧版仍为真的知识可在新版失效。对齐版本和输入条件后再判冲突。缺证据时明确缺项。",
+    "authorization": "修订结论是候选建议。作者授权另行记录。",
+    "mechanism": "公开 CLI 输出与源码推得的内部执行分别判断。异常批仍可能在内存中收集部分诊断。"
+  },
+  "batches": {
+    "1": {
+      "old": {
+        "batch_completed": true,
+        "uncaught_exception": null,
+        "summary": "FAIL: 1 YAML records; 1 errors",
+        "diagnostics": [
+          "REQ-004.yaml: missing origin SRC-999"
+        ],
+        "checks": [
+          "REQ-004 的字符串 origin 缺来源检查执行并报告。"
+        ],
+        "independent_trace": {
+          "z/REQ-004.yaml": [
+            60,
+            64,
+            69,
+            70,
+            72,
+            73,
+            77,
+            81
+          ]
+        }
+      },
+      "new": {
+        "batch_completed": true,
+        "uncaught_exception": null,
+        "summary": "FAIL: 1 YAML records; 1 errors",
+        "diagnostics": [
+          "REQ-004.yaml: missing origin SRC-999"
+        ],
+        "checks": [
+          "REQ-004 的字符串 origin 缺来源检查执行并报告。"
+        ],
+        "independent_trace": {
+          "z/REQ-004.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            78,
+            80,
+            84,
+            89
+          ]
+        }
+      }
+    },
+    "2": {
+      "old": {
+        "batch_completed": false,
+        "uncaught_exception": "AttributeError: 'str' object has no attribute 'items'",
+        "summary": null,
+        "diagnostics": [],
+        "checks": [
+          "两条记录的 Schema 检查已执行。处理首条记录的 relations 时异常，未到达 REQ-004 的来源检查；已收集的 Schema 错误没有从 CLI 发出。"
+        ],
+        "independent_trace": {
+          "a/SRC-001.yaml": [
+            60,
+            64,
+            69,
+            70,
+            73,
+            81
+          ],
+          "z/REQ-004.yaml": [
+            60,
+            64,
+            69,
+            70,
+            72
+          ]
+        }
+      },
+      "new": {
+        "batch_completed": true,
+        "uncaught_exception": null,
+        "summary": "FAIL: 2 YAML records; 2 errors",
+        "diagnostics": [
+          "a/SRC-001.yaml [relations]: 'REQ-002' is not of type 'object'",
+          "z/REQ-004.yaml: missing origin SRC-999"
+        ],
+        "checks": [
+          "跳过该记录的关系检查，继续执行 REQ-004 的来源检查。"
+        ],
+        "independent_trace": {
+          "a/SRC-001.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            80,
+            89,
+            78
+          ],
+          "z/REQ-004.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            78,
+            80,
+            84,
+            89
+          ]
+        }
+      }
+    },
+    "3": {
+      "old": {
+        "batch_completed": false,
+        "uncaught_exception": "TypeError: unhashable type: 'list'",
+        "summary": null,
+        "diagnostics": [],
+        "checks": [
+          "来源记录的 Schema 检查先产生内存错误，并暂以字符串 ID 入索引。kind 成员判断异常，后续文件未走到，跨记录检查未开始，也无对外字段诊断。"
+        ],
+        "independent_trace": {
+          "a/SRC-001.yaml": [
+            60,
+            64,
+            69,
+            70
+          ]
+        }
+      },
+      "new": {
+        "batch_completed": true,
+        "uncaught_exception": null,
+        "summary": "FAIL: 3 YAML records; 2 errors",
+        "diagnostics": [
+          "a/SRC-001.yaml [kind]: ['source'] is not one of ['requirement', 'source', 'contract', 'artifact', 'test', 'observation']",
+          "z/REQ-004.yaml: missing origin SRC-999"
+        ],
+        "checks": [
+          "来源 ID 入索引，类型用未知值表示；REQ-005 的来源存在性检查执行且能解析，来源类型判错分支不适用。REQ-004 的独立缺来源仍报告。"
+        ],
+        "independent_trace": {
+          "a/SRC-001.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            80,
+            89,
+            78
+          ],
+          "b/REQ-005.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            80,
+            84,
+            86,
+            89,
+            78
+          ],
+          "z/REQ-004.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            78,
+            80,
+            84,
+            89
+          ]
+        }
+      }
+    },
+    "4": {
+      "old": {
+        "batch_completed": true,
+        "uncaught_exception": null,
+        "summary": "FAIL: 2 YAML records; 2 errors",
+        "diagnostics": [
+          "b/REQ-005.yaml: missing origin SRC-001",
+          "z/REQ-004.yaml: missing origin SRC-999"
+        ],
+        "checks": [
+          "不存在来源文件。两个已解析需求的缺来源检查各自执行并报告。"
+        ],
+        "independent_trace": {
+          "b/REQ-005.yaml": [
+            60,
+            64,
+            69,
+            70,
+            73,
+            77,
+            81,
+            72
+          ],
+          "z/REQ-004.yaml": [
+            60,
+            64,
+            69,
+            70,
+            72,
+            73,
+            77,
+            81
+          ]
+        }
+      },
+      "new": {
+        "batch_completed": true,
+        "uncaught_exception": null,
+        "summary": "FAIL: 2 YAML records; 2 errors",
+        "diagnostics": [
+          "b/REQ-005.yaml: missing origin SRC-001",
+          "z/REQ-004.yaml: missing origin SRC-999"
+        ],
+        "checks": [
+          "不存在来源文件。两个已解析需求的缺来源检查各自执行并报告。"
+        ],
+        "independent_trace": {
+          "b/REQ-005.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            80,
+            84,
+            89,
+            78
+          ],
+          "z/REQ-004.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            78,
+            80,
+            84,
+            89
+          ]
+        }
+      }
+    },
+    "5": {
+      "old": {
+        "batch_completed": true,
+        "uncaught_exception": null,
+        "summary": "FAIL: 2 YAML records; 2 errors",
+        "diagnostics": [
+          "a/SRC-001.yaml [relations]: [] is not of type 'object'",
+          "z/REQ-004.yaml: missing origin SRC-999"
+        ],
+        "checks": [
+          "Schema 拒绝空列表。旧版将假值空列表经 or {} 换为空 mapping；新版跳过非 mapping 的关系检查。两版均继续执行 REQ-004 的来源检查。"
+        ],
+        "independent_trace": {
+          "a/SRC-001.yaml": [
+            60,
+            64,
+            69,
+            70,
+            73,
+            81,
+            72
+          ],
+          "z/REQ-004.yaml": [
+            60,
+            64,
+            69,
+            70,
+            72,
+            73,
+            77,
+            81
+          ]
+        }
+      },
+      "new": {
+        "batch_completed": true,
+        "uncaught_exception": null,
+        "summary": "FAIL: 2 YAML records; 2 errors",
+        "diagnostics": [
+          "a/SRC-001.yaml [relations]: [] is not of type 'object'",
+          "z/REQ-004.yaml: missing origin SRC-999"
+        ],
+        "checks": [
+          "Schema 拒绝空列表。旧版将假值空列表经 or {} 换为空 mapping；新版跳过非 mapping 的关系检查。两版均继续执行 REQ-004 的来源检查。"
+        ],
+        "independent_trace": {
+          "a/SRC-001.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            80,
+            89,
+            78
+          ],
+          "z/REQ-004.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            78,
+            80,
+            84,
+            89
+          ]
+        }
+      }
+    },
+    "6": {
+      "old": {
+        "batch_completed": false,
+        "uncaught_exception": "AttributeError: 'list' object has no attribute 'items'",
+        "summary": null,
+        "diagnostics": [],
+        "checks": [
+          "两条记录的 Schema 检查已执行。真值非空列表进入 .items() 并异常，未到达 REQ-004 的来源检查。"
+        ],
+        "independent_trace": {
+          "a/SRC-001.yaml": [
+            60,
+            64,
+            69,
+            70,
+            73,
+            81
+          ],
+          "z/REQ-004.yaml": [
+            60,
+            64,
+            69,
+            70,
+            72
+          ]
+        }
+      },
+      "new": {
+        "batch_completed": true,
+        "uncaught_exception": null,
+        "summary": "FAIL: 2 YAML records; 2 errors",
+        "diagnostics": [
+          "a/SRC-001.yaml [relations]: ['REQ-002'] is not of type 'object'",
+          "z/REQ-004.yaml: missing origin SRC-999"
+        ],
+        "checks": [
+          "跳过非 mapping 的关系检查，REQ-004 的来源检查照常执行。"
+        ],
+        "independent_trace": {
+          "a/SRC-001.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            80,
+            89,
+            78
+          ],
+          "z/REQ-004.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            78,
+            80,
+            84,
+            89
+          ]
+        }
+      }
+    },
+    "7": {
+      "old": {
+        "batch_completed": true,
+        "uncaught_exception": null,
+        "summary": "FAIL: 3 YAML records; 3 errors",
+        "diagnostics": [
+          "a/SRC-001.yaml [id]: {'bad': 'SRC-001'} is not of type 'string'",
+          "b/REQ-005.yaml: missing origin SRC-001",
+          "z/REQ-004.yaml: missing origin SRC-999"
+        ],
+        "checks": [
+          "映射 ID 被拒，记录不进入第二轮遍历用的索引；该记录自己的 origin 检查跳过。两条其他记录的来源检查执行并各报缺失。"
+        ],
+        "independent_trace": {
+          "a/SRC-001.yaml": [
+            60,
+            64
+          ],
+          "b/REQ-005.yaml": [
+            60,
+            64,
+            69,
+            70,
+            73,
+            77,
+            81,
+            72
+          ],
+          "z/REQ-004.yaml": [
+            60,
+            64,
+            69,
+            70,
+            72,
+            73,
+            77,
+            81
+          ]
+        }
+      },
+      "new": {
+        "batch_completed": true,
+        "uncaught_exception": null,
+        "summary": "FAIL: 3 YAML records; 4 errors",
+        "diagnostics": [
+          "a/SRC-001.yaml [id]: {'bad': 'SRC-001'} is not of type 'string'",
+          "a/SRC-001.yaml: missing origin SRC-998",
+          "b/REQ-005.yaml: missing origin SRC-001",
+          "z/REQ-004.yaml: missing origin SRC-999"
+        ],
+        "checks": [
+          "映射 ID 不进入索引，记录仍留在已解析记录列表；其字符串 origin 检查执行并报告 SRC-998。两条其他记录的来源检查均执行，其结果与旧版一致。"
+        ],
+        "independent_trace": {
+          "a/SRC-001.yaml": [
+            62,
+            64,
+            66,
+            80,
+            84,
+            89,
+            78
+          ],
+          "b/REQ-005.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            80,
+            84,
+            89,
+            78
+          ],
+          "z/REQ-004.yaml": [
+            62,
+            64,
+            66,
+            69,
+            75,
+            78,
+            80,
+            84,
+            89
+          ]
+        }
+      }
+    }
+  },
+  "questions": {
+    "1": {
+      "dimension": "正确复用",
+      "conclusion": [
+        "两版均完成批次并对 REQ-004 报缺来源，旧行为在此条件下可复用。"
+      ],
+      "scope": [
+        "已解析且到达此检查；字符串 origin 非自身 ID，且不在本次索引。"
+      ],
+      "evidence": [
+        "批次 1 两版实际输出，或两版来源检查具体分支。"
+      ]
+    },
+    "2": {
+      "dimension": "正确拒用",
+      "conclusion": [
+        "旧异常是真实历史观察；新版的同样输入正常完成并输出两份诊断，旧异常预期不可直接迁移。"
+      ],
+      "scope": [
+        "明确两版本、relations 字符串及独立缺来源。版本迁移与同条件下的矛盾分别判断。"
+      ],
+      "evidence": [
+        "批次 2 两版输出及 field guard 或 H2 的对应历史记录。"
+      ]
+    },
+    "3": {
+      "dimension": "条件限定",
+      "conclusion": [
+        "新版 kind 错误不等于 ID 缺失；来源移除后才对 REQ-005 报缺失。旧版批次 3 异常中断。"
+      ],
+      "scope": [
+        "已解析并持有字符串 ID；错误 kind 的类型不能被认证为 source；独立 REQ-004 缺来源保持。"
+      ],
+      "evidence": [
+        "批次 3、4 的两版输出，以及新版分别存 records、kind_by_id 并处理未知 kind 的代码。"
+      ]
+    },
+    "4": {
+      "dimension": "冲突识别",
+      "conclusion": [
+        "任意列表均崩溃与旧版空列表反例冲突；旧版非空列表崩溃的具体历史观察仍成立。新版两批均完成。"
+      ],
+      "scope": [
+        "旧版真假值分支，空列表走 or {}，非空列表调用 .items()；新版跳过错误容器并保留独立诊断。"
+      ],
+      "evidence": [
+        "H1/H2、批次 5 和 6 两版输出、两版关系处理分支。"
+      ]
+    },
+    "5": {
+      "dimension": "知识修订",
+      "conclusion": [
+        "两版均不注册映射 ID，故其他记录均报缺来源；新版仍检查该已解析记录的独立字符串 origin。"
+      ],
+      "scope": [
+        "修订分别限定两版本、索引资格与后续检查；修订标候选或待授权。"
+      ],
+      "evidence": [
+        "H4、批次 7 两版诊断、旧版索引遍历与新版 records 遍历。"
+      ]
+    }
+  },
+  "independent_review": {
+    "method": "Separate replay of both snapshots plus sys.settrace at selected validator lines. Traces list reached lines per input file.",
+    "batch_1_path_note": "The independent harness put the sole input under z/. The CLI comparison normalized that directory prefix only; traces keep independent paths.",
+    "python": "3.12.15 (main, Oct 21 2026, 17:38:27) [Clang 23.1.3 ]",
+    "pyyaml": "6.0.4",
+    "jsonschema": "4.26.0",
+    "matched_runs": 14
+  }
+}

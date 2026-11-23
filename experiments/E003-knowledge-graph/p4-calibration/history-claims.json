@@ -1,0 +1,11 @@
+{
+  "revision": "9c38156fa8c277507ab30529af6d0480e8cbf833",
+  "claims": [
+    {"id": "K1", "subject": "批次校验器", "relation": "收集", "object": "缺来源 ID 诊断", "condition": "已解析记录以字符串 ID 进入首条记录索引，字符串 origin 非自身 ID 且不在索引内，执行到来源检查", "status": "旧代码行为", "evidence": "H4 · scripts/validate_truth.py:60–79"},
+    {"id": "K2", "subject": "批次校验器", "relation": "抛出", "object": "未捕获 AttributeError", "condition": "复现表所列 relations: REQ-002", "status": "历史复现记录", "evidence": "H2 · 第二行数据"},
+    {"id": "K3", "subject": "批次校验器", "relation": "抛出", "object": "未捕获 AttributeError", "condition": "问题描述中的 relations 为字符串或列表", "status": "历史问题陈述", "evidence": "H1 · relations 条目"},
+    {"id": "K4", "subject": "批次校验器", "relation": "抛出", "object": "未捕获 TypeError", "condition": "复现表所列 kind: [requirement]", "status": "历史复现记录", "evidence": "H2 · 第一行数据"},
+    {"id": "K5", "subject": "非字符串 ID 的已解析记录", "relation": "不进入", "object": "批次首条记录索引", "condition": "Schema 校验后读到非字符串 id", "status": "旧代码行为", "evidence": "H4 · scripts/validate_truth.py:60–72"},
+    {"id": "K6", "subject": "旧版后续跨记录检查", "relation": "遍历", "object": "批次首条记录索引", "condition": "第一轮记录处理结束后进入第二轮", "status": "旧代码行为", "evidence": "H4 · scripts/validate_truth.py:72–87"}
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "status": "frozen_calibration_only",
+  "design_commit": "73122b4",
+  "frozen_at": "2026-11-23T23:45:38+08:00",
+  "versions": {
+    "old": "9c38156fa8c277507ab30529af6d0480e8cbf833",
+    "new": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf"
+  },
+  "source_paths": [
+    "scripts",
+    "schemas",
+    "specifications",
+    "tests",
+    "examples"
+  ],
+  "runtime": {
+    "python": "3.12.15",
+    "pyyaml": "6.0.4",
+    "jsonschema": "4.26.0"
+  },
+  "common_packet_sha256": {
+    "evidence.json": "608077658a8dffebcf773d94a1f986515b5c040fb1e796c960680b32d63bdfad",
+    "history.md": "ec5049384322f5f544a02f77c229f51d9bea0a4fce32f04b3ff9e9baa69945fd",
+    "source/new/examples/invalid/alias.yaml": "d2a142b729c66d5dcb32a9fe9ac54f0ef9cc4be26ac9340ded3088c8c7836a59",
+    "source/new/examples/invalid/dangling-reference.yaml": "9a3498ed3b5ae51f67c1c983bc8657f12e07bbb20851e47916e0332fb0a6f5d8",
+    "source/new/examples/invalid/duplicate-key.yaml": "e759f2c635d218747ceb531399072f1b79a99d1d7441be9537848b28d768c05d",
+    "source/new/examples/invalid/missing-acceptance.yaml": "c07f08a268ede1c0fd9f02e783ad62f1dc701b1a403ae94f60df8983f65c0ca1",
+    "source/new/examples/invalid/relations-string.yaml": "fe13971d60e36bab86d7d596f73a18eb8a5aab3c0011ec3c87b735b2fbcf46c0",
+    "source/new/examples/valid/ART-001.yaml": "4f717804b8c3fc85528e814e97b8ef7e2c9a4b85fd4a97f9d243b50ca37b0364",
+    "source/new/examples/valid/REQ-001.yaml": "a2ac6d99cd98d82ee38ce46739d5604a4a17f7f9eb1ae1fe856e6db1328ce421",
+    "source/new/examples/valid/SRC-001.yaml": "210b39fee04cd48d3d2cfeb40784d77fcc543904f7759fae5109c2573ea5ba9a",
+    "source/new/examples/valid/SRC-002.yaml": "caf7883806b01a518ce76e024379a58be6a099f79ee100cc356653d9c4130e53",
+    "source/new/examples/valid/TEST-001.yaml": "e62faafe34ed802b9fb29962ada2a37aedbb34b5fc63760642d6a370d62935d3",
+    "source/new/schemas/knowledge.schema.json": "f2626651f6108d1fb37be1b20af6759f225e85c4e6787605e5b46e659ff7c551",
+    "source/new/scripts/validate_truth.py": "a2f8a24a31e80e42e97050ee3f57d71f2b9bdedd3a5c573901903ef34d6a9142",
+    "source/new/specifications/change-protocol.md": "5c3d82a1364eb2c0faa6c715326d589dad5f663dc19f00eff4afc5f88732345d",
+    "source/new/specifications/modes.md": "c5a085dc84568ce6b426bda3b1c241fe9fb4e7d6d7475c307a123495f1b50673",
+    "source/new/specifications/principles.md": "d3b883662cafb05e613f9b61b11e2bc01e0cfe3aacfa5c8761042ba8e408ab23",
+    "source/new/specifications/source-of-truth.md": "cfcbba0cdee97145dbc2cb7f575e238d297cea52569663a18d29f233688e1be0",
+    "source/new/specifications/terminology.md": "817937193210799feeedecccfb82a80fb7e65ea281befc95f567b419f9c0fae1",
+    "source/new/specifications/yaml-profile.md": "e71338bbd413fb52e0e7b5b28e24b5cb73b96179d7313c097d685d4b620523cc",
+    "source/new/tests/test_validation.py": "6c48d863bbbbea6bc49e4d0d7b2b2f273306023c5ab5cb5820c77672ea26a142",
+    "source/old/examples/invalid/alias.yaml": "d2a142b729c66d5dcb32a9fe9ac54f0ef9cc4be26ac9340ded3088c8c7836a59",
+    "source/old/examples/invalid/dangling-reference.yaml": "9a3498ed3b5ae51f67c1c983bc8657f12e07bbb20851e47916e0332fb0a6f5d8",
+    "source/old/examples/invalid/duplicate-key.yaml": "e759f2c635d218747ceb531399072f1b79a99d1d7441be9537848b28d768c05d",
+    "source/old/examples/invalid/missing-acceptance.yaml": "c07f08a268ede1c0fd9f02e783ad62f1dc701b1a403ae94f60df8983f65c0ca1",
+    "source/old/examples/valid/ART-001.yaml": "4f717804b8c3fc85528e814e97b8ef7e2c9a4b85fd4a97f9d243b50ca37b0364",
+    "source/old/examples/valid/REQ-001.yaml": "a2ac6d99cd98d82ee38ce46739d5604a4a17f7f9eb1ae1fe856e6db1328ce421",
+    "source/old/examples/valid/SRC-001.yaml": "210b39fee04cd48d3d2cfeb40784d77fcc543904f7759fae5109c2573ea5ba9a",
+    "source/old/examples/valid/TEST-001.yaml": "e62faafe34ed802b9fb29962ada2a37aedbb34b5fc63760642d6a370d62935d3",
+    "source/old/schemas/knowledge.schema.json": "f2626651f6108d1fb37be1b20af6759f225e85c4e6787605e5b46e659ff7c551",
+    "source/old/scripts/validate_truth.py": "30c8908a19b9277ccaa122b8c610436b1e0d07c8cdedc83cd9d793647b0a095a",
+    "source/old/specifications/change-protocol.md": "5c3d82a1364eb2c0faa6c715326d589dad5f663dc19f00eff4afc5f88732345d",
+    "source/old/specifications/modes.md": "c5a085dc84568ce6b426bda3b1c241fe9fb4e7d6d7475c307a123495f1b50673",
+    "source/old/specifications/principles.md": "d3b883662cafb05e613f9b61b11e2bc01e0cfe3aacfa5c8761042ba8e408ab23",
+    "source/old/specifications/source-of-truth.md": "cfcbba0cdee97145dbc2cb7f575e238d297cea52569663a18d29f233688e1be0",
+    "source/old/specifications/terminology.md": "817937193210799feeedecccfb82a80fb7e65ea281befc95f567b419f9c0fae1",
+    "source/old/specifications/yaml-profile.md": "e71338bbd413fb52e0e7b5b28e24b5cb73b96179d7313c097d685d4b620523cc",
+    "source/old/tests/test_validation.py": "a0635f821781d25f11d8fb85f0fa773045f7e9832ad3a3ae27f03dc87eeb9bc8",
+    "task.md": "d72b02330b36c64d070062f9dcf776ffeb12b38afb36426ae7a30649208da6b1"
+  },
+  "additional_packet_sha256": {
+    "A": {},
+    "B": {
+      "summary.md": "238cbf56a9bec3c7713121257fcbe6fb794d365b541f78d2fcd6878dc6a46773"
+    },
+    "C": {
+      "graph.md": "2c2570e4250630da5dd3c360ebbbcee46471bb850736e5e348eef59815a393f5"
+    }
+  },
+  "organizer_sha256": {
+    "prepare.py": "8dd27e47a8d5a774b5472e4cb1e1573255e860d9df7d3dc132ffe687ee4fe1be",
+    "gold.json": "3021025f984a07f7ec88b5a87d3de002132e2ab18edd46bef6274556debb46ac",
+    "history-claims.json": "ed742dd2dab331149af3a06269896a91e5b1ed464d626aee1332a56c94e0fe47",
+    "material-audit.md": "1d4285c9db55f955e6603649f889a0ac689bcbf65500ed9095aacf7203f2f06b",
+    "pilot-response.md": "f770a8a56cae6ecaca8b5c98cb74210bd9acb7517ad9aa761199867dbfcd3033"
+  },
+  "measured_input": {
+    "packet_totals": {
+      "A": {
+        "files": 39,
+        "characters": 37229,
+        "bytes": 47665
+      },
+      "B": {
+        "files": 40,
+        "characters": 37902,
+        "bytes": 48900
+      },
+      "C": {
+        "files": 40,
+        "characters": 38108,
+        "bytes": 49016
+      }
+    },
+    "added_material_characters": {
+      "A": 0,
+      "B": 673,
+      "C": 879
+    },
+    "human_preparation_time": null,
+    "note": "Counts cover all text files made available in each packet. Actual read volume and token use were not measured."
+  },
+  "pilot": {
+    "id": "pilot-A",
+    "group": "A",
+    "independent_session": true,
+    "packet_ready_to_response_seconds": 229.9,
+    "result": {
+      "correct_primary_judgments": 5,
+      "total_judgments": 5,
+      "matched_cli_rows": 14
+    },
+    "evidence_sha256_at_dispatch": "3ac1aeccdd902f44d69602e158eba81d94dc2ebe4a50e3eb0da01cb9ba18acea",
+    "canonicalization": "Replaced /privatescripts/validate_truth.py with scripts/validate_truth.py in nine traceback frames. All other packet bytes unchanged.",
+    "formal_sample": false
+  },
+  "formal_distribution": {
+    "status": "not_dispatched",
+    "planned_assignments_for_this_packet": [
+      {
+        "id": "502",
+        "wave": 1,
+        "group": "C"
+      },
+      {
+        "id": "399",
+        "wave": 1,
+        "group": "B"
+      },
+      {
+        "id": "873",
+        "wave": 1,
+        "group": "A"
+      },
+      {
+        "id": "650",
+        "wave": 2,
+        "group": "A"
+      },
+      {
+        "id": "464",
+        "wave": 2,
+        "group": "B"
+      },
+      {
+        "id": "528",
+        "wave": 2,
+        "group": "C"
+      }
+    ],
+    "random_seed": 73122,
+    "material_scope": "Two proposed independent sessions per condition. Pilot performance limits discrimination; use this frozen case for calibration."
+  }
+}

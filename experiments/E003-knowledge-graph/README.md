@@ -59,6 +59,8 @@ python -B experiments/E003-knowledge-graph/baseline/replay.py /path/to/cookbook/
 
 后续把五项分别记录。Triple F1 依已确认的实体、谓词和有向边统计。Evidence Support 逐条核对原始证据。Claim Recall 以人工确认的独立清单为分母。Scope Correctness 单列适用版本与前提。Unsupported Inference 记录无支持推断及未经支持升级为确定结论的实例。控制实验覆盖了匹配口径和错误识别，工程案例的人工判据仍待完成。
 
-## P3 · 知识复用对照准备
+## P3-A · 同案知识辅助
 
-已准备以修复前快照进行同案历史重放的匹配对照。两组使用相同任务、代码与来源。实验组增加人工确认的图谱子集。留出验收已用历史修复校准，历史修复前后的测试均通过原例和五项 #16 回归，只有修复后能识别补齐验收项及同文件错误诊断的两项变异。答卷采集待人工裁定后开始。 [对照草案](case-001/reuse-protocol.md) · [验收校准](case-001/reuse-calibration.json)
+两组使用相同的修复前代码、任务与来源。实验组增加作者确认的知识摘录。该设计观察知识结构、提前整理和人工筛选共同提供的辅助。留出验收已用历史修复校准，六条主张和两条关系已由作者确认为本轮输入。 [对照协议](case-001/reuse-protocol.md) · [知识摘录](case-001/reuse-knowledge.md) · [验收校准](case-001/reuse-calibration.json)
+
+P3-B 单独对照跨任务复用。新案例为尚未解决且机制相关的任务，使用在选定新任务前固定的知识，案例仍待选。 [跨任务复用范围](case-001/reuse-protocol.md#p3-b--跨任务知识复用)

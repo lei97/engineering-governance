@@ -1,0 +1,67 @@
+{
+  "status": "frozen-for-p3-a",
+  "baseline_revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+  "baseline_archive_sha256": "97b66e9c57a8d7f28e2429aa97acb1fe691f3f3168e70e69f83696375d6e967a",
+  "candidate_inputs_sha256": {
+    "reuse-task.md": "c59f79db01a1756be75013405bdc777ced85a0d9991f129c68121e68ab691a2c",
+    "sources.json": "b977ba4dc60673dc5379eb77f67565726dd39ebac437191b697ddc7451c075f2",
+    "reuse-knowledge.md": "9339a9c785dbf9230999d78b3d9428017c5e5f41377d016d133e63bc2a51e8ea"
+  },
+  "evaluator_only_sha256": {
+    "holdout.json": "38f687f6a394f249d503a3e36907979e64f9fbaf1e7fd4a42d118b40a44df395",
+    "reuse-calibration.json": "cb06a6c673e2d1d4b559f28df7e454502c95f90fb1e98ba95d86845d966517c9"
+  },
+  "runtime": {
+    "python": "3.12.15",
+    "pyyaml": "6.0.4",
+    "jsonschema": "4.26.0"
+  },
+  "preflight": {
+    "A": {
+      "input_files": [
+        "reuse-task.md",
+        "sources.json"
+      ],
+      "baseline_tests": "passed",
+      "positive_fixtures": "passed"
+    },
+    "B": {
+      "input_files": [
+        "reuse-task.md",
+        "sources.json",
+        "reuse-knowledge.md"
+      ],
+      "baseline_tests": "passed",
+      "positive_fixtures": "passed"
+    }
+  },
+  "author_decision": {
+    "date": "2026-11-23",
+    "approval": "作者确认，启动 P3-A",
+    "scope": "case-001 P3-A only",
+    "knowledge_sha256": "9339a9c785dbf9230999d78b3d9428017c5e5f41377d016d133e63bc2a51e8ea"
+  },
+  "protocol_sha256": "fa698ace8334c056b3d099548986b8b3a304e7db03b85d951f3b8c2896ce4e9f",
+  "assignment": [
+    {
+      "order": 1,
+      "group": "B",
+      "id": 479
+    },
+    {
+      "order": 2,
+      "group": "A",
+      "id": 391
+    },
+    {
+      "order": 3,
+      "group": "B",
+      "id": 494
+    },
+    {
+      "order": 4,
+      "group": "A",
+      "id": 700
+    }
+  ]
+}

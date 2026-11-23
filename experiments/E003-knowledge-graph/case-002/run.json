@@ -1,0 +1,106 @@
+{
+  "author_confirmation": "2026-11-23, 确认 #6a、逐文件报告小写 .yml、拒绝其入索引并继续校验 .yaml，冻结材料并启动 P3-B",
+  "frozen_at": "2026-11-23T22:41:32+08:00",
+  "code_commit": "804880a46f92b88de8ee6a7bbb29a5d624768df7",
+  "snapshot_paths": [
+    "AGENTS.md",
+    "requirements.txt",
+    "specifications/yaml-profile.md",
+    "scripts",
+    "schemas",
+    "tests",
+    "examples"
+  ],
+  "snapshot_manifest": {
+    "AGENTS.md": "6a38db3b3841f61ba86a27986860170d3ab2ad229028630a0285fce1e9d6339b",
+    "examples/invalid/00-support/SRC-001.yaml": "a325c89d12d611c93d2d9e2c646f940bc68f9680da123cfc24148dd1b3d6769d",
+    "examples/invalid/alias.yaml": "3c9e2791d2ffafe3044fcfbddeacc8f36f86d864e7a2242e2b1fdcb7c93d5ed5",
+    "examples/invalid/anchor.yaml": "b0149f23e57a358c4b1c638f811374ff613c916c594447020f085e0e232c317d",
+    "examples/invalid/complex-mapping-key.yaml": "1193003eca29f07aae680d564836393e42a76d453e52a300a10f140d9ac88442",
+    "examples/invalid/dangling-reference.yaml": "9a3498ed3b5ae51f67c1c983bc8657f12e07bbb20851e47916e0332fb0a6f5d8",
+    "examples/invalid/duplicate-id.yaml": "7a5378753b125935652d9ef7b163ee8e5b398a541d0cb2633a1fe63ba489abf2",
+    "examples/invalid/duplicate-key.yaml": "e759f2c635d218747ceb531399072f1b79a99d1d7441be9537848b28d768c05d",
+    "examples/invalid/explicit-tag.yaml": "4ab734a53a5efff2bfb67a080d1faf214f1e74ae3239aac28432876b07c6721e",
+    "examples/invalid/invalid-relation-target.yaml": "debb834472f23348a8ce222405e290dbe1dd1cc20d66a21fdf9962c5f677e45a",
+    "examples/invalid/mismatched-id-kind.yaml": "27ff28e5c824e4badc6595ce8fa6e4878f775335de45f3b6b5f04b622c3726f2",
+    "examples/invalid/missing-acceptance.yaml": "c07f08a268ede1c0fd9f02e783ad62f1dc701b1a403ae94f60df8983f65c0ca1",
+    "examples/invalid/missing-relation-target.yaml": "8d0fa0993a7c7e598ecfbd205c4e2e216e0ab4eaf444cdc3aff025908ee7b407",
+    "examples/invalid/multiple-documents.yaml": "ca85ca382ab881656f98b4899cf8aee91efeaa5ca944b426305f393623751be2",
+    "examples/invalid/origin-not-source.yaml": "eb3ea3f8f16272c72a76777fa0f5545c8d506a762fa3838cf5b08577c2581872",
+    "examples/invalid/relation-self.yaml": "3489fe4fe685a024b074d6f069bb779f8d7e0566724e0aaea2292e90bb264795",
+    "examples/invalid/relations-string.yaml": "fe13971d60e36bab86d7d596f73a18eb8a5aab3c0011ec3c87b735b2fbcf46c0",
+    "examples/invalid/self-origin.yaml": "ea11efafbe49eff1b3327b323152f934511ad8f5fd966917ab20035124be7ad5",
+    "examples/invalid/top-level-sequence.yaml": "46fa958c9ce8619e7afdd7c73630cd3168d434d867bb5b4d27dfaf4ff4ebae09",
+    "examples/valid/ART-001.yaml": "4f717804b8c3fc85528e814e97b8ef7e2c9a4b85fd4a97f9d243b50ca37b0364",
+    "examples/valid/REQ-001.yaml": "a2ac6d99cd98d82ee38ce46739d5604a4a17f7f9eb1ae1fe856e6db1328ce421",
+    "examples/valid/SRC-001.yaml": "210b39fee04cd48d3d2cfeb40784d77fcc543904f7759fae5109c2573ea5ba9a",
+    "examples/valid/SRC-002.yaml": "caf7883806b01a518ce76e024379a58be6a099f79ee100cc356653d9c4130e53",
+    "examples/valid/TEST-001.yaml": "e62faafe34ed802b9fb29962ada2a37aedbb34b5fc63760642d6a370d62935d3",
+    "requirements.txt": "8261f9aabf649d513cd6f9436e152bc7556415a887f87335a150c73f7d64633d",
+    "schemas/knowledge.schema.json": "f2626651f6108d1fb37be1b20af6759f225e85c4e6787605e5b46e659ff7c551",
+    "scripts/validate_truth.py": "a2f8a24a31e80e42e97050ee3f57d71f2b9bdedd3a5c573901903ef34d6a9142",
+    "specifications/yaml-profile.md": "e71338bbd413fb52e0e7b5b28e24b5cb73b96179d7313c097d685d4b620523cc",
+    "tests/test_validation.py": "63913738846a868fdecf97b83dad984239122c2656070f411c8f77d11e435922"
+  },
+  "knowledge_commit": "307ff57ba10dfb7f6c4773053f6b9dc6be0aec48",
+  "knowledge_sha256": "9339a9c785dbf9230999d78b3d9428017c5e5f41377d016d133e63bc2a51e8ea",
+  "prior_sources_sha256": "b977ba4dc60673dc5379eb77f67565726dd39ebac437191b697ddc7451c075f2",
+  "task_sha256": "a24547e62cbf7644fec2d6a6fb392c72a5262d6057aa24ba7e74cef4ec5d8f28",
+  "holdout_sha256": "49963c618e762f65257b6720a3fd2bc25df3584d563facbe1bc57ec0e5b07dcf",
+  "characters": {
+    "task": 646,
+    "shared_optional_prior_sources": 5168,
+    "B_only_knowledge": 1071
+  },
+  "runtime": {
+    "python": "3.12.15",
+    "pyyaml": "6.0.4",
+    "jsonschema": "4.26.0",
+    "models": "independent Codex agents with inherited default model settings"
+  },
+  "seed": 20261123,
+  "assignments": [
+    {
+      "id": "872",
+      "group": "A",
+      "wave": 1
+    },
+    {
+      "id": "689",
+      "group": "B",
+      "wave": 1
+    },
+    {
+      "id": "770",
+      "group": "A",
+      "wave": 2
+    },
+    {
+      "id": "605",
+      "group": "B",
+      "wave": 2
+    }
+  ],
+  "execution": {
+    "status": "partial",
+    "waves": [
+      {
+        "wave": 1,
+        "dispatch_marker_at": "2026-11-23T22:41:40+08:00"
+      },
+      {
+        "wave": 2,
+        "dispatch_marker_at": "2026-11-23T22:47:38+08:00"
+      }
+    ],
+    "received_by_group": {
+      "A": 1,
+      "B": 1
+    },
+    "not_received": {
+      "770": "Codex session usage limit, only test and fixture drafts, no final patch or report",
+      "605": "Codex session usage limit, only test and fixture drafts, no final patch or report"
+    },
+    "review": "Independent patch-review agent hit the same limit. The experiment coordinator reviewed the received patches and reports, with group assignments visible."
+  }
+}

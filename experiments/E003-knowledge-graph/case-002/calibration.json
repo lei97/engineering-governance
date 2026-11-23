@@ -1,0 +1,60 @@
+{
+  "baseline": {
+    "passed": false,
+    "failed_batches": [
+      "mixed",
+      "yml-only",
+      "continue-validation",
+      "exclude-rejected-source-from-index"
+    ],
+    "unittest_exit": 0
+  },
+  "reference": {
+    "passed": true,
+    "failed_batches": [],
+    "unittest_exit": 0
+  },
+  "early-return": {
+    "passed": false,
+    "failed_batches": [
+      "mixed",
+      "continue-validation",
+      "exclude-rejected-source-from-index"
+    ],
+    "unittest_exit": 0
+  },
+  "top-level-only": {
+    "passed": false,
+    "failed_batches": [
+      "mixed",
+      "yml-only",
+      "continue-validation",
+      "exclude-rejected-source-from-index"
+    ],
+    "unittest_exit": 0
+  },
+  "indexing-rejected-sources": {
+    "passed": false,
+    "failed_batches": [
+      "exclude-rejected-source-from-index"
+    ],
+    "unittest_exit": 0
+  },
+  "report-names-without-guidance": {
+    "passed": false,
+    "failed_batches": [
+      "mixed",
+      "yml-only",
+      "continue-validation",
+      "exclude-rejected-source-from-index"
+    ],
+    "unittest_exit": 0
+  },
+  "rejecting-directories": {
+    "passed": false,
+    "failed_batches": [
+      "yaml-only"
+    ],
+    "unittest_exit": 0
+  }
+}

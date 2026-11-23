@@ -1,0 +1,318 @@
+{
+  "claims": [
+    {
+      "id": "C01",
+      "statement": "模式要求 requirement 记录具备 acceptance 字段。",
+      "status": "policy",
+      "scope": "基线修订 83a21206ebf9e1addf6aa115a9f3c6427c2a40bf，knowledge.schema.json 的 requirement 条件分支",
+      "evidence": [
+        {
+          "document_id": "D6",
+          "lines": [
+            83,
+            98
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "statement": "反例 missing-acceptance.yaml 的 requirement 记录缺少 acceptance 字段。",
+      "status": "observation",
+      "scope": "基线修订 83a21206ebf9e1addf6aa115a9f3c6427c2a40bf，所给反例文件",
+      "evidence": [
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "statement": "反例 missing-acceptance.yaml 声明 origin 为 SRC-001。",
+      "status": "observation",
+      "scope": "基线修订 83a21206ebf9e1addf6aa115a9f3c6427c2a40bf，所给反例文件",
+      "evidence": [
+        {
+          "document_id": "D4",
+          "lines": [
+            6,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C04",
+      "statement": "所给 invalid 目录 ID 清单未列出 SRC-001。",
+      "status": "observation",
+      "scope": "基线修订 83a21206ebf9e1addf6aa115a9f3c6427c2a40bf，所给 git grep 清单",
+      "evidence": [
+        {
+          "document_id": "D5",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C05",
+      "statement": "对已进入 records 的记录，如果字符串 origin 既非自身 ID 又未收录于 kind_by_id，校验器追加带文件路径的 missing origin 诊断。",
+      "status": "observation",
+      "scope": "基线修订 83a21206ebf9e1addf6aa115a9f3c6427c2a40bf，validate_path 引用检查分支",
+      "evidence": [
+        {
+          "document_id": "D3",
+          "lines": [
+            62,
+            65
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            72,
+            85
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C06",
+      "statement": "test_invalid 对目录收集到的所有完整错误字符串执行 acceptance 子串的存在性断言。",
+      "status": "observation",
+      "scope": "基线修订 83a21206ebf9e1addf6aa115a9f3c6427c2a40bf，原 test_invalid 的 acceptance 断言",
+      "evidence": [
+        {
+          "document_id": "D2",
+          "lines": [
+            19,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C07",
+      "statement": "为反例补入合法的 acceptance 字段后，requirement 分支的缺字段条件消失。",
+      "status": "inference",
+      "scope": "基线修订 83a21206ebf9e1addf6aa115a9f3c6427c2a40bf，仅对反例补入合法字段，并继续按同一模式校验",
+      "evidence": [
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D6",
+          "lines": [
+            83,
+            98
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            62,
+            64
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C08",
+      "statement": "补入合法 acceptance 后，校验器仍会为该反例产生带 missing-acceptance.yaml 文件名的 missing origin SRC-001 诊断。",
+      "status": "inference",
+      "scope": "基线修订 83a21206ebf9e1addf6aa115a9f3c6427c2a40bf，保留文件名和 origin，记录进入 records，且 SRC-001 仍未进入 kind_by_id",
+      "evidence": [
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D5",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            62,
+            65
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C09",
+      "statement": "该缺失来源诊断的文件名足以使 acceptance 子串断言通过。",
+      "status": "inference",
+      "scope": "基线修订 83a21206ebf9e1addf6aa115a9f3c6427c2a40bf，接受该诊断的错误列表与 test_invalid 中的单项 acceptance 断言",
+      "evidence": [
+        {
+          "document_id": "D2",
+          "lines": [
+            20,
+            23
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        },
+        {
+          "document_id": "D5",
+          "lines": [
+            5,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C10",
+      "statement": "评审作者报告，复制目录并为反例补入合法 acceptance 后，原断言仍全部通过。",
+      "status": "reported",
+      "scope": "D1 所述临时目录复现条件",
+      "evidence": [
+        {
+          "document_id": "D1",
+          "lines": [
+            94,
+            97
+          ]
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "source": "C01",
+      "predicate": "supports_conditional",
+      "target": "C07",
+      "scope": "基线修订 83a21206ebf9e1addf6aa115a9f3c6427c2a40bf，反例的 kind 保持 requirement 且新字段合法",
+      "evidence": [
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D6",
+          "lines": [
+            83,
+            98
+          ]
+        }
+      ],
+      "reason": "C02 给出原始缺字段状态，加入字段满足模式在该分支的字段存在性约束。"
+    },
+    {
+      "source": "C05",
+      "predicate": "supports_conditional",
+      "target": "C08",
+      "scope": "基线修订 83a21206ebf9e1addf6aa115a9f3c6427c2a40bf，该记录进入 records，保留文件名和 origin，索引仍缺 SRC-001",
+      "evidence": [
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        },
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D5",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ],
+      "reason": "路径插值和未索引分支决定诊断格式。C03 提供引用值，C04 支持未索引条件。"
+    },
+    {
+      "source": "C08",
+      "predicate": "sufficient_for",
+      "target": "C09",
+      "scope": "基线修订 83a21206ebf9e1addf6aa115a9f3c6427c2a40bf，诊断位于传给原断言的 errors 中，仅就 acceptance 单项而言",
+      "evidence": [
+        {
+          "document_id": "D2",
+          "lines": [
+            20,
+            23
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        },
+        {
+          "document_id": "D5",
+          "lines": [
+            5,
+            5
+          ]
+        }
+      ],
+      "reason": "文件名已经包含 acceptance，故该诊断能充当任意匹配项。只要其他错误字符串含同一子串，该单项也可以通过。"
+    },
+    {
+      "source": "C09",
+      "predicate": "partially_explains",
+      "target": "C10",
+      "scope": "D1 所述的副本复现，按基线的原断言运行",
+      "evidence": [
+        {
+          "document_id": "D1",
+          "lines": [
+            94,
+            97
+          ]
+        },
+        {
+          "document_id": "D2",
+          "lines": [
+            19,
+            23
+          ]
+        }
+      ],
+      "reason": "文件名匹配解释了报告中的 acceptance 单项通过。整组断言还要求文件数为 5，其他三个子串也各有匹配。"
+    }
+  ]
+}

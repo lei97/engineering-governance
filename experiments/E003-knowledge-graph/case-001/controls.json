@@ -1,0 +1,333 @@
+{
+  "nodes": {
+    "E03": "v0.1 knowledge.schema.json",
+    "E05": "acceptance 字段",
+    "E04": "REQ-005 的修复前反例 missing-acceptance.yaml",
+    "E06": "SRC-001 来源 ID",
+    "C02": "test_invalid 在整批完整错误字符串中搜索 acceptance 子串",
+    "C05": "当次校验批次中缺少被 REQ-005 引用的 SRC-001",
+    "C08": "给反例补齐合法的 acceptance 后，该 acceptance 检查仍会因缺失来源诊断中的文件名而误通过"
+  },
+  "predicates": {
+    "requires": "定义为必填",
+    "forbids": "规定不得出现",
+    "references_as_origin": "源记录以目标 ID 作为 origin",
+    "contributes_to": "在其他相关前提成立时参与导致结果",
+    "guarantees": "源事实本身足以保证结果，即使其他前提未成立"
+  },
+  "source_documents": [
+    {
+      "id": "D1",
+      "type": "review_note",
+      "title": "v3 评审清单 #13 的问题与复现",
+      "artifact_sha256": "1576885cd8e1540654015d82ce3ed7adbfbaa017789e4b46b1f3e5a237e3fb4b",
+      "line_ranges": [
+        [
+          84,
+          97
+        ]
+      ],
+      "text": "84\t### 问题\n85\t`tests/test_validation.py` 中的 `test_invalid` 对整个目录的错误列表做子串匹配：\n86\t\n87\t```python\n88\tfor term in ('duplicate mapping key', 'anchors forbidden', 'missing origin', 'acceptance'):\n89\t    self.assertTrue(any(term in e for e in errors), (term, errors))\n90\t```\n91\t\n92\t错误字符串包含文件路径，而 `missing-acceptance.yaml` 的文件名本身就带有 `acceptance`。另外，这个反例引用了 `examples/invalid/` 中不存在的 `SRC-001`，所以它总会额外产生一条 `missing origin SRC-001`。\n93\t\n94\t### 复现\n95\t1. 复制 `examples/invalid/` 到临时目录\n96\t2. 给 `missing-acceptance.yaml` 补上合法的 `acceptance`\n97\t3. 再跑原来的断言，`'acceptance'` 仍然命中 `missing-acceptance.yaml: missing origin SRC-001`，测试照样通过"
+    },
+    {
+      "id": "D2",
+      "type": "git_file",
+      "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+      "path": "tests/test_validation.py",
+      "line_ranges": [
+        [
+          19,
+          23
+        ]
+      ],
+      "text": "19\t    def test_invalid(self):\n20\t        errors, count = validate_path(ROOT/'examples/invalid')\n21\t        self.assertEqual(count, 5)\n22\t        for term in ('duplicate mapping key', 'anchors forbidden', 'missing origin', 'acceptance'):\n23\t            self.assertTrue(any(term in e for e in errors), (term, errors))"
+    },
+    {
+      "id": "D3",
+      "type": "git_file",
+      "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+      "path": "scripts/validate_truth.py",
+      "line_ranges": [
+        [
+          47,
+          53
+        ],
+        [
+          62,
+          65
+        ],
+        [
+          72,
+          87
+        ],
+        [
+          103,
+          103
+        ]
+      ],
+      "text": "47\tdef validate_path(directory):\n48\t    schema = json.loads((ROOT/'schemas/knowledge.schema.json').read_text(encoding='utf-8'))\n49\t    validator = Draft202012Validator(schema)\n50\t    files = sorted(directory.rglob('*.yaml'))\n51\t    errors = []\n52\t    records = []\n53\t    kind_by_id = {}\n62\t        for err in validator.iter_errors(record):\n63\t            errors.append(f'{path} [{\"/\".join(map(str,err.path)) or \"root\"}]: {err.message}')\n64\t        records.append((path, record))\n65\t        ident = record.get('id')\n72\t        if ident in kind_by_id:\n73\t            errors.append(f'{path}: duplicate id {ident}')\n74\t        else:\n75\t            kind_by_id[ident] = kind\n76\t        if kind is not None and not ident.startswith(PREFIX[kind] + '-'):\n77\t            errors.append(f'{path}: mismatched id and kind')\n78\t    for path, record in records:\n79\t        ident = record.get('id')\n80\t        origin = record.get('origin')\n81\t        if isinstance(origin, str):\n82\t            if origin == ident:\n83\t                errors.append(f'{path}: self origin')\n84\t            elif origin not in kind_by_id:\n85\t                errors.append(f'{path}: missing origin {origin}')\n86\t            elif kind_by_id[origin] not in (None, 'source'):\n87\t                errors.append(f'{path}: origin must be source')\n103\t    return errors, len(files)"
+    },
+    {
+      "id": "D4",
+      "type": "git_file",
+      "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+      "path": "examples/invalid/missing-acceptance.yaml",
+      "line_ranges": [
+        [
+          1,
+          6
+        ]
+      ],
+      "text": "1\tid: REQ-005\n2\tkind: requirement\n3\ttitle: 没有验收条件\n4\tstatus: proposed\n5\tstatement: 该需求缺少可供判定完成条件的验收标准。\n6\torigin: SRC-001"
+    },
+    {
+      "id": "D5",
+      "type": "git_inventory",
+      "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+      "path": "examples/invalid/",
+      "command": "git grep -n '^id:' <revision> -- 'examples/invalid/*.yaml'",
+      "line_ranges": [
+        [
+          1,
+          6
+        ]
+      ],
+      "text": "1\texamples/invalid/alias.yaml:1:id: OBS-001\n2\texamples/invalid/dangling-reference.yaml:1:id: REQ-004\n3\texamples/invalid/duplicate-key.yaml:1:id: REQ-002\n4\texamples/invalid/duplicate-key.yaml:2:id: REQ-003\n5\texamples/invalid/missing-acceptance.yaml:1:id: REQ-005\n6\texamples/invalid/relations-string.yaml:1:id: TEST-002"
+    },
+    {
+      "id": "D6",
+      "type": "git_file",
+      "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+      "path": "schemas/knowledge.schema.json",
+      "line_ranges": [
+        [
+          81,
+          99
+        ]
+      ],
+      "text": "81\t  \"allOf\": [\n82\t    {\n83\t      \"if\": {\n84\t        \"properties\": {\n85\t          \"kind\": {\n86\t            \"const\": \"requirement\"\n87\t          }\n88\t        },\n89\t        \"required\": [\n90\t          \"kind\"\n91\t        ]\n92\t      },\n93\t      \"then\": {\n94\t        \"required\": [\n95\t          \"origin\",\n96\t          \"acceptance\"\n97\t        ]\n98\t      }\n99\t    },"
+    }
+  ],
+  "supplemental_observations": [
+    {
+      "id": "H1",
+      "path": "holdout.json",
+      "meaning": "同一补齐验收项变异在两个提交上的实测结果",
+      "text": {
+        "mutation": {
+          "file": "examples/invalid/missing-acceptance.yaml",
+          "append": "acceptance:\n  - 校验器可以读取补齐的验收条件。\n"
+        },
+        "test_command": "python -B -m unittest discover -s tests -k test_invalid",
+        "validation_command": "python -B scripts/validate_truth.py examples/invalid",
+        "runtime": {
+          "python": "3.12.15",
+          "pyyaml": "6.0.4",
+          "jsonschema": "4.26.0"
+        },
+        "pre-fix": {
+          "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+          "results": {
+            "original": {
+              "test_exit": 0,
+              "validation_exit": 1,
+              "diagnostics_for_mutated_file": [
+                "ERROR: examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property",
+                "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+              ],
+              "test_reports_required_property": false
+            },
+            "restored-acceptance": {
+              "test_exit": 0,
+              "validation_exit": 1,
+              "diagnostics_for_mutated_file": [
+                "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+              ],
+              "test_reports_required_property": false
+            }
+          }
+        },
+        "post-fix": {
+          "revision": "093f88d6f43b36e80fe846af26d423f98e4930e3",
+          "results": {
+            "original": {
+              "test_exit": 0,
+              "validation_exit": 1,
+              "diagnostics_for_mutated_file": [
+                "ERROR: examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property"
+              ],
+              "test_reports_required_property": false
+            },
+            "restored-acceptance": {
+              "test_exit": 1,
+              "validation_exit": 1,
+              "diagnostics_for_mutated_file": [],
+              "test_reports_required_property": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "H2",
+      "revision": "093f88d6f43b36e80fe846af26d423f98e4930e3",
+      "path": "tests/test_validation.py",
+      "line_ranges": [
+        [
+          41,
+          57
+        ]
+      ],
+      "text": "41\t    def test_invalid(self):\n42\t        self.assert_invalid_examples(ROOT / 'examples/invalid')\n43\t\n44\t    def assert_invalid_examples(self, directory):\n45\t        files = [path.relative_to(directory).as_posix() for path in directory.rglob('*.yaml')]\n46\t        self.assertCountEqual(files, INVALID_DIAGNOSTICS.keys())\n47\t        errors, count = validate_path(directory)\n48\t        self.assertEqual(count, len(files))\n49\t        for filename, expected in INVALID_DIAGNOSTICS.items():\n50\t            path = str(directory / filename)\n51\t            prefixes = (f'{path}: ', f'{path} [')\n52\t            diagnostics = [\n53\t                error[len(path):].removeprefix(': ').removeprefix(' ')\n54\t                for error in errors if error.startswith(prefixes)\n55\t            ]\n56\t            self.assertEqual(diagnostics, expected, filename)\n57\t        self.assertEqual(len(errors), sum(map(len, INVALID_DIAGNOSTICS.values())), errors)"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "K63",
+      "source": "E03",
+      "predicate": "forbids",
+      "target": "E05",
+      "scope": {
+        "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+        "conditions": "记录的 kind 为 requirement"
+      },
+      "evidence": [
+        "D6:83-97"
+      ]
+    },
+    {
+      "id": "K96",
+      "source": "C02",
+      "predicate": "contributes_to",
+      "target": "C08",
+      "scope": {
+        "revision": "093f88d6f43b36e80fe846af26d423f98e4930e3",
+        "conditions": "给原反例补齐合法 acceptance，保留原路径并运行该版本的测试"
+      },
+      "evidence": [
+        "D1:92-97",
+        "D2:19-23",
+        "H1",
+        "H2:41-57"
+      ]
+    },
+    {
+      "id": "K46",
+      "source": "C05",
+      "predicate": "guarantees",
+      "target": "C08",
+      "scope": {
+        "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+        "conditions": "测试同一类缺失来源变异，文件命名和断言仍是需要分别核对的条件"
+      },
+      "evidence": [
+        "D1:92-97",
+        "D2:22-23",
+        "D3:78-85",
+        "D4:6",
+        "D5:1-6"
+      ]
+    },
+    {
+      "id": "K17",
+      "source": "E03",
+      "predicate": "requires",
+      "target": "E05",
+      "scope": {
+        "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+        "conditions": "记录的 kind 为 requirement"
+      },
+      "evidence": [
+        "D6:83-97"
+      ]
+    },
+    {
+      "id": "K82",
+      "source": "C05",
+      "predicate": "contributes_to",
+      "target": "C08",
+      "scope": {
+        "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+        "conditions": "测试同一类缺失来源变异，文件命名和断言仍是需要分别核对的条件"
+      },
+      "evidence": [
+        "D1:92-97",
+        "D2:22-23",
+        "D3:78-85",
+        "D4:6",
+        "D5:1-6"
+      ]
+    },
+    {
+      "id": "K51",
+      "source": "C02",
+      "predicate": "contributes_to",
+      "target": "C08",
+      "scope": {
+        "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+        "conditions": "给原反例补齐合法 acceptance，保留原路径并运行该版本的测试"
+      },
+      "evidence": [
+        "D1:92-97",
+        "D2:19-23",
+        "H1"
+      ]
+    },
+    {
+      "id": "K24",
+      "source": "E06",
+      "predicate": "references_as_origin",
+      "target": "E04",
+      "scope": {
+        "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+        "conditions": "修复前 REQ-005 反例的 origin"
+      },
+      "evidence": [
+        "D4:1-6"
+      ]
+    },
+    {
+      "id": "K35",
+      "source": "E04",
+      "predicate": "references_as_origin",
+      "target": "E06",
+      "scope": {
+        "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+        "conditions": "修复前 REQ-005 反例的 origin"
+      },
+      "evidence": [
+        "D4:1-6"
+      ]
+    }
+  ],
+  "expected": {
+    "positives": [
+      "K17",
+      "K35",
+      "K51",
+      "K82"
+    ],
+    "hard_negatives": [
+      {
+        "id": "K63",
+        "kind": "predicate",
+        "retains": "K17"
+      },
+      {
+        "id": "K24",
+        "kind": "direction",
+        "retains": "K35"
+      },
+      {
+        "id": "K96",
+        "kind": "expired_scope",
+        "retains": "K51"
+      },
+      {
+        "id": "K46",
+        "kind": "unsupported_cause",
+        "retains": "K82"
+      }
+    ]
+  }
+}

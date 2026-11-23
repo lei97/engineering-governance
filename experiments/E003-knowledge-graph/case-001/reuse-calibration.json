@@ -1,0 +1,71 @@
+{
+  "runtime": {
+    "python": "3.12.15",
+    "pyyaml": "6.0.4",
+    "jsonschema": "4.26.0"
+  },
+  "test_command": "python -B -m unittest discover -s tests -k test_invalid",
+  "validation_command": "python -B scripts/validate_truth.py examples/invalid",
+  "mutation": {
+    "file": "examples/invalid/missing-acceptance.yaml",
+    "append": "acceptance:\n  - 校验器可以读取补齐的验收条件。\n"
+  },
+  "wrong_diagnostic_origin": "SRC-998",
+  "versions": {
+    "pre-fix": {
+      "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+      "positive_exit": 0,
+      "#16_regressions_passed": 5,
+      "scenarios": {
+        "original": {
+          "test_exit": 0,
+          "target_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property",
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+          ],
+          "other_diagnostics": 4
+        },
+        "restored-acceptance": {
+          "test_exit": 0,
+          "target_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+          ],
+          "other_diagnostics": 4
+        },
+        "wrong-diagnostic": {
+          "test_exit": 0,
+          "target_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-998"
+          ],
+          "other_diagnostics": 4
+        }
+      }
+    },
+    "post-fix": {
+      "revision": "093f88d6f43b36e80fe846af26d423f98e4930e3",
+      "positive_exit": 0,
+      "#16_regressions_passed": 5,
+      "scenarios": {
+        "original": {
+          "test_exit": 0,
+          "target_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property"
+          ],
+          "other_diagnostics": 16
+        },
+        "restored-acceptance": {
+          "test_exit": 1,
+          "target_diagnostics": [],
+          "other_diagnostics": 16
+        },
+        "wrong-diagnostic": {
+          "test_exit": 1,
+          "target_diagnostics": [
+            "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-998"
+          ],
+          "other_diagnostics": 16
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,483 @@
+{
+  "Apollo program": {
+    "entities": [
+      {
+        "name": "Apollo program",
+        "type": "EVENT",
+        "description": "The Apollo program, also known as Project Apollo, was a United States human spaceflight program that landed the first humans on the Moon in 1969."
+      },
+      {
+        "name": "NASA",
+        "type": "ORGANIZATION",
+        "description": "NASA was the organization that led the United States Apollo human spaceflight program."
+      },
+      {
+        "name": "Moon",
+        "type": "LOCATION",
+        "description": "The Moon was the destination where the Apollo program landed the first humans in 1969."
+      },
+      {
+        "name": "John F. Kennedy",
+        "type": "PERSON",
+        "description": "John F. Kennedy was the president who announced the national goal of landing a man on the Moon and returning him safely to Earth before the end of the decade."
+      }
+    ],
+    "relations": [
+      {
+        "source": "NASA",
+        "predicate": "led",
+        "target": "Apollo program"
+      },
+      {
+        "source": "Apollo program",
+        "predicate": "landed first humans on",
+        "target": "Moon"
+      },
+      {
+        "source": "Apollo program",
+        "predicate": "pursued goal announced by",
+        "target": "John F. Kennedy"
+      }
+    ]
+  },
+  "Apollo 11": {
+    "entities": [
+      {
+        "name": "Apollo 11",
+        "type": "EVENT",
+        "description": "Apollo 11 was the American spaceflight that first landed humans on the Moon and the fifth crewed mission of NASA's Apollo program."
+      },
+      {
+        "name": "Apollo program",
+        "type": "EVENT",
+        "description": "The Apollo program was NASA's program in which Apollo 11 was the fifth crewed mission."
+      },
+      {
+        "name": "NASA",
+        "type": "ORGANIZATION",
+        "description": "NASA was the organization whose Apollo program included Apollo 11."
+      },
+      {
+        "name": "Moon",
+        "type": "LOCATION",
+        "description": "The Moon was the destination where Apollo 11 first landed humans."
+      },
+      {
+        "name": "Neil Armstrong",
+        "type": "PERSON",
+        "description": "Neil Armstrong was the commander of Apollo 11, his second and final spaceflight."
+      },
+      {
+        "name": "Michael Collins",
+        "type": "PERSON",
+        "description": "Michael Collins was the command module pilot of Apollo 11, his second and final spaceflight."
+      },
+      {
+        "name": "Edwin \"Buzz\" Aldrin",
+        "type": "PERSON",
+        "description": "Edwin \"Buzz\" Aldrin was the lunar module pilot of Apollo 11, his second and final spaceflight."
+      }
+    ],
+    "relations": [
+      {
+        "source": "Apollo 11",
+        "predicate": "landed first humans on",
+        "target": "Moon"
+      },
+      {
+        "source": "Apollo 11",
+        "predicate": "was fifth crewed mission of",
+        "target": "Apollo program"
+      },
+      {
+        "source": "Apollo program",
+        "predicate": "belonged to",
+        "target": "NASA"
+      },
+      {
+        "source": "Neil Armstrong",
+        "predicate": "commanded",
+        "target": "Apollo 11"
+      },
+      {
+        "source": "Michael Collins",
+        "predicate": "served as command module pilot on",
+        "target": "Apollo 11"
+      },
+      {
+        "source": "Edwin \"Buzz\" Aldrin",
+        "predicate": "served as lunar module pilot on",
+        "target": "Apollo 11"
+      }
+    ]
+  },
+  "Neil Armstrong": {
+    "entities": [
+      {
+        "name": "Neil Alden Armstrong",
+        "type": "PERSON",
+        "description": "Neil Alden Armstrong was an American astronaut and aeronautical engineer who commanded Apollo 11 and became the first person to walk on the Moon."
+      },
+      {
+        "name": "Apollo 11",
+        "type": "EVENT",
+        "description": "Apollo 11 was the 1969 mission that Neil Alden Armstrong commanded when he became the first person to walk on the Moon."
+      },
+      {
+        "name": "Moon",
+        "type": "LOCATION",
+        "description": "The Moon was the place where Neil Alden Armstrong became the first person to walk on its surface."
+      }
+    ],
+    "relations": [
+      {
+        "source": "Neil Alden Armstrong",
+        "predicate": "commanded",
+        "target": "Apollo 11"
+      },
+      {
+        "source": "Neil Alden Armstrong",
+        "predicate": "was first to walk on",
+        "target": "Moon"
+      }
+    ]
+  },
+  "Saturn V": {
+    "entities": [
+      {
+        "name": "Saturn V",
+        "type": "ARTIFACT",
+        "description": "Saturn V was a retired American three-stage, liquid-fueled, human-rated super heavy-lift launch vehicle used from 1967 to 1973."
+      },
+      {
+        "name": "NASA",
+        "type": "ORGANIZATION",
+        "description": "NASA developed Saturn V under the Apollo program for human exploration of the Moon."
+      },
+      {
+        "name": "Apollo program",
+        "type": "EVENT",
+        "description": "The Apollo program was the program under which NASA developed Saturn V for human exploration of the Moon."
+      },
+      {
+        "name": "Moon",
+        "type": "LOCATION",
+        "description": "The Moon was the intended destination of the 24 astronauts launched toward it by Saturn V vehicles."
+      },
+      {
+        "name": "Kennedy Space Center Launch Complex 39",
+        "type": "LOCATION",
+        "description": "Kennedy Space Center Launch Complex 39 was the site of all thirteen Saturn V launches."
+      },
+      {
+        "name": "Apollo 8",
+        "type": "EVENT",
+        "description": "Apollo 8 was the first mission in the stated range of Saturn V flights that sent astronauts toward the Moon."
+      },
+      {
+        "name": "Apollo 17",
+        "type": "EVENT",
+        "description": "Apollo 17 was the last mission in the stated range of Saturn V flights that sent astronauts toward the Moon."
+      },
+      {
+        "name": "Skylab",
+        "type": "ARTIFACT",
+        "description": "Skylab was the first American space station, converted from a Saturn V third stage and flown on the vehicle's final launch."
+      }
+    ],
+    "relations": [
+      {
+        "source": "NASA",
+        "predicate": "developed",
+        "target": "Saturn V"
+      },
+      {
+        "source": "Saturn V",
+        "predicate": "was developed under",
+        "target": "Apollo program"
+      },
+      {
+        "source": "Saturn V",
+        "predicate": "launched from",
+        "target": "Kennedy Space Center Launch Complex 39"
+      },
+      {
+        "source": "Saturn V",
+        "predicate": "sent astronauts toward",
+        "target": "Moon"
+      },
+      {
+        "source": "Saturn V",
+        "predicate": "launched",
+        "target": "Apollo 8"
+      },
+      {
+        "source": "Saturn V",
+        "predicate": "launched",
+        "target": "Apollo 17"
+      },
+      {
+        "source": "Saturn V",
+        "predicate": "launched",
+        "target": "Skylab"
+      },
+      {
+        "source": "Skylab",
+        "predicate": "was converted from the third stage of",
+        "target": "Saturn V"
+      },
+      {
+        "source": "Apollo 8",
+        "predicate": "was part of",
+        "target": "Apollo program"
+      },
+      {
+        "source": "Apollo 17",
+        "predicate": "was part of",
+        "target": "Apollo program"
+      }
+    ]
+  },
+  "Buzz Aldrin": {
+    "entities": [
+      {
+        "name": "Buzz Aldrin",
+        "type": "PERSON",
+        "description": "Buzz Aldrin was an American astronaut, aeronautical engineer, and fighter pilot who became the second person to walk on the Moon and is described as the last surviving Apollo 11 crew member."
+      },
+      {
+        "name": "Neil Armstrong",
+        "type": "PERSON",
+        "description": "Neil Armstrong was the Apollo 11 mission commander, walked on the Moon before Aldrin, and died in 2012."
+      },
+      {
+        "name": "Michael Collins",
+        "type": "PERSON",
+        "description": "Michael Collins was a pilot on the Apollo 11 crew and died in 2021."
+      },
+      {
+        "name": "Moon",
+        "type": "LOCATION",
+        "description": "The Moon is where Neil Armstrong walked before Buzz Aldrin became the second person to walk on it."
+      },
+      {
+        "name": "NASA",
+        "type": "ORGANIZATION",
+        "description": "NASA was the organization behind the 1966 Gemini 12 mission that Aldrin piloted."
+      },
+      {
+        "name": "Gemini 12",
+        "type": "EVENT",
+        "description": "Gemini 12 was the 1966 NASA mission on which Aldrin served as pilot and made three spacewalks."
+      },
+      {
+        "name": "Apollo 11",
+        "type": "EVENT",
+        "description": "Apollo 11 was the 1969 mission on which Armstrong was commander and Aldrin was the Lunar Module Eagle pilot."
+      },
+      {
+        "name": "Lunar Module Eagle",
+        "type": "ARTIFACT",
+        "description": "Lunar Module Eagle was the Apollo 11 lunar module piloted by Aldrin."
+      }
+    ],
+    "relations": [
+      {
+        "source": "Buzz Aldrin",
+        "predicate": "piloted",
+        "target": "Gemini 12"
+      },
+      {
+        "source": "Buzz Aldrin",
+        "predicate": "served as lunar module pilot on",
+        "target": "Apollo 11"
+      },
+      {
+        "source": "Buzz Aldrin",
+        "predicate": "piloted",
+        "target": "Lunar Module Eagle"
+      },
+      {
+        "source": "Buzz Aldrin",
+        "predicate": "was second to walk on",
+        "target": "Moon"
+      },
+      {
+        "source": "Buzz Aldrin",
+        "predicate": "walked on the Moon after",
+        "target": "Neil Armstrong"
+      },
+      {
+        "source": "Neil Armstrong",
+        "predicate": "commanded",
+        "target": "Apollo 11"
+      },
+      {
+        "source": "Neil Armstrong",
+        "predicate": "walked on",
+        "target": "Moon"
+      },
+      {
+        "source": "Michael Collins",
+        "predicate": "served as pilot on",
+        "target": "Apollo 11"
+      },
+      {
+        "source": "Gemini 12",
+        "predicate": "was a mission of",
+        "target": "NASA"
+      },
+      {
+        "source": "Lunar Module Eagle",
+        "predicate": "was the lunar module for",
+        "target": "Apollo 11"
+      }
+    ]
+  },
+  "Kennedy Space Center": {
+    "entities": [
+      {
+        "name": "Kennedy Space Center",
+        "type": "ORGANIZATION",
+        "description": "Kennedy Space Center is a NASA field center on Merritt Island and has served as NASA's primary launch center since 1968."
+      },
+      {
+        "name": "NASA",
+        "type": "ORGANIZATION",
+        "description": "NASA is the organization that counts Kennedy Space Center among its ten field centers and uses it as its primary launch center."
+      },
+      {
+        "name": "Merritt Island",
+        "type": "LOCATION",
+        "description": "Merritt Island is the place in Florida where Kennedy Space Center is located."
+      },
+      {
+        "name": "Florida",
+        "type": "LOCATION",
+        "description": "Florida is the state whose east coast is home to Kennedy Space Center."
+      },
+      {
+        "name": "Kennedy Space Center Launch Complex 39",
+        "type": "LOCATION",
+        "description": "Kennedy Space Center Launch Complex 39 is the site from which Kennedy Space Center managed launch operations for the Apollo, Skylab, Space Shuttle, and Artemis programs."
+      },
+      {
+        "name": "Apollo program",
+        "type": "EVENT",
+        "description": "The Apollo program had launch operations at Kennedy Space Center Launch Complex 39 under Kennedy Space Center management."
+      },
+      {
+        "name": "Skylab program",
+        "type": "EVENT",
+        "description": "The Skylab program had launch operations at Kennedy Space Center Launch Complex 39 under Kennedy Space Center management."
+      },
+      {
+        "name": "Space Shuttle program",
+        "type": "EVENT",
+        "description": "The Space Shuttle program had launch operations at Kennedy Space Center Launch Complex 39 under Kennedy Space Center management."
+      },
+      {
+        "name": "Artemis program",
+        "type": "EVENT",
+        "description": "The Artemis program had launch operations at Kennedy Space Center Launch Complex 39 under Kennedy Space Center management."
+      },
+      {
+        "name": "Cape Canaveral Space Force Station",
+        "type": "LOCATION",
+        "description": "Cape Canaveral Space Force Station is the neighboring installation that shares resources with Kennedy Space Center and operates facilities on its property."
+      }
+    ],
+    "relations": [
+      {
+        "source": "Kennedy Space Center",
+        "predicate": "is a field center of",
+        "target": "NASA"
+      },
+      {
+        "source": "Kennedy Space Center",
+        "predicate": "is the primary launch center of",
+        "target": "NASA"
+      },
+      {
+        "source": "Kennedy Space Center",
+        "predicate": "is located on",
+        "target": "Merritt Island"
+      },
+      {
+        "source": "Merritt Island",
+        "predicate": "is located in",
+        "target": "Florida"
+      },
+      {
+        "source": "Kennedy Space Center",
+        "predicate": "is located on the east coast of",
+        "target": "Florida"
+      },
+      {
+        "source": "Kennedy Space Center",
+        "predicate": "manages launch operations from",
+        "target": "Kennedy Space Center Launch Complex 39"
+      },
+      {
+        "source": "Kennedy Space Center",
+        "predicate": "is adjacent to",
+        "target": "Cape Canaveral Space Force Station"
+      },
+      {
+        "source": "Kennedy Space Center",
+        "predicate": "shares resources with",
+        "target": "Cape Canaveral Space Force Station"
+      },
+      {
+        "source": "Kennedy Space Center",
+        "predicate": "operates facilities on the property of",
+        "target": "Cape Canaveral Space Force Station"
+      },
+      {
+        "source": "Cape Canaveral Space Force Station",
+        "predicate": "operates facilities on the property of",
+        "target": "Kennedy Space Center"
+      },
+      {
+        "source": "Apollo program",
+        "predicate": "had launch operations from",
+        "target": "Kennedy Space Center Launch Complex 39"
+      },
+      {
+        "source": "Skylab program",
+        "predicate": "had launch operations from",
+        "target": "Kennedy Space Center Launch Complex 39"
+      },
+      {
+        "source": "Space Shuttle program",
+        "predicate": "had launch operations from",
+        "target": "Kennedy Space Center Launch Complex 39"
+      },
+      {
+        "source": "Artemis program",
+        "predicate": "had launch operations from",
+        "target": "Kennedy Space Center Launch Complex 39"
+      },
+      {
+        "source": "Kennedy Space Center",
+        "predicate": "managed launch operations for",
+        "target": "Apollo program"
+      },
+      {
+        "source": "Kennedy Space Center",
+        "predicate": "managed launch operations for",
+        "target": "Skylab program"
+      },
+      {
+        "source": "Kennedy Space Center",
+        "predicate": "managed launch operations for",
+        "target": "Space Shuttle program"
+      },
+      {
+        "source": "Kennedy Space Center",
+        "predicate": "managed launch operations for",
+        "target": "Artemis program"
+      }
+    ]
+  }
+}

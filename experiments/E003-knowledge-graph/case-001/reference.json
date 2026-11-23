@@ -1,0 +1,220 @@
+{
+  "case_id": "validation-test-13",
+  "baseline_revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+  "rubric_status": "candidate",
+  "claims": [
+    {
+      "id": "C1",
+      "status": "policy",
+      "statement": "v0.1 Schema 对 kind: requirement 要求 acceptance 字段。",
+      "evidence": [
+        {
+          "document_id": "D6",
+          "lines": [
+            83,
+            97
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "status": "observation",
+      "statement": "修复前的反例 missing-acceptance.yaml 对应 REQ-005，整份记录没有 acceptance 字段。",
+      "evidence": [
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C3",
+      "status": "observation",
+      "statement": "REQ-005 引用 SRC-001，而传入 examples/invalid 校验的修复前记录没有这个 ID。",
+      "evidence": [
+        {
+          "document_id": "D4",
+          "lines": [
+            6,
+            6
+          ]
+        },
+        {
+          "document_id": "D5",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            47,
+            50
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C4",
+      "status": "observation",
+      "statement": "修复前 test_invalid 在全批完整错误字符串中搜索 acceptance 子串，没有逐文件核对诊断。",
+      "evidence": [
+        {
+          "document_id": "D2",
+          "lines": [
+            19,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C5",
+      "status": "observation",
+      "statement": "针对未找到的 origin，修复前校验器的诊断包含记录文件的路径。",
+      "evidence": [
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C6",
+      "status": "inference",
+      "statement": "临时补上合法的 acceptance 后，missing-acceptance.yaml 的未找到来源诊断仍会因文件名包含 acceptance 而使旧的 acceptance 断言误通过。",
+      "evidence": [
+        {
+          "document_id": "D1",
+          "lines": [
+            92,
+            97
+          ]
+        },
+        {
+          "document_id": "D2",
+          "lines": [
+            19,
+            23
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        },
+        {
+          "document_id": "D4",
+          "lines": [
+            6,
+            6
+          ]
+        },
+        {
+          "document_id": "D5",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ],
+      "qualification": "D1 给出问题复现描述。本判据以代码和记录解释它，未将该描述当作此次实验的独立运行日志。"
+    }
+  ],
+  "relations": [
+    {
+      "source": "C3",
+      "predicate": "contributes_to",
+      "target": "C6",
+      "evidence": [
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        },
+        {
+          "document_id": "D4",
+          "lines": [
+            6,
+            6
+          ]
+        },
+        {
+          "document_id": "D5",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "source": "C4",
+      "predicate": "contributes_to",
+      "target": "C6",
+      "evidence": [
+        {
+          "document_id": "D2",
+          "lines": [
+            19,
+            23
+          ]
+        },
+        {
+          "document_id": "D1",
+          "lines": [
+            92,
+            97
+          ]
+        }
+      ]
+    }
+  ],
+  "holdout": {
+    "revision": "093f88d6f43b36e80fe846af26d423f98e4930e3",
+    "parent_revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+    "checks": [
+      {
+        "path": "tests/test_validation.py",
+        "lines": [
+          41,
+          57
+        ],
+        "expected": "先按确切路径归属诊断，再比较去掉路径前缀后的完整诊断。"
+      },
+      {
+        "path": "tests/test_validation.py",
+        "lines": [
+          59,
+          75
+        ],
+        "expected": "增加两种变异检验，分别补齐 acceptance 与换成缺失来源 SRC-998。"
+      },
+      {
+        "path": "examples/invalid/00-support/SRC-001.yaml",
+        "lines": [
+          1,
+          6
+        ],
+        "expected": "合法的来源记录消除原反例的无关缺失来源错误。"
+      },
+      {
+        "command": "git diff --exit-code <pre> <post> -- scripts schemas",
+        "expected": "校验器与 Schema 无差异。"
+      }
+    ],
+    "execution_note": "可用固定版本及依赖独立复跑；本次准备只固定了提交、代码和预期结果。"
+  }
+}

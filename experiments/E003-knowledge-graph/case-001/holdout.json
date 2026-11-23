@@ -1,0 +1,54 @@
+{
+  "mutation": {
+    "file": "examples/invalid/missing-acceptance.yaml",
+    "append": "acceptance:\n  - 校验器可以读取补齐的验收条件。\n"
+  },
+  "test_command": "python -B -m unittest discover -s tests -k test_invalid",
+  "validation_command": "python -B scripts/validate_truth.py examples/invalid",
+  "runtime": {
+    "python": "3.12.15",
+    "pyyaml": "6.0.4",
+    "jsonschema": "4.26.0"
+  },
+  "pre-fix": {
+    "revision": "83a21206ebf9e1addf6aa115a9f3c6427c2a40bf",
+    "results": {
+      "original": {
+        "test_exit": 0,
+        "validation_exit": 1,
+        "diagnostics_for_mutated_file": [
+          "ERROR: examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property",
+          "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+        ],
+        "test_reports_required_property": false
+      },
+      "restored-acceptance": {
+        "test_exit": 0,
+        "validation_exit": 1,
+        "diagnostics_for_mutated_file": [
+          "ERROR: examples/invalid/missing-acceptance.yaml: missing origin SRC-001"
+        ],
+        "test_reports_required_property": false
+      }
+    }
+  },
+  "post-fix": {
+    "revision": "093f88d6f43b36e80fe846af26d423f98e4930e3",
+    "results": {
+      "original": {
+        "test_exit": 0,
+        "validation_exit": 1,
+        "diagnostics_for_mutated_file": [
+          "ERROR: examples/invalid/missing-acceptance.yaml [root]: 'acceptance' is a required property"
+        ],
+        "test_reports_required_property": false
+      },
+      "restored-acceptance": {
+        "test_exit": 1,
+        "validation_exit": 1,
+        "diagnostics_for_mutated_file": [],
+        "test_reports_required_property": true
+      }
+    }
+  }
+}

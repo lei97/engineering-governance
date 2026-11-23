@@ -1,0 +1,146 @@
+{
+  "PERSON": [
+    {
+      "canonical": "John F. Kennedy",
+      "aliases": [
+        "John F. Kennedy"
+      ]
+    },
+    {
+      "canonical": "Neil Alden Armstrong",
+      "aliases": [
+        "Neil Armstrong",
+        "Neil Alden Armstrong"
+      ]
+    },
+    {
+      "canonical": "Michael Collins",
+      "aliases": [
+        "Michael Collins"
+      ]
+    },
+    {
+      "canonical": "Edwin \"Buzz\" Aldrin",
+      "aliases": [
+        "Edwin \"Buzz\" Aldrin",
+        "Buzz Aldrin"
+      ]
+    }
+  ],
+  "ORGANIZATION": [
+    {
+      "canonical": "NASA",
+      "aliases": [
+        "NASA"
+      ]
+    },
+    {
+      "canonical": "Kennedy Space Center",
+      "aliases": [
+        "Kennedy Space Center"
+      ]
+    }
+  ],
+  "LOCATION": [
+    {
+      "canonical": "Moon",
+      "aliases": [
+        "Moon"
+      ]
+    },
+    {
+      "canonical": "Kennedy Space Center Launch Complex 39",
+      "aliases": [
+        "Kennedy Space Center Launch Complex 39"
+      ]
+    },
+    {
+      "canonical": "Merritt Island",
+      "aliases": [
+        "Merritt Island"
+      ]
+    },
+    {
+      "canonical": "Florida",
+      "aliases": [
+        "Florida"
+      ]
+    },
+    {
+      "canonical": "Cape Canaveral Space Force Station",
+      "aliases": [
+        "Cape Canaveral Space Force Station"
+      ]
+    }
+  ],
+  "EVENT": [
+    {
+      "canonical": "Apollo program",
+      "aliases": [
+        "Apollo program"
+      ]
+    },
+    {
+      "canonical": "Apollo 11",
+      "aliases": [
+        "Apollo 11"
+      ]
+    },
+    {
+      "canonical": "Apollo 8",
+      "aliases": [
+        "Apollo 8"
+      ]
+    },
+    {
+      "canonical": "Apollo 17",
+      "aliases": [
+        "Apollo 17"
+      ]
+    },
+    {
+      "canonical": "Gemini 12",
+      "aliases": [
+        "Gemini 12"
+      ]
+    },
+    {
+      "canonical": "Skylab program",
+      "aliases": [
+        "Skylab program"
+      ]
+    },
+    {
+      "canonical": "Space Shuttle program",
+      "aliases": [
+        "Space Shuttle program"
+      ]
+    },
+    {
+      "canonical": "Artemis program",
+      "aliases": [
+        "Artemis program"
+      ]
+    }
+  ],
+  "ARTIFACT": [
+    {
+      "canonical": "Saturn V",
+      "aliases": [
+        "Saturn V"
+      ]
+    },
+    {
+      "canonical": "Skylab",
+      "aliases": [
+        "Skylab"
+      ]
+    },
+    {
+      "canonical": "Lunar Module Eagle",
+      "aliases": [
+        "Lunar Module Eagle"
+      ]
+    }
+  ]
+}

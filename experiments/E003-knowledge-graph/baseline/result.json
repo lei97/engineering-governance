@@ -1,0 +1,661 @@
+{
+  "document_count": 6,
+  "raw_entities": 40,
+  "raw_relations": 49,
+  "unresolved_names": [],
+  "dropped_edges": 0,
+  "node_count": 22,
+  "edge_count": 49,
+  "weak_components": 1,
+  "evaluation": {
+    "documents": {
+      "Apollo 11": {
+        "entity_names": {
+          "predicted": 7,
+          "gold": 11,
+          "hits": 6,
+          "precision": 0.8571428571428571,
+          "recall": 0.5454545454545454,
+          "f1": 0.6666666666666666
+        },
+        "relation_endpoints": {
+          "predicted": 6,
+          "gold": 9,
+          "hits": 3,
+          "precision": 0.5,
+          "recall": 0.3333333333333333,
+          "f1": 0.4
+        },
+        "literal_triples": {
+          "predicted": 6,
+          "gold": 9,
+          "hits": 1,
+          "precision": 0.16666666666666666,
+          "recall": 0.1111111111111111,
+          "f1": 0.13333333333333333
+        },
+        "resolved_entity_recall": 0.5454545454545454,
+        "wrong_predicate_control": {
+          "endpoint_f1": 1.0,
+          "literal_triple_f1": 0.0
+        }
+      },
+      "Neil Armstrong": {
+        "entity_names": {
+          "predicted": 3,
+          "gold": 8,
+          "hits": 3,
+          "precision": 1.0,
+          "recall": 0.375,
+          "f1": 0.5454545454545454
+        },
+        "relation_endpoints": {
+          "predicted": 2,
+          "gold": 7,
+          "hits": 2,
+          "precision": 1.0,
+          "recall": 0.2857142857142857,
+          "f1": 0.4444444444444444
+        },
+        "literal_triples": {
+          "predicted": 2,
+          "gold": 7,
+          "hits": 1,
+          "precision": 0.5,
+          "recall": 0.14285714285714285,
+          "f1": 0.2222222222222222
+        },
+        "resolved_entity_recall": 0.375,
+        "wrong_predicate_control": {
+          "endpoint_f1": 1.0,
+          "literal_triple_f1": 0.0
+        }
+      }
+    },
+    "macro": {
+      "entity_names": {
+        "precision": 0.9285714285714286,
+        "recall": 0.4602272727272727,
+        "f1": 0.606060606060606
+      },
+      "relation_endpoints": {
+        "precision": 0.75,
+        "recall": 0.30952380952380953,
+        "f1": 0.4222222222222222
+      },
+      "literal_triples": {
+        "precision": 0.3333333333333333,
+        "recall": 0.12698412698412698,
+        "f1": 0.17777777777777776
+      }
+    }
+  },
+  "graph": {
+    "directed": true,
+    "multigraph": true,
+    "graph": {},
+    "nodes": [
+      {
+        "type": "EVENT",
+        "description": "The Apollo program, also known as Project Apollo, was a United States human spaceflight program that landed the first humans on the Moon in 1969.",
+        "source_docs": [
+          "Apollo 11",
+          "Apollo program",
+          "Kennedy Space Center",
+          "Saturn V"
+        ],
+        "mentions": 4,
+        "id": "Apollo program"
+      },
+      {
+        "type": "ORGANIZATION",
+        "description": "NASA was the organization that led the United States Apollo human spaceflight program.",
+        "source_docs": [
+          "Apollo 11",
+          "Apollo program",
+          "Buzz Aldrin",
+          "Kennedy Space Center",
+          "Saturn V"
+        ],
+        "mentions": 5,
+        "id": "NASA"
+      },
+      {
+        "type": "LOCATION",
+        "description": "The Moon was the destination where the Apollo program landed the first humans in 1969.",
+        "source_docs": [
+          "Apollo 11",
+          "Apollo program",
+          "Buzz Aldrin",
+          "Neil Armstrong",
+          "Saturn V"
+        ],
+        "mentions": 5,
+        "id": "Moon"
+      },
+      {
+        "type": "PERSON",
+        "description": "John F. Kennedy was the president who announced the national goal of landing a man on the Moon and returning him safely to Earth before the end of the decade.",
+        "source_docs": [
+          "Apollo program"
+        ],
+        "mentions": 1,
+        "id": "John F. Kennedy"
+      },
+      {
+        "type": "EVENT",
+        "description": "Apollo 11 was the American spaceflight that first landed humans on the Moon and the fifth crewed mission of NASA's Apollo program.",
+        "source_docs": [
+          "Apollo 11",
+          "Buzz Aldrin",
+          "Neil Armstrong"
+        ],
+        "mentions": 3,
+        "id": "Apollo 11"
+      },
+      {
+        "type": "PERSON",
+        "description": "Neil Armstrong was the commander of Apollo 11, his second and final spaceflight.",
+        "source_docs": [
+          "Apollo 11",
+          "Buzz Aldrin",
+          "Neil Armstrong"
+        ],
+        "mentions": 3,
+        "id": "Neil Alden Armstrong"
+      },
+      {
+        "type": "PERSON",
+        "description": "Michael Collins was the command module pilot of Apollo 11, his second and final spaceflight.",
+        "source_docs": [
+          "Apollo 11",
+          "Buzz Aldrin"
+        ],
+        "mentions": 2,
+        "id": "Michael Collins"
+      },
+      {
+        "type": "PERSON",
+        "description": "Edwin \"Buzz\" Aldrin was the lunar module pilot of Apollo 11, his second and final spaceflight.",
+        "source_docs": [
+          "Apollo 11",
+          "Buzz Aldrin"
+        ],
+        "mentions": 2,
+        "id": "Edwin \"Buzz\" Aldrin"
+      },
+      {
+        "type": "ARTIFACT",
+        "description": "Saturn V was a retired American three-stage, liquid-fueled, human-rated super heavy-lift launch vehicle used from 1967 to 1973.",
+        "source_docs": [
+          "Saturn V"
+        ],
+        "mentions": 1,
+        "id": "Saturn V"
+      },
+      {
+        "type": "LOCATION",
+        "description": "Kennedy Space Center Launch Complex 39 was the site of all thirteen Saturn V launches.",
+        "source_docs": [
+          "Kennedy Space Center",
+          "Saturn V"
+        ],
+        "mentions": 2,
+        "id": "Kennedy Space Center Launch Complex 39"
+      },
+      {
+        "type": "EVENT",
+        "description": "Apollo 8 was the first mission in the stated range of Saturn V flights that sent astronauts toward the Moon.",
+        "source_docs": [
+          "Saturn V"
+        ],
+        "mentions": 1,
+        "id": "Apollo 8"
+      },
+      {
+        "type": "EVENT",
+        "description": "Apollo 17 was the last mission in the stated range of Saturn V flights that sent astronauts toward the Moon.",
+        "source_docs": [
+          "Saturn V"
+        ],
+        "mentions": 1,
+        "id": "Apollo 17"
+      },
+      {
+        "type": "ARTIFACT",
+        "description": "Skylab was the first American space station, converted from a Saturn V third stage and flown on the vehicle's final launch.",
+        "source_docs": [
+          "Saturn V"
+        ],
+        "mentions": 1,
+        "id": "Skylab"
+      },
+      {
+        "type": "EVENT",
+        "description": "Gemini 12 was the 1966 NASA mission on which Aldrin served as pilot and made three spacewalks.",
+        "source_docs": [
+          "Buzz Aldrin"
+        ],
+        "mentions": 1,
+        "id": "Gemini 12"
+      },
+      {
+        "type": "ARTIFACT",
+        "description": "Lunar Module Eagle was the Apollo 11 lunar module piloted by Aldrin.",
+        "source_docs": [
+          "Buzz Aldrin"
+        ],
+        "mentions": 1,
+        "id": "Lunar Module Eagle"
+      },
+      {
+        "type": "ORGANIZATION",
+        "description": "Kennedy Space Center is a NASA field center on Merritt Island and has served as NASA's primary launch center since 1968.",
+        "source_docs": [
+          "Kennedy Space Center"
+        ],
+        "mentions": 1,
+        "id": "Kennedy Space Center"
+      },
+      {
+        "type": "LOCATION",
+        "description": "Merritt Island is the place in Florida where Kennedy Space Center is located.",
+        "source_docs": [
+          "Kennedy Space Center"
+        ],
+        "mentions": 1,
+        "id": "Merritt Island"
+      },
+      {
+        "type": "LOCATION",
+        "description": "Florida is the state whose east coast is home to Kennedy Space Center.",
+        "source_docs": [
+          "Kennedy Space Center"
+        ],
+        "mentions": 1,
+        "id": "Florida"
+      },
+      {
+        "type": "EVENT",
+        "description": "The Skylab program had launch operations at Kennedy Space Center Launch Complex 39 under Kennedy Space Center management.",
+        "source_docs": [
+          "Kennedy Space Center"
+        ],
+        "mentions": 1,
+        "id": "Skylab program"
+      },
+      {
+        "type": "EVENT",
+        "description": "The Space Shuttle program had launch operations at Kennedy Space Center Launch Complex 39 under Kennedy Space Center management.",
+        "source_docs": [
+          "Kennedy Space Center"
+        ],
+        "mentions": 1,
+        "id": "Space Shuttle program"
+      },
+      {
+        "type": "EVENT",
+        "description": "The Artemis program had launch operations at Kennedy Space Center Launch Complex 39 under Kennedy Space Center management.",
+        "source_docs": [
+          "Kennedy Space Center"
+        ],
+        "mentions": 1,
+        "id": "Artemis program"
+      },
+      {
+        "type": "LOCATION",
+        "description": "Cape Canaveral Space Force Station is the neighboring installation that shares resources with Kennedy Space Center and operates facilities on its property.",
+        "source_docs": [
+          "Kennedy Space Center"
+        ],
+        "mentions": 1,
+        "id": "Cape Canaveral Space Force Station"
+      }
+    ],
+    "edges": [
+      {
+        "predicate": "landed first humans on",
+        "source_doc": "Apollo program",
+        "source": "Apollo program",
+        "target": "Moon",
+        "key": 0
+      },
+      {
+        "predicate": "pursued goal announced by",
+        "source_doc": "Apollo program",
+        "source": "Apollo program",
+        "target": "John F. Kennedy",
+        "key": 0
+      },
+      {
+        "predicate": "belonged to",
+        "source_doc": "Apollo 11",
+        "source": "Apollo program",
+        "target": "NASA",
+        "key": 0
+      },
+      {
+        "predicate": "had launch operations from",
+        "source_doc": "Kennedy Space Center",
+        "source": "Apollo program",
+        "target": "Kennedy Space Center Launch Complex 39",
+        "key": 0
+      },
+      {
+        "predicate": "led",
+        "source_doc": "Apollo program",
+        "source": "NASA",
+        "target": "Apollo program",
+        "key": 0
+      },
+      {
+        "predicate": "developed",
+        "source_doc": "Saturn V",
+        "source": "NASA",
+        "target": "Saturn V",
+        "key": 0
+      },
+      {
+        "predicate": "landed first humans on",
+        "source_doc": "Apollo 11",
+        "source": "Apollo 11",
+        "target": "Moon",
+        "key": 0
+      },
+      {
+        "predicate": "was fifth crewed mission of",
+        "source_doc": "Apollo 11",
+        "source": "Apollo 11",
+        "target": "Apollo program",
+        "key": 0
+      },
+      {
+        "predicate": "commanded",
+        "source_doc": "Apollo 11",
+        "source": "Neil Alden Armstrong",
+        "target": "Apollo 11",
+        "key": 0
+      },
+      {
+        "predicate": "commanded",
+        "source_doc": "Neil Armstrong",
+        "source": "Neil Alden Armstrong",
+        "target": "Apollo 11",
+        "key": 1
+      },
+      {
+        "predicate": "commanded",
+        "source_doc": "Buzz Aldrin",
+        "source": "Neil Alden Armstrong",
+        "target": "Apollo 11",
+        "key": 2
+      },
+      {
+        "predicate": "was first to walk on",
+        "source_doc": "Neil Armstrong",
+        "source": "Neil Alden Armstrong",
+        "target": "Moon",
+        "key": 0
+      },
+      {
+        "predicate": "walked on",
+        "source_doc": "Buzz Aldrin",
+        "source": "Neil Alden Armstrong",
+        "target": "Moon",
+        "key": 1
+      },
+      {
+        "predicate": "served as command module pilot on",
+        "source_doc": "Apollo 11",
+        "source": "Michael Collins",
+        "target": "Apollo 11",
+        "key": 0
+      },
+      {
+        "predicate": "served as pilot on",
+        "source_doc": "Buzz Aldrin",
+        "source": "Michael Collins",
+        "target": "Apollo 11",
+        "key": 1
+      },
+      {
+        "predicate": "served as lunar module pilot on",
+        "source_doc": "Apollo 11",
+        "source": "Edwin \"Buzz\" Aldrin",
+        "target": "Apollo 11",
+        "key": 0
+      },
+      {
+        "predicate": "served as lunar module pilot on",
+        "source_doc": "Buzz Aldrin",
+        "source": "Edwin \"Buzz\" Aldrin",
+        "target": "Apollo 11",
+        "key": 1
+      },
+      {
+        "predicate": "piloted",
+        "source_doc": "Buzz Aldrin",
+        "source": "Edwin \"Buzz\" Aldrin",
+        "target": "Gemini 12",
+        "key": 0
+      },
+      {
+        "predicate": "piloted",
+        "source_doc": "Buzz Aldrin",
+        "source": "Edwin \"Buzz\" Aldrin",
+        "target": "Lunar Module Eagle",
+        "key": 0
+      },
+      {
+        "predicate": "was second to walk on",
+        "source_doc": "Buzz Aldrin",
+        "source": "Edwin \"Buzz\" Aldrin",
+        "target": "Moon",
+        "key": 0
+      },
+      {
+        "predicate": "walked on the Moon after",
+        "source_doc": "Buzz Aldrin",
+        "source": "Edwin \"Buzz\" Aldrin",
+        "target": "Neil Alden Armstrong",
+        "key": 0
+      },
+      {
+        "predicate": "was developed under",
+        "source_doc": "Saturn V",
+        "source": "Saturn V",
+        "target": "Apollo program",
+        "key": 0
+      },
+      {
+        "predicate": "launched from",
+        "source_doc": "Saturn V",
+        "source": "Saturn V",
+        "target": "Kennedy Space Center Launch Complex 39",
+        "key": 0
+      },
+      {
+        "predicate": "sent astronauts toward",
+        "source_doc": "Saturn V",
+        "source": "Saturn V",
+        "target": "Moon",
+        "key": 0
+      },
+      {
+        "predicate": "launched",
+        "source_doc": "Saturn V",
+        "source": "Saturn V",
+        "target": "Apollo 8",
+        "key": 0
+      },
+      {
+        "predicate": "launched",
+        "source_doc": "Saturn V",
+        "source": "Saturn V",
+        "target": "Apollo 17",
+        "key": 0
+      },
+      {
+        "predicate": "launched",
+        "source_doc": "Saturn V",
+        "source": "Saturn V",
+        "target": "Skylab",
+        "key": 0
+      },
+      {
+        "predicate": "was part of",
+        "source_doc": "Saturn V",
+        "source": "Apollo 8",
+        "target": "Apollo program",
+        "key": 0
+      },
+      {
+        "predicate": "was part of",
+        "source_doc": "Saturn V",
+        "source": "Apollo 17",
+        "target": "Apollo program",
+        "key": 0
+      },
+      {
+        "predicate": "was converted from the third stage of",
+        "source_doc": "Saturn V",
+        "source": "Skylab",
+        "target": "Saturn V",
+        "key": 0
+      },
+      {
+        "predicate": "was a mission of",
+        "source_doc": "Buzz Aldrin",
+        "source": "Gemini 12",
+        "target": "NASA",
+        "key": 0
+      },
+      {
+        "predicate": "was the lunar module for",
+        "source_doc": "Buzz Aldrin",
+        "source": "Lunar Module Eagle",
+        "target": "Apollo 11",
+        "key": 0
+      },
+      {
+        "predicate": "is a field center of",
+        "source_doc": "Kennedy Space Center",
+        "source": "Kennedy Space Center",
+        "target": "NASA",
+        "key": 0
+      },
+      {
+        "predicate": "is the primary launch center of",
+        "source_doc": "Kennedy Space Center",
+        "source": "Kennedy Space Center",
+        "target": "NASA",
+        "key": 1
+      },
+      {
+        "predicate": "is located on",
+        "source_doc": "Kennedy Space Center",
+        "source": "Kennedy Space Center",
+        "target": "Merritt Island",
+        "key": 0
+      },
+      {
+        "predicate": "is located on the east coast of",
+        "source_doc": "Kennedy Space Center",
+        "source": "Kennedy Space Center",
+        "target": "Florida",
+        "key": 0
+      },
+      {
+        "predicate": "manages launch operations from",
+        "source_doc": "Kennedy Space Center",
+        "source": "Kennedy Space Center",
+        "target": "Kennedy Space Center Launch Complex 39",
+        "key": 0
+      },
+      {
+        "predicate": "is adjacent to",
+        "source_doc": "Kennedy Space Center",
+        "source": "Kennedy Space Center",
+        "target": "Cape Canaveral Space Force Station",
+        "key": 0
+      },
+      {
+        "predicate": "shares resources with",
+        "source_doc": "Kennedy Space Center",
+        "source": "Kennedy Space Center",
+        "target": "Cape Canaveral Space Force Station",
+        "key": 1
+      },
+      {
+        "predicate": "operates facilities on the property of",
+        "source_doc": "Kennedy Space Center",
+        "source": "Kennedy Space Center",
+        "target": "Cape Canaveral Space Force Station",
+        "key": 2
+      },
+      {
+        "predicate": "managed launch operations for",
+        "source_doc": "Kennedy Space Center",
+        "source": "Kennedy Space Center",
+        "target": "Apollo program",
+        "key": 0
+      },
+      {
+        "predicate": "managed launch operations for",
+        "source_doc": "Kennedy Space Center",
+        "source": "Kennedy Space Center",
+        "target": "Skylab program",
+        "key": 0
+      },
+      {
+        "predicate": "managed launch operations for",
+        "source_doc": "Kennedy Space Center",
+        "source": "Kennedy Space Center",
+        "target": "Space Shuttle program",
+        "key": 0
+      },
+      {
+        "predicate": "managed launch operations for",
+        "source_doc": "Kennedy Space Center",
+        "source": "Kennedy Space Center",
+        "target": "Artemis program",
+        "key": 0
+      },
+      {
+        "predicate": "is located in",
+        "source_doc": "Kennedy Space Center",
+        "source": "Merritt Island",
+        "target": "Florida",
+        "key": 0
+      },
+      {
+        "predicate": "had launch operations from",
+        "source_doc": "Kennedy Space Center",
+        "source": "Skylab program",
+        "target": "Kennedy Space Center Launch Complex 39",
+        "key": 0
+      },
+      {
+        "predicate": "had launch operations from",
+        "source_doc": "Kennedy Space Center",
+        "source": "Space Shuttle program",
+        "target": "Kennedy Space Center Launch Complex 39",
+        "key": 0
+      },
+      {
+        "predicate": "had launch operations from",
+        "source_doc": "Kennedy Space Center",
+        "source": "Artemis program",
+        "target": "Kennedy Space Center Launch Complex 39",
+        "key": 0
+      },
+      {
+        "predicate": "operates facilities on the property of",
+        "source_doc": "Kennedy Space Center",
+        "source": "Cape Canaveral Space Force Station",
+        "target": "Kennedy Space Center",
+        "key": 0
+      }
+    ]
+  }
+}

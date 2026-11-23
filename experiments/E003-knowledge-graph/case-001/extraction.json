@@ -1,0 +1,485 @@
+{
+  "entities": [
+    {
+      "id": "E01",
+      "name": "tests/test_validation.py::test_invalid",
+      "type": "test"
+    },
+    {
+      "id": "E02",
+      "name": "scripts/validate_truth.py::validate_path",
+      "type": "validator"
+    },
+    {
+      "id": "E03",
+      "name": "schemas/knowledge.schema.json",
+      "type": "schema"
+    },
+    {
+      "id": "E04",
+      "name": "examples/invalid/missing-acceptance.yaml (REQ-005)",
+      "type": "fixture"
+    },
+    {
+      "id": "E05",
+      "name": "acceptance",
+      "type": "field"
+    },
+    {
+      "id": "E06",
+      "name": "SRC-001",
+      "type": "record_id"
+    },
+    {
+      "id": "E07",
+      "name": "examples/invalid/",
+      "type": "fixture_directory"
+    },
+    {
+      "id": "E08",
+      "name": "missing origin",
+      "type": "reference_diagnostic"
+    },
+    {
+      "id": "E09",
+      "name": "带文件路径的 schema 校验诊断",
+      "type": "schema_diagnostic"
+    },
+    {
+      "id": "E10",
+      "name": "v3 评审清单 #13",
+      "type": "review_note"
+    }
+  ],
+  "claims": [
+    {
+      "id": "C01",
+      "statement": "当记录的 kind 为 requirement 时，schema 要求包含 acceptance 字段。",
+      "status": "policy",
+      "evidence": [
+        {
+          "document_id": "D6",
+          "lines": [
+            81,
+            99
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "statement": "test_invalid 的 acceptance 断言在整个 examples/invalid/ 的错误列表中搜索 acceptance 子串。",
+      "status": "observation",
+      "evidence": [
+        {
+          "document_id": "D2",
+          "lines": [
+            19,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "statement": "REQ-005 反例未声明 acceptance 字段。",
+      "status": "observation",
+      "evidence": [
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C04",
+      "statement": "REQ-005 的 origin 指向 SRC-001。",
+      "status": "observation",
+      "evidence": [
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C05",
+      "statement": "给定的 examples/invalid/ ID 清单未列出 SRC-001。",
+      "status": "observation",
+      "evidence": [
+        {
+          "document_id": "D5",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C06",
+      "statement": "validate_path 把文件路径写入 schema 校验错误字符串。",
+      "status": "observation",
+      "evidence": [
+        {
+          "document_id": "D3",
+          "lines": [
+            62,
+            63
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C07",
+      "statement": "当字符串 origin 既不等于当前记录 ID 又不在已登记 ID 中时，validate_path 添加带文件路径的 missing origin 错误。",
+      "status": "observation",
+      "evidence": [
+        {
+          "document_id": "D3",
+          "lines": [
+            72,
+            75
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C08",
+      "statement": "REQ-005 的 missing origin SRC-001 错误可凭文件名中的 acceptance 满足该子串断言。",
+      "status": "inference",
+      "evidence": [
+        {
+          "document_id": "D2",
+          "lines": [
+            20,
+            23
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        },
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D5",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C09",
+      "statement": "评审记录称，给 missing-acceptance.yaml 补上合法的 acceptance 后，原测试仍然通过。",
+      "status": "reported",
+      "evidence": [
+        {
+          "document_id": "D1",
+          "lines": [
+            94,
+            97
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C10",
+      "statement": "该断言无法单独验证 REQ-005 是否触发缺少 acceptance 的 schema 错误。",
+      "status": "inference",
+      "evidence": [
+        {
+          "document_id": "D2",
+          "lines": [
+            20,
+            23
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        },
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D5",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D6",
+          "lines": [
+            81,
+            99
+          ]
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "source": "E03",
+      "predicate": "requires_for_requirements",
+      "target": "E05",
+      "evidence": [
+        {
+          "document_id": "D6",
+          "lines": [
+            81,
+            99
+          ]
+        }
+      ]
+    },
+    {
+      "source": "E01",
+      "predicate": "validates",
+      "target": "E07",
+      "evidence": [
+        {
+          "document_id": "D2",
+          "lines": [
+            19,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "source": "E01",
+      "predicate": "searches_diagnostics_for_field_name",
+      "target": "E05",
+      "evidence": [
+        {
+          "document_id": "D2",
+          "lines": [
+            20,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "source": "E04",
+      "predicate": "omits_field",
+      "target": "E05",
+      "evidence": [
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "source": "E04",
+      "predicate": "references_as_origin",
+      "target": "E06",
+      "evidence": [
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "source": "E02",
+      "predicate": "emits",
+      "target": "E09",
+      "evidence": [
+        {
+          "document_id": "D3",
+          "lines": [
+            62,
+            63
+          ]
+        }
+      ]
+    },
+    {
+      "source": "E02",
+      "predicate": "emits_for_unregistered_origin",
+      "target": "E08",
+      "evidence": [
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        }
+      ]
+    },
+    {
+      "source": "C04",
+      "predicate": "contributes_to",
+      "target": "C08",
+      "evidence": [
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        }
+      ]
+    },
+    {
+      "source": "C05",
+      "predicate": "contributes_to",
+      "target": "C08",
+      "evidence": [
+        {
+          "document_id": "D5",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        }
+      ]
+    },
+    {
+      "source": "E08",
+      "predicate": "can_satisfy",
+      "target": "C02",
+      "evidence": [
+        {
+          "document_id": "D2",
+          "lines": [
+            22,
+            23
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        },
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D5",
+          "lines": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "source": "E10",
+      "predicate": "reports",
+      "target": "C09",
+      "evidence": [
+        {
+          "document_id": "D1",
+          "lines": [
+            94,
+            97
+          ]
+        }
+      ]
+    },
+    {
+      "source": "C08",
+      "predicate": "supports",
+      "target": "C10",
+      "evidence": [
+        {
+          "document_id": "D2",
+          "lines": [
+            22,
+            23
+          ]
+        },
+        {
+          "document_id": "D3",
+          "lines": [
+            78,
+            85
+          ]
+        },
+        {
+          "document_id": "D4",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D5",
+          "lines": [
+            1,
+            6
+          ]
+        },
+        {
+          "document_id": "D6",
+          "lines": [
+            81,
+            99
+          ]
+        }
+      ]
+    }
+  ]
+}

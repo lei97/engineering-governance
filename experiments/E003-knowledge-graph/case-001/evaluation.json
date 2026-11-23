@@ -1,0 +1,212 @@
+{
+  "claims": [
+    {
+      "id": "C01",
+      "verdict": "supported",
+      "status_aligned": true,
+      "reason": "D6:81–99 明确在 kind 为 requirement 时要求 acceptance。状态 policy 对应此 schema 的规范约束。"
+    },
+    {
+      "id": "C02",
+      "verdict": "supported",
+      "status_aligned": true,
+      "reason": "D2:19–23 验证整个反例目录，并用 any(term in e for e in errors) 对返回的完整错误字符串查找 acceptance。属于静态代码观察。"
+    },
+    {
+      "id": "C03",
+      "verdict": "supported",
+      "status_aligned": true,
+      "reason": "D4:1–6 是给定 REQ-005 反例，未声明 acceptance。属于记录观察。"
+    },
+    {
+      "id": "C04",
+      "verdict": "supported",
+      "status_aligned": true,
+      "reason": "D4:1、6 明确给出 REQ-005 和 origin: SRC-001。属于记录观察。"
+    },
+    {
+      "id": "C05",
+      "verdict": "supported",
+      "status_aligned": true,
+      "reason": "D5:1–6 的清单未列 SRC-001。措辞限于给定清单，避免把针对特定 YAML 声明形式的 grep 当成完整解析结果。"
+    },
+    {
+      "id": "C06",
+      "verdict": "supported",
+      "status_aligned": true,
+      "reason": "D3:62–63 将 path 插入每条 validator.iter_errors 的错误字符串。属于静态代码观察。"
+    },
+    {
+      "id": "C07",
+      "verdict": "supported",
+      "status_aligned": true,
+      "reason": "D3:72–75 给出 ID 登记，D3:78–85 给出字符串 origin、非自引用及缺少 ID 的分支与带 path 的诊断。属于静态代码观察。"
+    },
+    {
+      "id": "C08",
+      "verdict": "supported",
+      "status_aligned": true,
+      "reason": "D4 的文件路径与 origin、D5 的给定 ID 清单、D3:78–85 的带路径诊断和 D2:20–23 的子串匹配共同推出该诊断可以满足断言。D5 对 SRC-001 的缺失提供清单层面的依据。这是代码推断。"
+    },
+    {
+      "id": "C09",
+      "verdict": "supported",
+      "status_aligned": true,
+      "reason": "D1:94–97 记述加上合法 acceptance 后重跑原断言，测试仍通过。reported 保持了复现叙述的来源属性。"
+    },
+    {
+      "id": "C10",
+      "verdict": "supported",
+      "status_aligned": true,
+      "reason": "D2:20–23 的查找可被 D3:78–85 形成、与 D4/D5 对应的缺少来源诊断满足。D6 的 acceptance 约束则描述待验证的另一项条件。断言缺乏诊断专属性属于推断。"
+    }
+  ],
+  "relations": [
+    {
+      "source": "E03",
+      "predicate": "requires_for_requirements",
+      "target": "E05",
+      "verdict": "supported",
+      "reason": "D6:81–99 直接支持从 schema 到 requirement 的必填字段。"
+    },
+    {
+      "source": "E01",
+      "predicate": "validates",
+      "target": "E07",
+      "verdict": "supported",
+      "reason": "D2:19–20 中测试调用 validate_path 并将反例目录作为参数，方向正确。"
+    },
+    {
+      "source": "E01",
+      "predicate": "searches_diagnostics_for_field_name",
+      "target": "E05",
+      "verdict": "supported",
+      "reason": "D2:20–23 直接出现目标字符串 acceptance 和对完整错误文本的查找。"
+    },
+    {
+      "source": "E04",
+      "predicate": "omits_field",
+      "target": "E05",
+      "verdict": "supported",
+      "reason": "D4:1–6 的反例记录省略了目标字段。"
+    },
+    {
+      "source": "E04",
+      "predicate": "references_as_origin",
+      "target": "E06",
+      "verdict": "supported",
+      "reason": "D4:1–6 直接支持反例把 SRC-001 用作 origin。"
+    },
+    {
+      "source": "E02",
+      "predicate": "emits",
+      "target": "E09",
+      "verdict": "supported",
+      "reason": "D3:62–63 中 validator.iter_errors 的每个诊断均以带 path 的字符串加入 errors。"
+    },
+    {
+      "source": "E02",
+      "predicate": "emits_for_unregistered_origin",
+      "target": "E08",
+      "verdict": "supported",
+      "reason": "D3:78–85 支持从校验函数到诊断的方向，适用条件为未登记且非自引用的字符串 origin。"
+    },
+    {
+      "source": "C04",
+      "predicate": "contributes_to",
+      "target": "C08",
+      "verdict": "supported",
+      "reason": "D4:1–6 中 REQ-005 的 origin 是 D3:78–85 缺少来源分支的一项前提，和 C08 本身的断言与清单证据合起来支持该贡献。"
+    },
+    {
+      "source": "C05",
+      "predicate": "contributes_to",
+      "target": "C08",
+      "verdict": "supported",
+      "reason": "D5:1–6 中没有 SRC-001，与 D3:78–85 的查找条件对应。在 C08 所列记录和断言证据的上下文中，该清单支持触发缺少来源诊断的前提。"
+    },
+    {
+      "source": "E08",
+      "predicate": "can_satisfy",
+      "target": "C02",
+      "verdict": "partial",
+      "reason": "D2:22–23、D3:78–85、D4/D5 支持具体的带路径诊断满足子串断言。E08 指代诊断类别，实际匹配依赖带有 acceptance 的文件路径实例。C02 是对查找行为的陈述，能被满足的是其中描述的断言条件。"
+    },
+    {
+      "source": "E10",
+      "predicate": "reports",
+      "target": "C09",
+      "verdict": "supported",
+      "reason": "D1:94–97 是 C09 的记述来源。按来源关系读取，方向为评审记录提供记述。"
+    },
+    {
+      "source": "C08",
+      "predicate": "supports",
+      "target": "C10",
+      "verdict": "supported",
+      "reason": "D2:22–23 和 D3:78–85 与 D4/D5 给出错误匹配路径，D6 给出另一个实际要验证的 schema 约束。错误匹配机制支持断言缺乏诊断专属性的结论。"
+    }
+  ],
+  "reference_claims": [
+    {
+      "id": "C1",
+      "matched": [
+        "C01"
+      ],
+      "reason": "覆盖同一基线 schema 的 requirement/acceptance 规则。D6 的给定片段未单独声明版本标签 v0.1。"
+    },
+    {
+      "id": "C2",
+      "matched": [
+        "C03"
+      ],
+      "reason": "同一 REQ-005 反例，缺少 acceptance。D4 元数据与记录给出文件路径和 ID。"
+    },
+    {
+      "id": "C3",
+      "matched": [
+        "C04",
+        "C05"
+      ],
+      "reason": "引用关系与给定清单中缺少被引用 ID 分列。对缺失的观察严格限于清单，是否存在不符合 grep 模式的声明无独立解析证据。"
+    },
+    {
+      "id": "C4",
+      "matched": [
+        "C02"
+      ],
+      "reason": "在目录的全批错误字符串中做子串查找，代码隐含没有逐文件核对诊断。"
+    },
+    {
+      "id": "C5",
+      "matched": [
+        "C07"
+      ],
+      "reason": "同一缺少来源分支和诊断路径前缀。C06 针对 schema 校验分支。"
+    },
+    {
+      "id": "C6",
+      "matched": [
+        "C08",
+        "C09"
+      ],
+      "reason": "C08 给出可匹配的缺少来源诊断机制，C09 给出补齐后仍通过的复现叙述。反事实场景与代码推断分开表述，抽取中没有一条明确将补齐步骤、存续诊断和断言误通过全部相连的推断。"
+    }
+  ],
+  "reference_relations": [
+    {
+      "source": "C3",
+      "predicate": "contributes_to",
+      "target": "C6",
+      "covered": true,
+      "reason": "C04→C08 与 C05→C08 同方向覆盖两个来源前提对误匹配机制的贡献。反事实步骤只在 C09 单列，图谱没有把这两条边连到 C09。"
+    },
+    {
+      "source": "C4",
+      "predicate": "contributes_to",
+      "target": "C6",
+      "covered": false,
+      "reason": "图谱缺少从 C02 的全批子串断言指向 C08/C09 误通过的因果解释。E08→C02 说明诊断匹配断言条件，端点含义和方向不同。C08 的引文包含 D2，图谱仍没有给出对应关系。"
+    }
+  ]
+}

@@ -2,6 +2,8 @@
 
 本仓库已用 E002 记录时间语义实验，因此将对话中的知识图谱实验编号为 E003。首轮核对从原始材料提取的实体、主张和有向关系能否回到证据。通过 Apollo 基线检查管线，再用一个真实工程缺陷检验提取质量。 [讨论来源](chatgpt-conversation://6b0141a3-4e6c-83ec-8546-2139db0306b6)
 
+**E003 已阶段性收口。** P0 至 P4 的材料、复核与对照结果见下文。阶段复盘汇总已观察到的事实、研究认识及待验证问题。 [E003 阶段复盘](retrospective.md)
+
 ## P0 · Cookbook 替代模型试跑
 
 上游固定在 `8ad5de647d4f0f50c95d74aabc8aa20a3f70cdd3`。2026-11-23 获取六篇 Wikipedia REST 摘要，保存原文、接口与修订号。语料来自对应 Wikipedia 条目的贡献者，按 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) 提供。每一条的修订号可用作 `https://en.wikipedia.org/w/index.php?oldid=<revision>` 的版本入口。 [官方教程](https://platform.claude.com/cookbook/capabilities-knowledge-graph-guide) · [固定版本的示例和评估](https://github.com/anthropics/claude-cookbooks/tree/8ad5de647d4f0f50c95d74aabc8aa20a3f70cdd3/capabilities/knowledge_graph) · [冻结语料](baseline/corpus.json)
@@ -75,7 +77,7 @@ E003 初步支持显式提取工程知识、追溯原证据和审查适用条件
 
 ## P4 · 跨版本知识有效性
 
-候选设计比较原始资料、等义摘要与等义图谱，逐项评阅历史知识的复用、拒用、限定、冲突识别和修订理由。#16 的七批金标已独立复跑，三组校准包已冻结。共同资料试答答对五项主判断，正式对照需要更有区分度的版本案例。 [设计](cross-version-validity.md) · [校准与冻结记录](p4-calibration/README.md)
+设计比较原始资料、等义摘要与等义图谱，逐项评阅历史知识的复用、拒用、限定、冲突识别和修订理由。#16 的七批金标已独立复跑，三组校准包已冻结。共同资料试答答对五项主判断，试答单独归档。 [设计](cross-version-validity.md) · [校准与冻结记录](p4-calibration/README.md)
 
 作者确认采用 Kubernetes Job 生命周期交接案。正式对照分开检查历史知识恢复与目标案例判定，包括版本迁移、现场根因和资源归还的证据边界。 [正式案例与材料](p4-job-handoff/README.md)
 

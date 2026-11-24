@@ -2,7 +2,7 @@
 
 Engineering Governance 是供需求作者和 Agent 共用的工程治理 Skill。v0.1 首先检验，在需求已经确认的前提下，用简洁、受约束的 YAML 管理需求真源，能否减少解读时的隐含假设、歧义和遗漏。
 
-**当前为实验原型。** E001 和 E002 已完成各自的案例对照。现行 Schema 继续作为实验基线。下一步从真实工程案例中查找现有表达的失效边界。 [两轮实验联合复盘](docs/v0.1-experiment-retrospective.md) · [v0.1 版本确认记录](docs/v0.1-review.md)
+**当前为实验原型。** E001 和 E002 已完成各自的案例对照，E003 的工程知识提取与复用研究也已阶段性收口。现行 Schema 继续作为实验基线。 [E001 与 E002 联合复盘](docs/v0.1-experiment-retrospective.md) · [E003 阶段复盘](experiments/E003-knowledge-graph/retrospective.md) · [v0.1 版本确认记录](docs/v0.1-review.md)
 
 ## 快速验证
 

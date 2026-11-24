@@ -1,0 +1,67 @@
+{
+  "case": "Kubernetes Job handoff",
+  "author_confirmed_distribution": true,
+  "frozen_at": "2026-11-24T20:00:40+08:00",
+  "calibration_archive": "c27ed46df86a96d25d356ba1cc94a3f34fb89f98",
+  "packet_sha256": {
+    "C": {
+      "history-note.md": "680cdca5218af60d571274b5d6c5202bc42269abe3742d48dd2b3d5624e01151",
+      "sources.md": "decbddbb953ce45b6bfc6e45f4d2a9d117cd51465dbc6b50d4a637d6de3a170a",
+      "task.md": "43e63615b6bb34025a5a50f06bc64a48bcb25ed274651ab9a0b38c44cc267a60"
+    },
+    "A": {
+      "sources.md": "decbddbb953ce45b6bfc6e45f4d2a9d117cd51465dbc6b50d4a637d6de3a170a",
+      "task.md": "43e63615b6bb34025a5a50f06bc64a48bcb25ed274651ab9a0b38c44cc267a60"
+    },
+    "B": {
+      "history-note.md": "e1cfb1304a1baa42e0e5d6c5ffbcf4b99b19d2fb70f66e2f6dd78f04bde47008",
+      "sources.md": "decbddbb953ce45b6bfc6e45f4d2a9d117cd51465dbc6b50d4a637d6de3a170a",
+      "task.md": "43e63615b6bb34025a5a50f06bc64a48bcb25ed274651ab9a0b38c44cc267a60"
+    }
+  },
+  "organizer_sha256": {
+    "prepare.py": "992a593b5b36554e20d716b6fc670042f9f5b4a8e7f51e255dd359ab8b7e85b2",
+    "claims.json": "e08ab3a5b47e1bd89a4c491463a1481ca4c8d2a5a080befcbf36adf853cdefcb",
+    "reference.md": "ec8db53a2ba04f2bc843b6491a5ac6544afbef958aa8d42f981fe9465331fc4a"
+  },
+  "selection_seed": 20261124,
+  "assignments": [
+    {
+      "id": "943",
+      "wave": 1,
+      "group": "C"
+    },
+    {
+      "id": "277",
+      "wave": 1,
+      "group": "A"
+    },
+    {
+      "id": "791",
+      "wave": 1,
+      "group": "B"
+    },
+    {
+      "id": "103",
+      "wave": 2,
+      "group": "B"
+    },
+    {
+      "id": "145",
+      "wave": 2,
+      "group": "A"
+    },
+    {
+      "id": "788",
+      "wave": 2,
+      "group": "C"
+    }
+  ],
+  "scope": "Kubernetes only; the #16 calibration and its pilot are excluded.",
+  "model_config": "Independent Codex sessions with the inherited default model configuration.",
+  "char_counts": {
+    "A": 7893,
+    "B": 9243,
+    "C": 9489
+  }
+}

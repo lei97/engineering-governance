@@ -1,0 +1,403 @@
+{
+  "freeze_sha256": "caed99085a3f3073e08127cbbc8c4199f00365d1d8489a756b5d06d70a606481",
+  "dispatch_notes": {
+    "capacity_retry": "Initial 791 launch was not created due to the concurrent session limit. Both other wave-1 launches succeeded. 791 was then dispatched to its preassigned untouched packet.",
+    "waves": "Both balanced waves used the frozen assignments. Some sessions overlapped across waves because slots opened at different times.",
+    "timing": "943 and 277 share the first dispatch marker; other cases have individual dispatch markers. Time includes orchestration overhead."
+  },
+  "review_method": "Two independent reviewers received alias-only packets with the common materials, criteria, and historical claims. Citation patterns and tool disclosures in responses can reveal material condition.",
+  "adjudication": [
+    {
+      "criterion": "V10",
+      "id": "788",
+      "independent_rating": "met",
+      "final_rating": "partial",
+      "reason": "两份同类答卷都将修订放在候选状态，也分别指出证据核验责任方，但均缺少条目采纳责任方。按冻结的 V10 和任务要求统一判为部分满足，保留原评分。",
+      "comparison_response": "943"
+    }
+  ],
+  "cost": {
+    "tokens": null,
+    "actual_read_volume": null,
+    "human_preparation_time": null,
+    "note": "Frozen file character budgets, response sizes and dispatch-to-file times are recorded; tool use and files consulted come from self-reports."
+  },
+  "submissions": [
+    {
+      "id": "943",
+      "wave": 1,
+      "group": "C",
+      "status": "received_and_reviewed",
+      "dispatch_marker_at": "2026-11-24T20:01:06+08:00",
+      "dispatch_marker_to_response_seconds": 255.9,
+      "input_hashes_verified": true,
+      "response_sha256": "03da79788a0939a84e2fbaed1184771f00a2d11e3d28d3e5b215aecc1421c508",
+      "response_characters": 10003,
+      "response": "# Job 生命周期交接复核\n\n## 1. H1 的两次观测\n\n**恢复的事实及出处**\n\n- 2024 年 3 月 7 日的复现删除了一个 Pod，使用 Indexed Job，配置为 `completions: 4`、`parallelism: 4`、`backoffLimit: 0`、`podReplacementPolicy: Failed`。所贴状态同时有 `Failed=True`，原因为 `BackoffLimitExceeded`，以及 `failed=4`、`ready=2`、`terminating=1`、`uncountedTerminatedPods={}`。 [H1 原议题](https://github.com/kubernetes/kubernetes/issues/123775) · [3 月状态](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1982959351)\n- 2024 年 5 月 16 日是另一次复现，使用 600 个索引和 `backoffLimit: 0`。评论依次记录 `11:13:10.933897` 第 0 个 Pod 失败，`11:13:11.942719` Job 更新 `uncountedTerminatedPods`，`11:13:23.981958` Job 出现 `Failed`，`11:13:50.139687` 最后一个 Pod 被标为 `Failed`。 [H1 复现时间轴](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-2114710754)\n\n**判断、版本和条件。** 早期的 `Failed=True` 能确认控制器已发布 Job 失败，3 月状态还给出了触发原因。3 月同一状态中终止计数仍为 1，5 月记录中 Job 失败早于最后一个 Pod 的失败标记约 26.16 秒。因此，用这两次复现的早期 `Failed` 推断所有 Pod 均已进入终态，结论不成立。两次复现的具体构建均未给出。H1 的容量讨论指出，Kueue 若收到 Job 失败便启动替代任务，可能与尚在消耗资源的原 Pod 重叠。实际是否发生重叠、资源何时归还，证据不足。需查对应 Pod 的容器退出记录，以及节点、调度器或 Kueue 在同一时间段的容量与配额记录。最后一个 Pod 被标为 `Failed` 只确定了其终态的记录时间。 [H1 容量核算讨论](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1983329580) · [history-note.md，J1](/private/tmp/eg-p4-job-formal-is2fegsb/943/history-note.md)\n\n## 2. H2 的终态发布规则\n\n**恢复的事实及出处**\n\n- 上游 `v1.30.0` 的内置控制器在 `enactJobFinished` 中检查待计数的已终止 Pod UID，之后可写入 `Failed` 或 `Complete`。2024 年 7 月合并的 #125510 扩展了提前条件，失败判据达到时可先发布 `FailureTarget`，成功判据达到时可先发布 `SuccessCriteriaMet`。 [H2 v1.30.0 源码](https://github.com/kubernetes/kubernetes/blob/7c48c2bd72b9bf5c44d21d7338cc7bea77d0ad2a/pkg/controller/job/job_controller.go#L1350-L1369) · [#125510](https://github.com/kubernetes/kubernetes/pull/125510)\n- 上游 `v1.31.9` 和 `v1.32.7` 的内置控制器在 `JobManagedBy` 或 `JobPodReplacementPolicy` 任一启用时进入终态延后分支。`v1.32.7` 中若 `UncountedTerminatedPods` 的成功或失败 UID 集合有条目，`enactJobFinished` 返回 `false`。延后分支另在内部终止中 Pod 数大于零时返回 `false`，两项检查都在写入终态之前。 [H2 v1.31.9 门控](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/controller/job/job_controller.go#L999-L1002) · [v1.32.7 门控](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1082-L1086) · [v1.32.7 完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501) · [history-note.md，J2–J4](/private/tmp/eg-p4-job-formal-is2fegsb/943/history-note.md)\n- API 的 `terminating` 统计已有删除时间戳且仍为 `Pending` 或 `Running` 的 Pod。记账流程为登记已终止 Pod 的 UID、移除跟踪 finalizer、把 UID 从待计数集合移除并累计到 Job 计数。 [H2 终止中计数](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L546-L552) · [记账步骤](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L579-L594)\n\n**判断、版本和条件。** 对上游 `v1.32.7` 的内置控制器，达到相应成败判据后，终态发布需待两类未记账 UID 清空。任一延后门控启用时，还需控制器内部的终止中 Pod 数归零。最终凭证是 API 已接受并持久化相应的 `Failed=True` 或 `Complete=True` 状态。两门控均关闭时没有这项额外的终止中 Pod 检查。单凭 Job 状态 `terminating=0` 判定终态已发布或资源已归还，均不成立。该字段只描述所统计的 Pod 类别，无法确证 UID 已记账、Pod 对象已删除或容量已可再次调度。资源归还时间需由相应的运行时与容量核算记录确认。\n\n## 3. H3 的 Running 回归\n\n**恢复的事实及出处**\n\n- 原报告的 Job 为 `completions: 0` 且 `suspend: true`。`v1.31.9` 出现 `SuccessCriteriaMet=True`、`Complete=True` 和 `completionTime`。`v1.32.0+k3s1` 在约 2 秒时表格显示 `Running`，所贴状态只显示 `SuccessCriteriaMet=True`，早期评论猜测还有 Pod 正在终止。独立复现记录两个版本都没有创建 Pod，`v1.32` 约 10 分钟后仍显示 `Running`，并有 `status.startTime: Required value: startTime is required for finished job`。报告人称 Flux 流程未进入后续依赖项。 [H3 原报告](https://github.com/kubernetes/kubernetes/issues/132144) · [早期猜测](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2954740579) · [独立复现](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2957408192) · [Flux 影响](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2966466616)\n- 上游默认值在 `v1.31.9` 至 `v1.32.0` 之间，`JobManagedBy` 由 Alpha、关闭，变为 Beta、开启，`JobPodReplacementPolicy` 两版均为 Beta、开启。两版 Job 状态策略文件对应同一个 blob，增强状态校验由 `JobManagedBy` 控制。此门控开启且终态标记或 `startTime` 发生变化时，会启用 `RejectFinishedJobWithoutStartTime`。在 `v1.32.0`，若拟写入的是终态且 `StartTime == nil`，API 拒绝这次状态更新。表格打印器的默认分支可显示 `Running`。 [H3 v1.31.9 默认值](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/features/kube_features.go#L1094-L1100) · [v1.32.0 默认值](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/features/versioned_kube_features.go#L430-L444) · [v1.31.9 策略](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/registry/batch/job/strategy.go#L344-L405) · [v1.32.0 策略](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/registry/batch/job/strategy.go#L344-L405) · [校验](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/apis/batch/validation/validation.go#L530-L539) · [打印器](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/printers/internalversion/printers.go#L1209-L1226) · [history-note.md，J5–J8](/private/tmp/eg-p4-job-formal-is2fegsb/943/history-note.md)\n- #132614 合并后经 #132727 回移到 `release-1.32`。在 `suspend=true` **且** `completions=0` 时，跳过缺失 `startTime` 的这项拒绝检查。集成用例验证了此配置可以产生 `SuccessCriteriaMet` 和 `Complete`，维护者在 kind 观察到 `Complete`，原报告人确认 `1.32.7` 和 `1.33.3` 已解决其回归。 [H4 主线修复](https://github.com/kubernetes/kubernetes/pull/132614) · [回移](https://github.com/kubernetes/kubernetes/pull/132727) · [v1.32.7 源码](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/registry/batch/job/strategy.go#L377-L400) · [kind 观察](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-3036731203) · [报告人确认](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-3088832393) · [history-note.md，J9](/private/tmp/eg-p4-job-formal-is2fegsb/943/history-note.md)\n\n**判断、版本和条件。** 对该独立复现，Pod 仍在终止的解释不成立，终态写入因缺 `startTime` 被拒的解释成立。表格上的 `Running` 只是显示结果。上游默认配置下，`v1.31.9` 已可通过 `JobPodReplacementPolicy` 启用终态延后，所以版本差异可定位到 `v1.32.0` 默认开启的 `JobManagedBy` 所控制的增强状态校验。修复的豁免只覆盖同时满足暂停和零完成数的配置，并只针对缺 `startTime` 的检查。上述默认值和修复源码属于所列上游版本，k3s 表格及报告人确认属于对应环境的观测。\n\n## 4. 对 T1 的三种解释\n\n**恢复的事实及出处。** #133903 提交者称，EKS `v1.32.7-eks-ace6451` 上 Helm pre-install/pre-upgrade Hook 未进入 `Complete`，后续 Deployment 未创建。所贴状态含 `SuccessCriteriaMet=True`、`reason=CompletionsReached`，其 `lastTransitionTime` 为 `2025-09-05T06:10:23Z`，有 `startTime=2025-09-05T06:10:09Z` 和 `terminating=0`，且 `uncountedTerminatedPods.succeeded` 仍有一条 UID `ccbd79bb-77f2-44d5-b460-34a06d87fc26`，片段未显示 `Complete`。复现片段有 `restartPolicy: Never` 和 `backoffLimit: 2`，未展示 `successPolicy`、`suspend: true` 或 `completions: 0`。以上是报告中的配置与状态片段。 [T1 原报告](https://github.com/kubernetes/kubernetes/issues/133903)\n\n1. **报告证明显式配置或触发了 `spec.successPolicy`，不成立。** H2 的上游 `v1.32.7` 源码显示，普通完成计数路径在延后分支和 `JobSuccessPolicy` 门控开启时可产生 `SuccessCriteriaMet`，原因为 `CompletionsReached`，匹配显式策略的路径使用 `SuccessPolicy`。因此该原因与普通完成计数相符。如果“启用”指功能门控，该原因在相同上游实现下与门控开启相符，EKS 的实际门控仍需由发行商配置或控制面证据确认。若要确认显式策略是否存在以及是否命中，需要完整的实际 Job spec 和控制器对应的条件或日志。 [H2 策略匹配分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L965-L969) · [普通完成判据和原因](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L993-L1079)\n2. **单凭 `terminating=0` 应当立刻发布 `Complete`，不成立。** 即使当时控制器内部终止计数也为零，快照中仍有未记账的成功 Pod UID。上游 `v1.32.7` 在该 UID 仍属于本次处理的待记账集合时会阻止终态发布。这是固定版本源码对快照的条件性解释。要确认 EKS 控制器实际采用同一分支、UID 持续多久，以及记账停在哪一步，需该发行构建的实现或厂商确认，加上连续的 Job 和 Pod 状态、跟踪 finalizer 更新与控制器日志。 [H2 完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501)\n3. **可直接套用 H3 的回归，不成立。** T1 快照已有 `startTime`，所贴配置也未显示 H3 的暂停与零完成数组合。H3 的独立复现未创建 Pod，并取得了缺 `startTime` 的拒绝日志，T1 有一条成功 Pod 的待记账 UID，上游 `v1.32.7` 又已包含 H4 针对该配置的修复。T1 未给出先前状态写入的请求和响应，也未验证 EKS 的实现与上游相同。若需判断其他时间是否有状态校验失败，应查实际 Job spec、完整状态历史及 API 拒绝响应。 [H3 独立复现](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2957408192) · [H4 v1.32.7 源码](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/registry/batch/job/strategy.go#L377-L400)\n\n## 5. T2 的归因、资源归还和交接修订\n\n**恢复的事实及出处。** 关闭前，报告人把问题归因于一个持续修改 Pod 的 Kyverno 策略，并称该策略妨碍了终止中 Pod 的删除。T1 只给出一个 Job 状态片段，既未呈现策略、实际的 Pod 修改与删除操作，也未给出运行时退出或容量归还记录。 [T1 原报告](https://github.com/kubernetes/kubernetes/issues/133903) · [T2 关闭说明](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422)\n\n**判断、版本和条件。** “报告人如此归因”成立。该策略是否导致此 EKS 构建上的删除或 finalizer 更新受阻、受阻后是否使 T1 的 UID 停留在未记账集合、最后何时发布终态，均证据不足。`terminating=0` 与关闭说明无法据现有材料对齐到同一 Pod、时刻与状态口径。应取得策略规则和匹配对象、按 Pod UID 和时间关联的 Kyverno 日志与 API 审计请求和响应、Pod phase、`deletionTimestamp` 与 finalizer 变化、Job 状态更新及控制器日志。策略停用或修改前后的同配置复现可帮助判断因果。Pod API 删除时间和 Job 状态只能验证各自的生命周期事件。实际资源何时归还，仍需 kubelet 或容器运行时的退出记录，以及调度器和所用配额系统重新计入容量的记录。\n\n**候选交接修订，待确认。** 对上游 `v1.32.7` 内置控制器，遇到 `SuccessCriteriaMet=True`、`terminating=0` 且 `uncountedTerminatedPods` 非空时，按 Pod UID 核对记账、跟踪 finalizer 和后续 `Complete` 写入。任一延后门控开启时，同时检查控制器内部终止计数。对 EKS `v1.32.7-eks-ace6451`，待 EKS 控制面维护方确认对应实现和门控，待报告人或集群与 Kyverno 管理方提供上述操作证据，待节点或调度配额维护方确认资源归还。当前 Kyverno 归因保留为报告人陈述。 [H2 门控和完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1082-L1086) · [终态写入检查](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501) · [T1 原报告](https://github.com/kubernetes/kubernetes/issues/133903) · [T2 关闭说明](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422)\n\n## 查阅范围与工具\n\n实际查阅了同目录的 `task.md`、`sources.md` 和 `history-note.md`。使用 `rg --files --hidden` 列出材料、`cat` 读取和写入答卷、`python3` 校对文字，并以 `wc` 和 `rg` 检查交付。材料提供了报告摘录、历史关系和固定版本源码定位，未提供完整状态历史、EKS 内部日志及策略原件，也没有可供重现的集群。链接保留用于定位。本次仅在该目录离线处理，输入原样保留。\n",
+      "review": {
+        "alias": "G",
+        "ratings": {
+          "R1": "met",
+          "R2": "met",
+          "R3": "met",
+          "R4": "met",
+          "R5": "met",
+          "R6": "met",
+          "V1": "met",
+          "V2": "met",
+          "V3": "met",
+          "V4": "met",
+          "V5": "met",
+          "V6": "met",
+          "V7": "met",
+          "V8": "met",
+          "V9": "met",
+          "V10": "partial"
+        },
+        "notes": [
+          "V10（第 46 行，兼看第 44 行）：提出了带上游版本与 OR 门控边界、可追溯的候选条目，并分别列出现场实现、根因和资源记录的核验方。三方待确认的事项都是事实或证据，未明确交接维护者确认是否采纳该条修订。"
+        ],
+        "unsupported": [],
+        "boundary": "第 37、38、42、44、46 行把非空未入账 UID 指向上游的条件性解释，将持续修改 Pod 的 Kyverno 策略保留为关单作者归因。缺同 UID 的策略、准入／API 和 finalizer 到 Job 更新的时序关联，也缺对应的节点运行时、调度容量或配额释放记录，现场根因及实际资源归还时间证据不足。"
+      },
+      "final_ratings": {
+        "R1": "met",
+        "R2": "met",
+        "R3": "met",
+        "R4": "met",
+        "R5": "met",
+        "R6": "met",
+        "V1": "met",
+        "V2": "met",
+        "V3": "met",
+        "V4": "met",
+        "V5": "met",
+        "V6": "met",
+        "V7": "met",
+        "V8": "met",
+        "V9": "met",
+        "V10": "partial"
+      },
+      "counts_by_dimension": {
+        "R": {
+          "met": 6
+        },
+        "V": {
+          "met": 9,
+          "partial": 1
+        }
+      }
+    },
+    {
+      "id": "277",
+      "wave": 1,
+      "group": "A",
+      "status": "received_and_reviewed",
+      "dispatch_marker_at": "2026-11-24T20:01:06+08:00",
+      "dispatch_marker_to_response_seconds": 297.5,
+      "input_hashes_verified": true,
+      "response_sha256": "1e8f505365886d2c62555887fc9740dad2597881cbdc81da257b2a2f8ce9e206",
+      "response_characters": 11693,
+      "response": "# Kubernetes Job 生命周期交接复核\n\n## 1. H1 的两次观测\n\n### 恢复的事实及出处\n\n- **2024 年 3 月 7 日的状态。** #123775 使用 Indexed Job，设 `completions=4`、`parallelism=4`、`backoffLimit=0` 和 `podReplacementPolicy=Failed`，随后删除一个 Pod。按相同配置贴出的同一份 Job 状态中，`Failed=True`，原因为 `BackoffLimitExceeded`，同时 `failed=4`、`ready=2`、`terminating=1`、`uncountedTerminatedPods={}`。 [H1 议题](https://github.com/kubernetes/kubernetes/issues/123775) · [3 月状态](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1982959351)\n- **2024 年 5 月 16 日的复现。** 维护者另用 600 个索引、`backoffLimit=0`，第 0 个 Pod 首先失败。以下时间按评论原样记录。 [H1 复现时间轴](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-2114710754)\n\n| 时间 | 维护者观测 |\n| --- | --- |\n| `11:13:10.933897` | 第 0 个 Pod 失败 |\n| `11:13:11.942719` | Job 更新 `uncountedTerminatedPods` |\n| `11:13:23.981958` | Job 出现 `Failed` |\n| `11:13:50.139687` | 最后一个 Pod 被标为 `Failed` |\n\n### 判断、适用版本及条件\n\n- **成立。** 这两次观测中的早期 `Failed` 可以用来确认 Job 已发布失败决定。3 月的计数显示它可与终止中的 Pod 并存。5 月最后一个 Pod 的 `Failed` 状态晚了约 **26.16 秒**，直接证实 Job `Failed` 可以先于最后一个 Pod 的终态。材料未给出两次复现的精确集群版本。H2 的上游 `v1.30.0` 实现提供了旧行为的代码例证，适用边界还要看 #125510 后的门控。 [H1 3 月状态](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1982959351) · [H1 5 月时间轴](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-2114710754) · [H2 v1.30.0 控制器](https://github.com/kubernetes/kubernetes/blob/7c48c2bd72b9bf5c44d21d7338cc7bea77d0ad2a/pkg/controller/job/job_controller.go#L1350-L1369)\n- **资源归还时间证据不足。** Job 条件和 Pod phase 给出的是 API 状态时间。H1 讨论中的 Kueue 替代任务、配额和调度影响是风险推断。需要相关 Pod UID 对应的节点容器退出或资源清理记录，以及调度器或 Kueue 的配额核算时间线，才能分别判定节点资源释放与配额回补。 [H1 容量核算讨论](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1983329580)\n\n## 2. H2 的终态发布规则\n\n### 恢复的事实及出处\n\n- 上游 `v1.30.0` 的 `enactJobFinished` 在写终态前检查 `uncountedTerminatedPods`。2024 年 7 月合并的 #125510 解决 #123775，扩展了终态前的 `FailureTarget` 和 `SuccessCriteriaMet`。上游 `v1.31.9` 和 `v1.32.7` 的内置 Job 控制器在 `JobManagedBy`、`JobPodReplacementPolicy` 任一门控启用时进入延后分支。 [H2 v1.30.0 控制器](https://github.com/kubernetes/kubernetes/blob/7c48c2bd72b9bf5c44d21d7338cc7bea77d0ad2a/pkg/controller/job/job_controller.go#L1350-L1369) · [#125510](https://github.com/kubernetes/kubernetes/pull/125510) · [v1.31.9 门控](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/controller/job/job_controller.go#L999-L1002) · [v1.32.7 门控](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1082-L1086)\n- `v1.32.7` 的 `enactJobFinished` 先检查成功和失败的未计数 UID 数。只要仍有 UID 就返回 `false`。启用延后分支时，内部终止中 Pod 数大于零同样会提前退出。API 将 `terminating` 定义为带删除时间戳且仍处于 `Pending` 或 `Running` 的 Pod 数。终止 Pod 的记账依次为登记 UID、移除跟踪 finalizer、从未计数集合移除 UID 并累计计数。 [H2 完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501) · [终止中计数](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L546-L552) · [记账步骤](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L579-L594)\n\n### 判断、适用版本及条件\n\n- **成立。** 在上游内置控制器的延后路径中，`FailureTarget=True` 和 `SuccessCriteriaMet=True` 分别提前公布已命中的失败和成功判据，终态分别为 `Failed=True` 和 `Complete=True`。以 `v1.32.7` 为例，发布终态需要控制器判定 Job 已满足成败判据、成功和失败的未计数 UID 均为空、延后分支内部终止中 Pod 数为零，并成功写入状态。两个门控均关闭时，延后分支的额外等待条件不适用，未计数 UID 的检查仍适用。发行商构建或其他控制器需核对对应实现与配置。 [H2 #125510](https://github.com/kubernetes/kubernetes/pull/125510) · [v1.32.7 完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501)\n- **单凭 `terminating=0` 作为凭证不成立。** 该字段只反映定义内的 API 计数。终止后的 Pod 可退出该计数，同时仍有 UID 待 Job 记账。确认终态需要看到后续 Job 状态中的终态条件。确认资源归还需要调度、配额或节点的独立记录，按要确认的资源类型取证。 [H2 终止中计数](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L546-L552) · [记账步骤](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L579-L594)\n\n## 3. H3 的 `Running` 回归\n\n### 恢复的事实及出处\n\n- 报告配置同时设 `completions=0` 和 `suspend=true`。报告人称 `v1.31.9` 有 `SuccessCriteriaMet=True`、`Complete=True` 和 `completionTime`，表格显示 `Complete`。`v1.32.0+k3s1` 在 `AGE=2s` 时表格显示 `Running`，状态片段只显示 `SuccessCriteriaMet=True`。早期评论怀疑仍在等待 Pod 终止。 [H3 原报告](https://github.com/kubernetes/kubernetes/issues/132144) · [早期假设](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2954740579)\n- 独立复现者记录两版均未创建 Pod，`v1.32` 在约 10 分钟后仍显示 `Running`，控制器日志报 `status.startTime: Required value: startTime is required for finished job`。报告人还称 Flux 工作流没有继续到下一依赖项。 [H3 独立复现与日志](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2957408192) · [用户工作流](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2966466616)\n- 上游默认配置中，`JobManagedBy` 从 `v1.31.9` 的 Alpha、默认关闭变为 `v1.32.0` 的 Beta、默认开启。`JobPodReplacementPolicy` 在两版均为 Beta、默认开启。两个版本的状态策略文件对应同一 blob，增强校验由 `JobManagedBy` 控制。 [H3 v1.31.9 门控](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/features/kube_features.go#L1094-L1100) · [v1.32.0 门控](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/features/versioned_kube_features.go#L430-L444) · [v1.31.9 状态策略](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/registry/batch/job/strategy.go#L344-L405) · [v1.32.0 状态策略](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/registry/batch/job/strategy.go#L344-L405)\n- H4 的主线修复 #132614 和 `release-1.32` 回移 #132727 给 `suspend=true` 且 `completions=0` 加入例外，并添加覆盖两个成功条件的集成用例。维护者报告在 kind 用原配置见到 `Complete`，原报告人确认 `1.32.7` 和 `1.33.3` 解决其回归。 [H4 主线修复](https://github.com/kubernetes/kubernetes/pull/132614) · [回移](https://github.com/kubernetes/kubernetes/pull/132727) · [kind 观察](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-3036731203) · [报告人确认](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-3088832393)\n\n### 判断、适用版本及条件\n\n- **等待 Pod 终止的猜测在独立复现中不成立。** 两版均无 Pod，且日志定位到 API 状态校验。表格的 `Running` 来自打印器的默认分支，因此仅凭表格状态无法判断有无运行中的 Pod。 [H3 独立复现与日志](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2957408192) · [Job 表格输出](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/printers/internalversion/printers.go#L1209-L1226)\n- **默认门控引发校验回归的解释成立。** 修复前，启用 `JobManagedBy` 时，`RejectFinishedJobWithoutStartTime` 取 `isJobFinishedChanged || isStartTimeChanged`。该选项生效且拟写状态为终态、`startTime` 为空时，API 拒绝更新，已写入的 `SuccessCriteriaMet` 可保留。上游 `v1.31.9` 默认未启用该校验，`JobPodReplacementPolicy` 仍可启用延后流程。上游 `v1.32.0` 默认启用该校验。修复后，只有同时满足暂停和零完成数才适用这项例外。该结论覆盖材料中的原配置和已验证修复范围，具体发行商构建及自定义门控仍须核实。 [H3 状态策略](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/registry/batch/job/strategy.go#L344-L405) · [状态校验](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/apis/batch/validation/validation.go#L530-L539) · [H4 v1.32.7 状态策略](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/registry/batch/job/strategy.go#L377-L400)\n\n## 4. T1 的三种解释\n\n### 恢复的事实及出处\n\n- #133903 报告 EKS 服务端版本 `v1.32.7-eks-ace6451`。Helm 的 pre-install/pre-upgrade Hook Job 据称未进入 `Complete`，后续 Deployment 未创建。复现片段有 `restartPolicy=Never` 和 `backoffLimit=2`，未展示 `successPolicy`、`suspend=true` 或 `completions=0`。状态片段有 `SuccessCriteriaMet=True`、原因 `CompletionsReached`、`lastTransitionTime=2025-09-05T06:10:23Z`、`startTime=2025-09-05T06:10:09Z`、`terminating=0`，并在 `uncountedTerminatedPods.succeeded` 留有 UID `ccbd79bb-77f2-44d5-b460-34a06d87fc26`。片段未显示 `Complete`。这些信息来自报告和当时的状态片段。 [T1 原报告](https://github.com/kubernetes/kubernetes/issues/133903)\n- 上游 `v1.32.7` 中，普通完成计数路径在延后分支可生成 `SuccessCriteriaMet`，在 `JobSuccessPolicy` 门控启用时该路径给出 `CompletionsReached`。匹配显式 `spec.successPolicy` 的路径给出 `SuccessPolicy`。H2 的终态写入检查未计数 UID。H3 的拒绝要求拟写终态状态缺少 `startTime`，H4 的修复针对暂停且零完成数。 [H2 策略匹配](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L965-L969) · [普通完成判据](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L993-L1012) · [条件和原因](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1069-L1079) · [完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501) · [H3 校验](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/apis/batch/validation/validation.go#L530-L539) · [H4 回移](https://github.com/kubernetes/kubernetes/pull/132727)\n\n### 判断、适用版本及条件\n\n1. **“报告证明 Job 启用了 `successPolicy`”不成立。** 按上游 `v1.32.7` 的实现，观察到的原因对应普通完成计数路径。若 EKS 保留对应实现，原因对 `JobSuccessPolicy` 门控生效提供间接线索。显式策略是否配置还需查该 UID 的完整、经准入后的 Job 对象，是否命中显式策略需对应的控制器决定记录或条件原因。要确认 EKS 门控和行为映射，需要发行商构建证据或集群的有效配置。\n2. **“`terminating=0` 应立刻发布 `Complete`”不成立。** 片段显示一个成功 UID 尚在未计数集合。假定 EKS 使用 H2 的上游完成分支，这个 UID 已足以使对应状态的终态发布检查返回 `false`。片段只能解释为何该时点可以尚无 `Complete`。要判定滞留多久及卡在哪一步，需同一 Job 和 Pod UID 的连续状态、跟踪 finalizer 变更及控制器调谐或状态更新日志。\n3. **“可以直接套用 H3 的 `startTime` 回归”不成立。** T1 已显示有效 `startTime`，所贴配置也没有展示 H3 的两个触发字段。上游同补丁号 `v1.32.7` 有 H4 修复，EKS 构建是否等同仍须查证。若要证明 EKS 在某一次拟写终态时触发了该校验，需要该次状态更新的实际载荷及 API 拒绝日志，完整 Job 对象可确认是否符合暂停且零完成数的配置。\n\n## 5. T2 根因、资源归还和交接修订\n\n### 恢复的事实及出处\n\n- 原报告人在关闭 #133903 前把问题归因于一个持续修改 Pod 的 Kyverno 策略，并称它阻碍了终止中 Pod 的删除。T1 是一个发布了预成功条件、带一个未计数 UID 的 Job 状态片段。两段材料的证据来源均为报告人。 [T1 原报告](https://github.com/kubernetes/kubernetes/issues/133903) · [T2 关闭说明](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422)\n\n### 判断、适用版本及条件\n\n- **根因证据不足。** Kyverno 是报告人给出的候选根因。T1 状态快照报告的终止中 Pod 计数为零，无法判定 T2 所称的删除受阻是否发生、发生在哪个时点，以及是否与 T1 的同一 UID 有关。需实际 Kyverno 策略版本、匹配条件与变更记录，能关联 Pod UID 的准入或 API 审计记录、删除请求响应、Pod phase 和 finalizer 时间线，再结合 Job 控制器日志定位删除、记账或终态写入的阻断环节。同配置下停用或收窄策略后恢复成功的可比较复现，可进一步检验因果。 [H2 API 计数和记账](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L546-L614) · [T2 关闭说明](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422)\n- **资源归还证据不足。** 关闭说明未提供节点运行时、调度器或配额核算数据。需要按同一 Pod UID 对照节点的资源清理时间、调度容量恢复或队列配额回补记录，方能判定相应资源何时可复用。 [H1 容量核算讨论](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1983329580) · [T2 关闭说明](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422)\n- **交接修订候选，待确认。** 对采用上游 `v1.32.7` 内置 Job 控制器等效实现、且 `JobManagedBy` 或 `JobPodReplacementPolicy` 至少一个启用的集群，Hook 出现 `SuccessCriteriaMet=True` 但未见 `Complete` 时，按 UID 保留完整 Job 状态序列、Pod phase、删除时间戳、跟踪 finalizer 和控制器日志，检查未计数 UID 与延后终态条件。若报告涉及 Kyverno，关联同一 UID 的策略及 API 审计记录，涉及资源归还时记录对应节点或配额系统的观测。请 EKS 集群运营方确认构建和实际门控，Kyverno 策略所有者确认命中与变更证据，交接维护者复核后决定是否采纳。 [H2 门控](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1082-L1086) · [完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501) · [T1 原报告](https://github.com/kubernetes/kubernetes/issues/133903) · [T2 关闭说明](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422)\n\n## 查阅范围和限制\n\n实际查阅 `task.md` 和 `sources.md`，两份输入均保持原样。使用目录内的 shell 命令 `rg --files --hidden` 列出文件，`cat` 和 `sed` 阅读及检查内容，`shasum` 核对输入，使用 shell 的 heredoc 写入答卷。来源链接仅供定位，未联网或查阅其他目录、会话、Git 历史和历史实验。可见证据限于包内的摘录、报告陈述和源码定位，EKS 的构建差异、有效门控、原始状态序列、审计日志和资源归还记录均未提供。本答卷未运行集群复现。\n",
+      "review": {
+        "alias": "N",
+        "ratings": {
+          "R1": "met",
+          "R2": "met",
+          "R3": "met",
+          "R4": "met",
+          "R5": "met",
+          "R6": "met",
+          "V1": "met",
+          "V2": "met",
+          "V3": "met",
+          "V4": "met",
+          "V5": "met",
+          "V6": "met",
+          "V7": "met",
+          "V8": "met",
+          "V9": "met",
+          "V10": "met"
+        },
+        "notes": [],
+        "unsupported": [],
+        "boundary": "第 58–59、65、69–71 行区分了固定上游代码的条件性解释与 EKS 现场。关单作者的 Kyverno 归因可记录，须按同一 UID 关联策略命中、准入或 API 请求、Pod finalizer 及 Job 调谐来验证具体阻断。节点清理、调度容量和配额回补均需独立的同 UID、同时序记录。交接维护者复核后决定是否采纳。"
+      },
+      "final_ratings": {
+        "R1": "met",
+        "R2": "met",
+        "R3": "met",
+        "R4": "met",
+        "R5": "met",
+        "R6": "met",
+        "V1": "met",
+        "V2": "met",
+        "V3": "met",
+        "V4": "met",
+        "V5": "met",
+        "V6": "met",
+        "V7": "met",
+        "V8": "met",
+        "V9": "met",
+        "V10": "met"
+      },
+      "counts_by_dimension": {
+        "R": {
+          "met": 6
+        },
+        "V": {
+          "met": 10
+        }
+      }
+    },
+    {
+      "id": "791",
+      "wave": 1,
+      "group": "B",
+      "status": "received_and_reviewed",
+      "dispatch_marker_at": "2026-11-24T20:05:40+08:00",
+      "dispatch_marker_to_response_seconds": 245.7,
+      "input_hashes_verified": true,
+      "response_sha256": "6cecd3898f4dc1b16e22c0abc539c9df78b2dd7cc60b4b4e4e91b7b5abca9c30",
+      "response_characters": 9738,
+      "response": "# Job 生命周期交接复核\n\n## 1. H1 的两次观测\n\n**恢复的事实**\n\n- 2024-03-07 的状态来自 Indexed Job 复现。配置为 `completions: 4`、`parallelism: 4`、`backoffLimit: 0`、`podReplacementPolicy: Failed`，复现者删除了一个 Pod。状态同时显示 `Failed=True`（`BackoffLimitExceeded`）、`failed=4`、`ready=2`、`terminating=1` 和空的 `uncountedTerminatedPods`。 [H1 · 3 月状态](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1982959351)\n- 2024-05-16 是另一次复现，使用 600 个索引和 `backoffLimit: 0`。记录依次为 `11:13:10.933897` 第 0 个 Pod 失败、`11:13:11.942719` Job 更新 `uncountedTerminatedPods`、`11:13:23.981958` Job 出现 `Failed`、`11:13:50.139687` 最后一个 Pod 被标记为 `Failed`。 [H1 · 5 月复现时间轴](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-2114710754)\n- 讨论中提出，Kueue 看到 Job 失败后可能启动替代任务，若原 Pod 仍占资源，配额和调度可能受影响。 [H1 · 容量核算讨论](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1983329580)\n\n**判断与边界。** 成立的是控制器已判定 Job 失败，3 月状态还给出了超过重试上限的原因。3 月快照中的 `terminating=1` 已表明仍有 Pod 正在终止，即使待记账 UID 集合为空。5 月观测中 Job 的失败条件比最后一个 Pod 的终态记录早约 26.16 秒。两次是独立复现，材料未给出具体构建，无法把观察外推到所有旧版本。实际资源归还时间证据不足，需要相应 Pod UID 的容器退出记录，以及调度或配额系统释放分配的记录，分别确认工作负载何时退出、容量何时可再次分配。\n\n## 2. H2 的版本交接规则\n\n**恢复的事实**\n\n- 上游 `v1.30.0` 的内置控制器在 `enactJobFinished` 中检查待记账 UID；该实现没有后来的终止中 Pod 延后检查。2024 年 7 月合并的 #125510 扩展了提前公布判据的条件，失败用 `FailureTarget`，成功用 `SuccessCriteriaMet`。最终条件分别为 `Failed` 和 `Complete`。 [H2 · v1.30.0 源码](https://github.com/kubernetes/kubernetes/blob/7c48c2bd72b9bf5c44d21d7338cc7bea77d0ad2a/pkg/controller/job/job_controller.go#L1350-L1369) [H2 · #125510](https://github.com/kubernetes/kubernetes/pull/125510)\n- 上游 `v1.31.9`、`v1.32.7` 的内置控制器在 `JobManagedBy` 或 `JobPodReplacementPolicy` 任一开启时启用终态延后分支。上游 `v1.32.7` 对已确定的终态先检查成功、失败两类待记账 UID，任一非空即返回，之后在延后分支开启时检查控制器内部的终止中 Pod 数，大于零也返回。 [H2 · v1.31.9 门控](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/controller/job/job_controller.go#L999-L1002) [H2 · v1.32.7 门控](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1082-L1086) [H2 · v1.32.7 完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501)\n- API 的 `terminating` 统计有删除时间戳且处于 `Pending` 或 `Running` 的 Pod。已终止但尚未计入 Job 状态计数的 Pod 进入 `uncountedTerminatedPods`。控制器登记 UID、移除跟踪 finalizer，再从集合移出 UID 并累计计数。 [H2 · 终止中计数](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L546-L552) [H2 · 记账步骤](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L579-L594)\n\n**判断与边界。** 把提前条件视为判据已达到成立。以 `terminating=0` 单独证明发布终态或资源归还均不成立。在上述 `v1.32.7` 实现里，需已确定终态，两类 UID 均已记账，启用延后分支时控制器内部的终止中 Pod 数也须为零，并且终态状态更新须被 API 接受并持久化。公开字段是一个状态快照，只涵盖上述 Pod 范围，也不能确认已经删除所有相关 Pod 对象。确认终态要查看后来保存的 Job 条件或状态更新结果，确认资源归还则要查看对应的工作负载和资源核算记录。发行商构建或外部控制器的行为需各自核验。\n\n## 3. H3 的 `Running` 回归\n\n**恢复的事实**\n\n- 原报告的 Job 设置 `completions: 0` 和 `suspend: true`。`v1.31.9` 有 `SuccessCriteriaMet=True`、`Complete=True` 和 `completionTime`，表格显示 `Complete`。`v1.32.0+k3s1` 约 2 秒时表格显示 `Running`，贴出的状态只有 `SuccessCriteriaMet=True`。早期评论怀疑有 Pod 正在终止。独立复现记录两版均未创建 Pod，`v1.32` 约 10 分钟仍显示 `Running`，日志给出 `status.startTime: Required value: startTime is required for finished job`。 [H3 · 原报告](https://github.com/kubernetes/kubernetes/issues/132144) [H3 · 早期假设](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2954740579) [H3 · 独立复现与日志](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2957408192)\n- 上游默认配置中，`JobManagedBy` 从 `v1.31.9` 的 Alpha、关闭变成 `v1.32.0` 的 Beta、开启；`JobPodReplacementPolicy` 两版都是 Beta、开启。两版的 Job 状态策略文件对应同一个 blob。其增强校验由 `JobManagedBy` 门控，进入终态或 `startTime` 变化时启用 `RejectFinishedJobWithoutStartTime`，对拟发布终态且 `StartTime == nil` 的更新返回 Required 错误。Job 表格的兜底显示为 `Running`。 [H3 · v1.31.9 门控](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/features/kube_features.go#L1094-L1100) [H3 · v1.32.0 门控](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/features/versioned_kube_features.go#L430-L444) [H3 · 状态策略](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/registry/batch/job/strategy.go#L344-L405) [H3 · 状态校验](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/apis/batch/validation/validation.go#L530-L539) [H3 · 表格输出](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/printers/internalversion/printers.go#L1209-L1226)\n- 主线 #132614 和 `release-1.32` 回移 #132727 对 `suspend=true` 且 `completions=0` 的组合豁免这一项缺 `startTime` 的校验，并加入同时验证 `SuccessCriteriaMet` 和 `Complete` 的集成用例。维护者在 kind 用原配置看到了 `Complete`，原报告人确认 `1.32.7` 和 `1.33.3` 解决了其问题。 [H4 · 主线修复](https://github.com/kubernetes/kubernetes/pull/132614) [H4 · 1.32 回移](https://github.com/kubernetes/kubernetes/pull/132727) [H4 · v1.32.7 源码](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/registry/batch/job/strategy.go#L377-L400) [H4 · kind 观测](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-3036731203) [H4 · 报告人确认](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-3088832393)\n\n**判断与边界。** Pod 仍终止的假设对独立复现不成立。无 Pod 的观测和拒绝日志将故障定位在 API 状态校验，源码解释了为什么 Job 留在提前成功条件，表格落入 `Running`。在上游默认配置下，两版都有终态延后分支（`JobPodReplacementPolicy` 已开启），而 `JobManagedBy` 默认变化使相同的增强校验代码在 `v1.32.0` 生效。修复仅豁免上述两个配置同时满足时的缺 `startTime` 校验。自定义门控和其他发行商构建应以实际配置和源码为准。\n\n## 4. T1 的三种解释\n\n**恢复的事实。** 原报告人提供服务器版本 `v1.32.7-eks-ace6451`，并报告 Helm pre-install/pre-upgrade Hook Job 未进入 `Complete`、后续 Deployment 未创建。复现片段含 `restartPolicy: Never`、`backoffLimit: 2`，未展示 `successPolicy`、`suspend: true` 或 `completions: 0`。贴出的状态为 `SuccessCriteriaMet=True`，原因 `CompletionsReached`（`2025-09-05T06:10:23Z`），`startTime=2025-09-05T06:10:09Z`，`terminating=0`，仍有一条 `uncountedTerminatedPods.succeeded` UID `ccbd79bb-77f2-44d5-b460-34a06d87fc26`，未显示 `Complete`。这些是报告人的状态快照和行为陈述。H2 的控制器逻辑和 H3/H4 的校验及修复均有固定版本上游源码，EKS 构建及其有效配置在包中没有独立证据。 [T1 · 报告与状态片段](https://github.com/kubernetes/kubernetes/issues/133903) [H2 · 普通完成判据](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L993-L1012) [H4 · v1.32.7 状态策略](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/registry/batch/job/strategy.go#L377-L400)\n\n1. **报告证明启用了 Job 的 `spec.successPolicy`，不成立。** 上游 `v1.32.7` 的普通完成计数路径在延后分支开启时可给出 `SuccessCriteriaMet`，在 `JobSuccessPolicy` 门控开启时用 `CompletionsReached`。匹配显式策略的分支用 `SuccessPolicy`。因此快照符合普通完成计数路径；上游代码对原因和门控的关系只能作为有条件的实现推断。实际 Job 是否配置该字段需要完整的线上 Job 对象，EKS 控制面门控是否开启需要该构建的有效门控配置或发行商确认。 [H2 · 策略匹配分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L965-L969) [H2 · 条件和原因](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1069-L1079)\n2. **仅凭 `terminating=0` 应立即发布 `Complete`，不成立。** 如 EKS 内置控制器执行同样的完成分支，快照中的成功 UID 已足以触发待记账检查返回。快照与这一分支吻合，长期卡在哪一步仍需 UID 对应的 Pod 生命周期和 finalizer 变化、控制器记账及 Job 状态写入记录来判定。 [T1 · 状态片段](https://github.com/kubernetes/kubernetes/issues/133903) [H2 · 完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501)\n3. **直接套用零完成数暂停 Job 的 `startTime` 回归，不成立。** T1 的状态已有 `startTime`，片段没有展示 H3 的配置组合，也没有 H3 中缺 `startTime` 的 API 拒绝日志。上游同号 `v1.32.7` 已包含该组合的修复。要确认 EKS 构建是否包含回移、复核某次终态更新是否遭 API 拒绝，分别需要发行商构建对应的源码或补丁清单，以及失败的状态更新请求和 API 响应。 [T1 · 报告与状态](https://github.com/kubernetes/kubernetes/issues/133903) [H3 · 独立复现日志](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2957408192) [H4 · 回移](https://github.com/kubernetes/kubernetes/pull/132727)\n\n## 5. T2 的根因、资源归还与交接修订\n\n**恢复的事实。** 原报告人关闭议题前将问题归因于持续修改 Pod 的 Kyverno 策略，称这阻碍了终止中 Pod 的删除。包内有 T1 的单个 Job 状态快照和 H2 的上游机制，没有策略原文、针对该 UID 的连续记录或独立复现。 [T2 · 关闭说明](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422) [T1 · 状态片段](https://github.com/kubernetes/kubernetes/issues/133903)\n\n**判断与边界。** T2 可以记录为报告人的归因。证据不足以独立确认策略阻碍删除、如何影响跟踪 finalizer 或 Job 记账，以及是否造成整个 Hook 阻塞。对同一 UID，需要当时的 Kyverno 策略及匹配规则、Kyverno 或 API 审计的请求响应，和 Pod 的 phase、删除时间戳、finalizer 及控制器状态更新时间线，才能串起策略变更、删除或记账受阻和终态缺失。受控启停同一策略并比较结果可以检验因果归因。资源归还也证据不足。已终态但仍留存的对象与 `terminating=0` 可以并存，须用该 UID 的 kubelet 或容器运行时退出记录、以及相关调度或配额系统的释放记录确认各自环节。 [H2 · API 计数范围](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L546-L552)\n\n**候选交接修订，待确认。** 增补一条规则：“对行为与上游 `v1.32.7` 内置 Job 控制器一致的构建，遇到 `SuccessCriteriaMet/CompletionsReached`、`terminating=0` 且仍有待记账 UID 时，按 UID 核对 Pod 跟踪 finalizer 和 Job 计数更新。若启用了 `JobManagedBy` 或 `JobPodReplacementPolicy`，同时检查控制器内部的终止中 Pod 数。以 API 中已保存的 `Complete` 确认终态，以资源核算系统的释放记录确认容量归还。EKS `v1.32.7-eks-ace6451` 的 Kyverno 归因为报告人陈述。”请 EKS 控制面维护方确认该构建的实现和有效门控，策略维护方核实 Kyverno 与该 UID 的日志和复现，资源核算维护方确认释放记录。交接条目由维护者确认后采用。 [H2 · 门控](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1082-L1086) [H2 · 完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501) [T1 · 报告](https://github.com/kubernetes/kubernetes/issues/133903) [T2 · 关闭说明](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422)\n\n## 查阅范围\n\n实际读取了 `task.md`、`sources.md`、`history-note.md`。通过 `functions.exec` 调用 `exec_command`，用 `pwd` 和 `rg` 确认目录和清点文件，用 `cat` 读取材料、写入并回读 `response.md`。全部操作在本包目录内，只写了答卷。链接用于定位，未访问网络。可见证据限于包内转录的状态、复现记录、报告人陈述和源码摘要，无法独立核查原始事件、EKS 实际构建或资源释放。\n",
+      "review": {
+        "alias": "T",
+        "ratings": {
+          "R1": "met",
+          "R2": "met",
+          "R3": "met",
+          "R4": "met",
+          "R5": "met",
+          "R6": "met",
+          "V1": "met",
+          "V2": "met",
+          "V3": "met",
+          "V4": "met",
+          "V5": "met",
+          "V6": "met",
+          "V7": "met",
+          "V8": "met",
+          "V9": "met",
+          "V10": "met"
+        },
+        "notes": [],
+        "unsupported": [],
+        "boundary": "第 38–39、43、45、47 行把非空未入账 UID 定为上游实现下的充分阻断条件，保留 EKS 构建和实际轨迹边界。Kyverno 归因为关单作者陈述，缺策略命中、同 UID 的准入响应及删除、finalizer、记账和终态时序。资源归还只能用同 UID 的运行时退出和实际调度／配额释放记录确认。交接条目由维护者确认后采用。"
+      },
+      "final_ratings": {
+        "R1": "met",
+        "R2": "met",
+        "R3": "met",
+        "R4": "met",
+        "R5": "met",
+        "R6": "met",
+        "V1": "met",
+        "V2": "met",
+        "V3": "met",
+        "V4": "met",
+        "V5": "met",
+        "V6": "met",
+        "V7": "met",
+        "V8": "met",
+        "V9": "met",
+        "V10": "met"
+      },
+      "counts_by_dimension": {
+        "R": {
+          "met": 6
+        },
+        "V": {
+          "met": 10
+        }
+      }
+    },
+    {
+      "id": "103",
+      "wave": 2,
+      "group": "B",
+      "status": "received_and_reviewed",
+      "dispatch_marker_at": "2026-11-24T20:06:01+08:00",
+      "dispatch_marker_to_response_seconds": 258.9,
+      "input_hashes_verified": true,
+      "response_sha256": "c16312f8b7c9a970e04ac0a7d7ebc6c86889fb2691e360fb512bbac760b53880",
+      "response_characters": 11122,
+      "response": "# Job 生命周期交接复核\n\n## 1. H1 的两次观测\n\n**恢复的事实与出处**\n\n- 2024-03-07，#123775 使用 Indexed Job，配置 `completions: 4`、`parallelism: 4`、`backoffLimit: 0`、`podReplacementPolicy: Failed`，随后删除一个 Pod。贴出的状态为 `Failed=True`，原因为 `BackoffLimitExceeded`，同时有 `failed=4`、`ready=2`、`terminating=1`、`uncountedTerminatedPods={}`。 [H1 议题](https://github.com/kubernetes/kubernetes/issues/123775) · [3 月状态评论](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1982959351)\n- 2024-05-16，维护者另用 600 个索引、`backoffLimit: 0` 复现。时间轴依次是 `11:13:10.933897` 第 0 个 Pod 失败，`11:13:11.942719` Job 更新 `uncountedTerminatedPods`，`11:13:23.981958` Job 出现 `Failed`，`11:13:50.139687` 最后一个 Pod 被标为 `Failed`。 [H1 复现时间轴](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-2114710754) · `history-note.md` J1\n- 讨论给出了 Kueue 的潜在容量风险。若它看到 Job 失败便启动替代任务，而原 Pod 还在消耗资源，新旧工作会重叠并影响配额和调度。 [H1 容量核算讨论](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1983329580)\n\n**判断与边界**\n\n- **成立**。3 月的 `Failed=True` 与原因说明当时控制器已发布 Job 失败结论，且该快照同时记录了仍在终止的 Pod。5 月的时间轴表明 Job `Failed` 比最后一个 Pod 被标为 `Failed` 早约 26.158 秒。这是两次历史观测，材料没有提供这两次使用的确切构建。3 月的计数无法还原每个 Pod 的终态时间。\n- **证据不足**。5 月的顺序只确定了 API 状态记录的先后，实际进程结束、节点资源可再用和调度配额归还分别需要对应时间戳。判断具体何时归还需要 Pod UID 对应的节点或运行时停止记录，以及实际采用的调度器或配额系统的占用释放记录。H1 的 Kueue 讨论未给出该复现发生资源重叠的实测记录。\n\n## 2. H2 规则的版本交接\n\n**恢复的事实与出处**\n\n- 上游 `v1.30.0` 内置控制器的 `enactJobFinished` 已检查待计数的已终止 Pod。2024 年 7 月合并的 #125510 解决 #123775，扩展了 `FailureTarget` 和 `SuccessCriteriaMet`，允许分别提前公布失败判据和成功判据，再发布 `Failed` 或 `Complete`。 [H2 v1.30.0 完成分支](https://github.com/kubernetes/kubernetes/blob/7c48c2bd72b9bf5c44d21d7338cc7bea77d0ad2a/pkg/controller/job/job_controller.go#L1350-L1369) · [#125510](https://github.com/kubernetes/kubernetes/pull/125510) · `history-note.md` J3\n- 在上游 `v1.31.9` 和 `v1.32.7` 的内置控制器，`JobManagedBy` 或 `JobPodReplacementPolicy` 任一启用会走终态延后分支。在 `v1.32.7` 的 `enactJobFinished`，`uncountedTerminatedPods` 的成功或失败 UID 数大于零时先返回 `false`。启用延后分支时，内部终止中 Pod 数大于零也会返回 `false`。两项检查先于终态条件写入。 [H2 v1.31.9 门控](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/controller/job/job_controller.go#L999-L1002) · [v1.32.7 门控](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1082-L1086) · [v1.32.7 完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501) · `history-note.md` J2、J4\n- `status.terminating` 统计有删除时间戳且仍为 `Pending` 或 `Running` 的 Pod。`uncountedTerminatedPods` 记录已终止但尚未计入 Job 状态计数的 Pod UID。API 说明的记账顺序为登记 UID、移除 Job 跟踪 finalizer、从待记账集合移除 UID 并累计计数。 [H2 终止中计数](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L546-L552) · [记账步骤](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L579-L594) · [待记账 UID 字段](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L602-L614)\n\n**判断与边界**\n\n- **成立**。对上游 `v1.32.7` 的完成路径，控制器已有成败结论且成功、失败待记账 UID 均已清空，才可通过记账检查。延后分支打开时还须通过内部终止中 Pod 数检查。随后状态更新还须得到 API 接受，才有可见的 `Failed` 或 `Complete`。提前条件可供观察成败判据，具体构建和门控决定适用分支。\n- **不成立**。单个 `terminating=0` 快照只表示按该字段口径计为零。它单独无法证明记账已清、终态已写入、Pod 对象删除完成或节点与配额资源已释放。要确认实际发布应查看 Job 条件及状态更新结果。要确认资源归还须按实际资源种类查看节点、调度或配额记录。上游固定版本源码的规则用于发行商构建时，需要确认对应实现与运行门控。\n\n## 3. H3 的 `Running` 回归\n\n**恢复的事实与出处**\n\n- #132144 的 Job 为 `spec.completions: 0` 且 `spec.suspend: true`。报告人说 `v1.31.9` 有 `SuccessCriteriaMet=True`、`Complete=True` 和 `completionTime`，表格是 `Complete`。`v1.32.0+k3s1` 初次表格约 2 秒时是 `Running`，贴出的片段只有 `SuccessCriteriaMet=True`。早期评论猜测有 Pod 尚在终止。 [H3 原报告](https://github.com/kubernetes/kubernetes/issues/132144) · [早期假设](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2954740579) · `history-note.md` J7\n- 独立复现者记录两版都没有创建 Pod，`v1.32` 约 10 分钟仍显示 `Running`，且控制器日志出现 `status.startTime: Required value: startTime is required for finished job`。报告人的 Flux 流程未推进到下一依赖项。 [H3 独立复现与日志](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2957408192) · [工作流报告](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2966466616) · `history-note.md` J8\n- 上游默认门控中，`JobManagedBy` 在 `v1.31.9` 为 Alpha、默认 `false`，在 `v1.32.0` 为 Beta、默认 `true`。`JobPodReplacementPolicy` 两版均为 Beta、默认 `true`。两版的 Job 状态策略对应同一 blob `1de03e459da69e59a734413a0348b2c033995334`，其中增强状态校验受 `JobManagedBy` 控制。 `RejectFinishedJobWithoutStartTime` 在该代码块取 `isJobFinishedChanged || isStartTimeChanged`。 `v1.32.0` 校验在该选项生效、拟更新状态为终态且 `StartTime == nil` 时返回 Required。表格打印器最后的 `else` 分支输出 `Running`。 [H3 v1.31.9 门控](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/features/kube_features.go#L1094-L1100) · [v1.32.0 门控](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/features/versioned_kube_features.go#L430-L444) · [v1.31.9 状态策略](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/registry/batch/job/strategy.go#L344-L405) · [v1.32.0 状态策略](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/registry/batch/job/strategy.go#L344-L405) · [拒绝条件](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/apis/batch/validation/validation.go#L530-L539) · [表格打印](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/printers/internalversion/printers.go#L1209-L1226) · `history-note.md` J5、J6\n- #132614 修复并由 #132727 回移 `release-1.32`，在 `suspend=true` **且** `completions=0` 时跳过缺 `startTime` 的拒绝检查。修复的集成用例验证该配置可出现 `SuccessCriteriaMet` 和 `Complete`。维护者报告 kind 中原配置显示 `Complete`，原报告人确认 `1.32.7` 和 `1.33.3` 解决了回归。 [H4 主线修复](https://github.com/kubernetes/kubernetes/pull/132614) · [回移](https://github.com/kubernetes/kubernetes/pull/132727) · [v1.32.7 状态策略](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/registry/batch/job/strategy.go#L377-L400) · [kind 观察](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-3036731203) · [报告人确认](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-3088832393) · `history-note.md` J9\n\n**判断与边界**\n\n- **不成立**。对独立复现，等待 Pod 终止的猜测与两版均无 Pod 的记录不符，表格 `Running` 也无法单独证明有 Pod 在运行。两版 `JobPodReplacementPolicy` 默认都打开，按任一门控为真的规则，默认都会进入延后分支。\n- **成立**。独立复现日志显示实际失败点是终态状态更新因缺 `startTime` 被拒。上游默认值差异解释了同一状态策略为何会在 `v1.32.0` 启用该校验，在 `v1.31.9` 默认跳过。该解释以原配置、相应控制器和 API 校验实现以及有效门控为条件。修复豁免要求暂停和零完成数同时满足，`1.32.7` 和 `1.33.3` 的修复效果来自原报告人确认。材料没有证明所有 1.32 补丁版本或所有发行商构建的运行结果相同。\n\n## 4. T1 的三种解释\n\n**恢复的事实与出处**\n\n- #133903 报告 `v1.32.7-eks-ace6451` 上 Helm pre-install/pre-upgrade Hook Job 未进入 `Complete`，后续 Deployment 未创建。复现片段展示 `restartPolicy: Never` 和 `backoffLimit: 2`，未展示 `successPolicy`、`suspend: true` 或 `completions: 0`。所贴快照有 `SuccessCriteriaMet=True`、`reason=CompletionsReached`，过渡时间 `2025-09-05T06:10:23Z`，`startTime=2025-09-05T06:10:09Z`，`terminating=0`，`uncountedTerminatedPods.succeeded` 中有 UID `ccbd79bb-77f2-44d5-b460-34a06d87fc26`，未显示 `Complete`。 [T1 原报告](https://github.com/kubernetes/kubernetes/issues/133903)\n- 上游 `v1.32.7` 普通完成计数路径在延后分支开启时可以产生 `SuccessCriteriaMet`。该路径在 `JobSuccessPolicy` 门控开启时使用 `CompletionsReached`，而匹配显式 `spec.successPolicy` 的路径使用 `SuccessPolicy`。同版完成分支会等待待记账 UID 清空。H3 的回归需要终态更新时缺 `startTime`，H4 已对暂停且零完成数的组合回移修复。 [H2 普通完成判据](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L993-L1012) · [条件和原因](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1069-L1079) · [策略匹配](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L965-L969) · [完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501) · [H3 状态校验](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/apis/batch/validation/validation.go#L530-L539) · [H4 v1.32.7 状态策略](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/registry/batch/job/strategy.go#L377-L400) · `history-note.md` J4、J6、J9、J10\n\n**判断与证据层级**\n\n1. **报告证明启用了 Job `successPolicy`：不成立。** `SuccessCriteriaMet` 单独只是提前条件。报告中的 `CompletionsReached` 与上游普通完成计数路径一致。若 EKS 构建使用同一实现，可据此推测这个路径使用了启用的 `JobSuccessPolicy` 特性门控。门控和 Job 对象配置是两项证据，当前片段不足以判定对象是否配置了 `spec.successPolicy`，也不足以直接证实发行商门控。应查实际持久化的完整 Job spec 来确认字段，查控制平面有效门控与对应实现来确认该分支。\n2. **单凭 `terminating=0` 应立即发布 `Complete`：不成立。** 报告快照同一时刻仍有一个待计数的成功 UID。若 EKS 的完成分支与上游 `v1.32.7` 一致，该 UID 足以解释其执行 `enactJobFinished` 时为何可先退出，因此这个快照可以与没有 `Complete` 同时出现。单一快照无法证明持续卡住的环节和时间。要验证后续卡在 UID 清理、计数更新、控制器重试还是状态写入，需连续的 Job 状态、UID 对应 Pod 的状态与 finalizer 历史，以及控制器和 API 的更新记录。\n3. **可直接套用零完成数暂停 Job 的 `startTime` 回归：不成立。** T1 快照已有 `startTime`，没有报告缺该字段的状态更新错误，所给 spec 也没有呈现 H3 的两个配置条件。上游同补丁号已有 H4 回移，但 EKS 构建需独立核对。若要验证 EKS 上是否存在其他时刻的同类校验拒绝，需查看完整生效 spec、当时被拒的 Job status 请求与 API 错误，以及构建包含的修复和有效门控。当前只能下判断说直接套用的依据不足。\n\n## 5. T2 的归因、资源归还和交接修订\n\n**恢复的事实与出处**\n\n- 原报告人在关闭议题前将问题归因于一个持续修改 Pod 的 Kyverno 策略，并称它阻碍了终止中 Pod 的删除。T1 附的是一条 Job 状态快照。材料未包含 Kyverno 策略、Pod 删除或变更历史、关闭前后的对照和资源归还时间。 [T2 报告人关闭说明](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422) · [T1 原报告与快照](https://github.com/kubernetes/kubernetes/issues/133903)\n\n**判断与边界**\n\n- **成立**。可以把 Kyverno 写为原报告人给出的关闭归因。**证据不足**。要把它写作已验证根因，需要该集群生效的策略定义和规则匹配记录，Pod UID 对应的审计记录，包括变更主体、删除请求结果、删除时间戳与 finalizer 历史，以及 Job 控制器对待记账 UID 的重试/完成记录。它们能把策略操作、Pod 删除或 finalizer 更新、记账留存、Job 终态更新串成同一时间轴。策略停用或调整前后的同配置复现，或等价的反事实记录，可检验这条因果链。\n- **证据不足**。`terminating=0`、已终止待记账 UID 和报告人的删除受阻陈述都不足以判定 Pod 进程何时退出、节点何时可重用资源或调度与配额何时释放占用。需按同一 UID 对齐 kubelet 或容器运行时的停止记录、节点资源记录，以及该集群实际使用的调度器或配额系统的释放记录。材料没有提供这些记录或对应归还时间。\n\n**候选交接修订，待确认**\n\n在 Job 交接条目写明：上游 `v1.32.7` 内置控制器在终态发布前等待 `uncountedTerminatedPods` 的成功、失败 UID 清空。若 `JobManagedBy` 或 `JobPodReplacementPolicy` 任一启用，还检查内部终止中 Pod 数。在看到 `SuccessCriteriaMet/CompletionsReached`、`terminating=0` 和待记账成功 UID 的组合时，按 UID 核对 Pod 跟踪 finalizer、Job 记账和 API 状态更新时间。将 T2 作为原报告人归因的案例附在此条下，资源归还用实际节点和调度/配额记录判断。待 EKS 集群维护方确认 `v1.32.7-eks-ace6451` 对应实现、有效门控及状态记录，待策略维护方确认 Kyverno 命中的变更和删除时间轴，待交接维护者确认是否采纳条目。 [H2 v1.32.7 完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501) · [H2 v1.32.7 门控](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1082-L1086) · [T1](https://github.com/kubernetes/kubernetes/issues/133903) · [T2](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422)\n\n## 材料、工具和可见限制\n\n- 实际查阅 `task.md`、`sources.md`、`history-note.md`。历史摘要的条目号用于定位，版本与观察判断以包内来源摘录为依据。\n- 只在本包目录通过 `functions.exec` 调用 `exec_command`，用 `rg` 枚举和核对文件、`cat` 读取材料并写出 `response.md`。输入文件保持原样。未联网，未查阅当前仓库、其他目录、会话或历史实验。\n- 链接用于定位包中摘录的报告和源码，未在线打开。没有集群中的完整 Job/Pod 时序、EKS 构建实现和门控配置、审计日志、Kyverno 策略或节点与资源核算记录。本答卷的源码判断限于包内所列上游版本，集群实际原因和资源归还仍待原始证据核验。\n",
+      "review": {
+        "alias": "L",
+        "ratings": {
+          "R1": "met",
+          "R2": "met",
+          "R3": "met",
+          "R4": "met",
+          "R5": "met",
+          "R6": "met",
+          "V1": "met",
+          "V2": "met",
+          "V3": "met",
+          "V4": "met",
+          "V5": "met",
+          "V6": "met",
+          "V7": "met",
+          "V8": "met",
+          "V9": "met",
+          "V10": "met"
+        },
+        "notes": [],
+        "unsupported": [],
+        "boundary": "L.md 第 53–54、60、64–65 行以固定版源码解释现场快照为何可无 Complete，并将 EKS 的实际执行、UID 持续未入账的原因、其他时刻的校验拒绝和 Kyverno 的 reported 归因保留为待核实。需按同 UID 对齐策略、审计、finalizer 和 Job 更新时序。节点容量与配额归还需查对应运行时、节点及实际记账方的释放记录，现有材料无法判定。"
+      },
+      "final_ratings": {
+        "R1": "met",
+        "R2": "met",
+        "R3": "met",
+        "R4": "met",
+        "R5": "met",
+        "R6": "met",
+        "V1": "met",
+        "V2": "met",
+        "V3": "met",
+        "V4": "met",
+        "V5": "met",
+        "V6": "met",
+        "V7": "met",
+        "V8": "met",
+        "V9": "met",
+        "V10": "met"
+      },
+      "counts_by_dimension": {
+        "R": {
+          "met": 6
+        },
+        "V": {
+          "met": 10
+        }
+      }
+    },
+    {
+      "id": "145",
+      "wave": 2,
+      "group": "A",
+      "status": "received_and_reviewed",
+      "dispatch_marker_at": "2026-11-24T20:06:22+08:00",
+      "dispatch_marker_to_response_seconds": 238.0,
+      "input_hashes_verified": true,
+      "response_sha256": "e079b83cd43555fffa2597716b91bf1093e8e7104940a231c2d67e3ed1650258",
+      "response_characters": 5517,
+      "response": "# Job 生命周期交接复核\n\n## 1. H1 的两次观测\n\n**事实与出处**\n\n- 2024 年 3 月 7 日的状态来自一次 Indexed Job 复现。配置为 `completions: 4`、`parallelism: 4`、`backoffLimit: 0`、`podReplacementPolicy: Failed`，操作为删除一个 Pod。所贴状态同时有 `Failed=True`（`BackoffLimitExceeded`）、`failed: 4`、`ready: 2`、`terminating: 1` 和空的 `uncountedTerminatedPods`。见 H1 的议题与状态评论。\n- 2024 年 5 月 16 日是另一次复现，使用 600 个索引和 `backoffLimit: 0`。第 0 个 Pod 在 `11:13:10.933897` 失败，Job 在 `11:13:11.942719` 更新 `uncountedTerminatedPods`，在 `11:13:23.981958` 出现 `Failed`，最后一个 Pod 在 `11:13:50.139687` 被标为 `Failed`。该 Pod 的失败标记比 Job 的 `Failed` 晚约 26.16 秒。见 H1 的复现时间轴。\n- 讨论提出一个下游风险，即 Kueue 看到 Job 失败后可能启动替代任务，此时原 Pod 可能仍占用资源。见 H1 的容量核算讨论。\n\n**判断、版本与条件**\n\n- 用早期 `Failed=True` 推断该 Job 已按失败判据被标记为失败，成立。3 月快照里的 `ready: 2`、`terminating: 1` 和 5 月时间轴都反对把这个条件当作所有 Pod 已进入终态的凭证。`failed: 4` 是 Job 状态计数，空的 UID 集合表示该字段当时没有待记账 UID。\n- 5 月记录可以确定 Job 终态发布早于最后一个 Pod 被标为 `Failed`。资源何时归还、Kueue 是否实际放行了替代任务均证据不足。需要按 UID 对齐 Pod 相位与删除记录，并查看相关资源记账方的配额、调度或准入记录，才能确定各环节时点。H1 摘录没有标明两次复现的构建号。上游 `v1.30.0` 有 H2 所述的早期发布规则，但不能据此为两次复现认定版本。\n\n## 2. H2 的版本交接规则\n\n**事实与出处**\n\n- 上游 `v1.30.0` 的 `enactJobFinished` 检查待记账的终止 Pod UID，集合清空后可以发布终态。#125510 于 2024 年 7 月合并解决 #123775，扩展了 `FailureTarget` 与 `SuccessCriteriaMet`，使成败判据可以先于终态公布。见 H2 的 `v1.30.0` 控制器和 #125510。\n- 在 H2 所列上游 `v1.31.9` 和 `v1.32.7` 内置控制器中，`JobManagedBy` 或 `JobPodReplacementPolicy` 任一启用即走延后分支。H3 给出的两个上游默认组合（`v1.31.9` 与 `v1.32.0`）均满足该条件。使用发行商构建或其他门控组合时，需要按实际实现和配置确认。\n- `v1.32.7` 的 `enactJobFinished` 先检查 `uncountedTerminatedPods` 中成功与失败 UID，任一非空即返回。延后分支开启时，控制器内部终止中 Pod 数大于零也会返回。API 的 `terminating` 统计带删除时间戳且仍为 `Pending` 或 `Running` 的 Pod。终止 Pod 的记账依次登记 UID、移除跟踪 finalizer、移出 UID 并累加计数。见 H2 的控制器完成分支及 API 字段定义。\n\n**判断、版本与条件**\n\n- 延后分支中，控制器判定已达到失败或成功判据后，可以先发布 `FailureTarget=True` 或 `SuccessCriteriaMet=True`。例如，达到适用的回退上限可满足失败判据，普通完成计数达标或显式成功策略匹配可满足成功判据。以 `v1.32.7` 内置控制器为准，发布对应 `Failed=True` 或 `Complete=True` 需要已有成败判定，成功与失败的待记账 UID 都已清空，且延后分支开启时内部终止中 Pod 数为零。对外可见的终态还取决于状态更新成功写入 API。\n- 以 `terminating: 0` 单独证明终态已发布或资源已归还，不成立。状态快照中的零只说明该字段所定义的 Pod 计数，无法覆盖待记账 UID、状态写入或下游资源账本。判断发布看同一 Job UID 的终态条件及状态更新记录，判断资源归还看实际资源记账方的观测。\n\n## 3. H3 的 `Running` 回归\n\n**事实与出处**\n\n- 原报告使用 `completions: 0` 且 `suspend: true`。`v1.31.9` 显示 `SuccessCriteriaMet=True`、`Complete=True` 和 `completionTime`，表格为 `Complete`。`v1.32.0+k3s1` 在约 2 秒时表格显示 `Running`，所贴状态片段只显示提前条件。早期评论猜测有 Pod 尚在终止。见 H3 的原报告与早期假设。\n- 独立复现记录两版都没有创建 Pod，`v1.32` 约 10 分钟仍显示 `Running`，控制器日志报 `status.startTime: Required value: startTime is required for finished job`。`printJob` 的最终分支可显示 `Running`，该表格值本身不能证明有运行中的 Pod。报告人另称 Flux 因此未推进到依赖项。见 H3 的复现、日志、打印源码及工作流陈述。\n- 两个上游发行提交的 Job 状态策略是同一 blob。`JobPodReplacementPolicy` 在 `v1.31.9` 与 `v1.32.0` 都是 Beta、默认开启。`JobManagedBy` 从前者 Alpha、默认关闭变为后者 Beta、默认开启。它控制增强状态校验，其中 `RejectFinishedJobWithoutStartTime` 取终态是否改变或 `startTime` 是否改变。该选项生效时，拟写入终态且 `startTime` 为空会被拒绝。见 H3 的门控、状态策略及校验源码。\n- #132614 和回移 #132727 为 `suspend=true` 且 `completions=0` 同时成立的配置豁免这项拒绝检查，并以集成用例验证两个成功条件。维护者在 kind 中观察到 `Complete`，原报告人确认 `1.32.7` 与 `1.33.3` 解决了该回归。见 H4 的修复、源码及验证记录。\n\n**判断、版本与条件**\n\n- 仍有 Pod 终止的猜测对独立复现不成立。缺失 `startTime` 触发状态校验、导致终态无法落盘的解释有日志与源码支持。两版默认都可延后发布，差异与 `JobManagedBy` 默认打开后启用的状态校验相符。这个解释的适用条件是未修复代码、相关门控和校验选项生效、拟更新为终态且缺少 `startTime`。上游默认值不能确认原报告的 k3s 构建实际门控。\n- 已修复规则的豁免仅适用于 `suspend=true` 与 `completions=0` 同时成立的 Job。源码、集成用例、kind 观察及报告人确认分别支持实现、覆盖范围及实际复现结果。\n\n## 4. T1 的三个解释\n\n**事实与出处**\n\n- T1 是服务器自报 `v1.32.7-eks-ace6451` 的 Helm pre-install/pre-upgrade Hook 报告。片段给出 `restartPolicy: Never` 和 `backoffLimit: 2`，未展示 `successPolicy`、`suspend: true` 或 `completions: 0`。报告人称 Hook 未进入 `Complete`，后续 Deployment 未创建。\n- T1 的状态片段有 `SuccessCriteriaMet=True`、原因 `CompletionsReached`、转换时间 `2025-09-05T06:10:23Z`、`startTime: 2025-09-05T06:10:09Z`、`terminating: 0`，以及一条成功待记账 UID `ccbd79bb-77f2-44d5-b460-34a06d87fc26`。片段未显示 `Complete`。\n- 上游 `v1.32.7` 普通完成计数在延后分支可产生 `SuccessCriteriaMet`，`JobSuccessPolicy` 门控启用时原因可为 `CompletionsReached`。匹配显式 `spec.successPolicy` 的分支使用原因 `SuccessPolicy`。待记账 UID 检查和零完成数回归的范围分别见 H2 和 H3/H4。\n\n**判断、版本与条件**\n\n| 解释 | 判断与证据层级 |\n| --- | --- |\n| 报告证明启用了 Job `successPolicy` | **不成立。** T1 的快照和上游代码对照支持普通完成判据路径。`CompletionsReached` 在该上游路径上与门控启用相符，无法证明 EKS 的实际门控、完整 Job 配置或显式策略曾匹配。需取得该 Job 的完整 API 对象和相应控制器构建、门控配置，才能分别确认字段和运行分支。 |\n| 单凭 `terminating: 0` 应立即发布 `Complete` | **不成立。** 若该 EKS 构建沿用 H2 实现，T1 的非空成功 UID 已足以让该状态所对应的终态发布条件未满足。快照与该阻挡机制相符。要确认持续卡住的环节及后续能否发布，需有同 UID 的 Job/Pod 状态序列、finalizer 和控制器对账及状态更新结果。 |\n| 可直接套用零完成数暂停 Job 的 `startTime` 回归 | **不成立。** T1 已展示 `startTime`，未展示 H3 的两项配置，也没有 H3 的校验错误。H4 的对应上游 `v1.32.7` 已有修复，而 EKS 构建的实际实现仍需核实。若怀疑某次状态写入触发缺 `startTime` 校验，需取得该写入的请求体和 API 返回、完整 Job 规格与供应商构建信息。 |\n\n## 5. T2 的根因、资源归还与交接修订\n\n**事实与出处**\n\n- T2 的关闭说明将问题归因于一个持续修改 Pod 的 Kyverno 策略，并称它阻碍了终止中 Pod 的删除。材料只保留报告人的关闭陈述。T1 的单个 Job 快照保留了一条成功待记账 UID，没有提供相应 Pod 对象和后续状态。见 T1 和 T2。\n\n**判断、版本与条件**\n\n- Kyverno 是报告人归因。独立确认该策略持续变更了哪个 Pod、如何阻碍删除，以及是否关联到 T1 的待记账 UID，均证据不足。需要事发版本的策略及匹配配置、按 Pod UID 对齐的准入或 API 审计请求与结果、Pod 的删除时间戳及 finalizer 变化、Job 控制器的记账与写入记录。若有调整策略前后的受控复现，还可检验因果关系和修复结果。\n- 资源是否及何时归还也证据不足。需对齐 Pod 终止与删除时间，以及实际记账方释放资源或重新准入的记录，例如使用 Kueue 时的配额释放或后续任务准入记录。关闭议题、Job 条件或 Pod 删除记录各自只覆盖其中一环。\n\n**交接修订候选（待确认）**\n\n在 Job 交接条目补一条规则。以上游 `v1.32.7` 内置控制器为依据，记录提前条件和终态各自的时间，并在延后分支开启时同时核对待记账 UID 及终止中 Pod。遇到 `SuccessCriteriaMet=True`、`terminating: 0` 且有待记账 UID 时，沿同一 Job 和 Pod UID 检查终态写入与记账进度。资源归还时间由实际记账方记录确认。EKS 平台与策略维护方待确认 `v1.32.7-eks-ace6451` 的控制器行为、有效门控与 Kyverno 记录，资源记账方待确认释放凭证，交接维护者待审定条目。依据见 H2、T1、T2。\n\n## 材料与限制\n\n实际查阅 `task.md` 与 `sources.md`。通过 `functions.exec` 调用本地 shell，在指定目录用 `pwd`、`rg`、`cat`、`perl` 和 `tail` 确认路径、列出和读取材料、编写及检查答卷。来源链接使用包内标识定位，未联网、未打开链接、未查阅外部目录或会话，未改输入。复现结果、日志、源码与厂商构建信息的判断仅来自包内摘录，未运行集群复现。\n",
+      "review": {
+        "alias": "W",
+        "ratings": {
+          "R1": "met",
+          "R2": "met",
+          "R3": "met",
+          "R4": "met",
+          "R5": "met",
+          "R6": "met",
+          "V1": "met",
+          "V2": "met",
+          "V3": "met",
+          "V4": "met",
+          "V5": "met",
+          "V6": "met",
+          "V7": "met",
+          "V8": "met",
+          "V9": "met",
+          "V10": "met"
+        },
+        "notes": [],
+        "unsupported": [],
+        "boundary": "W.md 第 55–57、63、67–68 行把源码机制与 EKS 实际轨迹分开，记录 Kyverno 为报告人归因，并明确同一 Pod 的命中、删除受阻机制和 T1 的 UID 关联均缺原始证据。资源是否以及何时归还亦未建立，需对齐 Pod 生命周期和实际记账方的配额释放或准入记录。"
+      },
+      "final_ratings": {
+        "R1": "met",
+        "R2": "met",
+        "R3": "met",
+        "R4": "met",
+        "R5": "met",
+        "R6": "met",
+        "V1": "met",
+        "V2": "met",
+        "V3": "met",
+        "V4": "met",
+        "V5": "met",
+        "V6": "met",
+        "V7": "met",
+        "V8": "met",
+        "V9": "met",
+        "V10": "met"
+      },
+      "counts_by_dimension": {
+        "R": {
+          "met": 6
+        },
+        "V": {
+          "met": 10
+        }
+      }
+    },
+    {
+      "id": "788",
+      "wave": 2,
+      "group": "C",
+      "status": "received_and_reviewed",
+      "dispatch_marker_at": "2026-11-24T20:10:00+08:00",
+      "dispatch_marker_to_response_seconds": 168.6,
+      "input_hashes_verified": true,
+      "response_sha256": "c9e8a3b24f4bdf08a0555623fc7fa768caefb06aea1e0e33dcab17cca804997f",
+      "response_characters": 11287,
+      "response": "# Job 生命周期交接复核\n\n## 1. H1 的两次观测\n\n**恢复的事实**\n\n- 2024 年 3 月 7 日，报告中的 Indexed Job 设置了 `completions: 4`、`parallelism: 4`、`backoffLimit: 0` 和 `podReplacementPolicy: Failed`，复现步骤删除一个 Pod。所贴状态同时有 `Failed=True`（`BackoffLimitExceeded`）、`failed=4`、`ready=2`、`terminating=1` 及空的 `uncountedTerminatedPods`。见 H1。[复现议题](https://github.com/kubernetes/kubernetes/issues/123775) · [3 月状态](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1982959351)\n- 2024 年 5 月 16 日，维护者在另一轮复现中使用 600 个索引和 `backoffLimit: 0`。按评论记录的时钟，`11:13:10.933897` 第 0 个 Pod 失败，`11:13:11.942719` Job 更新 `uncountedTerminatedPods`，`11:13:23.981958` Job 出现 `Failed`，`11:13:50.139687` 最后一个 Pod 被标为 `Failed`。Job 的终态记录比最后一个 Pod 的终态记录早约 26.16 秒。见 H1 和 J1。[5 月复现时间轴](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-2114710754)\n\n**判断及边界**\n\n- **成立。** 早期 `Failed=True` 可用于判断 Job 已发布失败结果。3 月的同一份状态还记录了终止中的 Pod，5 月的时间轴直接显示 Job 发布 `Failed` 时最后一个 Pod 尚未被记录为终态。两轮的具体集群构建未给出。上游 `v1.30.0` 的 `enactJobFinished` 检查待记账 UID 后即可写终态，这为历史现象提供了一个具体的版本参照。[v1.30.0 控制器](https://github.com/kubernetes/kubernetes/blob/7c48c2bd72b9bf5c44d21d7338cc7bea77d0ad2a/pkg/controller/job/job_controller.go#L1350-L1369)\n- **证据不足。** 两轮记录无法定位资源实际归还的时间，也无法验证替代 Job 当时能否安全调度。讨论只提出了 Kueue 看到 Job 失败便可能调度替代任务的风险。需要原 Pod 的 UID 级退出或删除记录、节点运行时资源记录，以及相关队列的配额释放和调度记录，才能确定各层释放的时点及是否与替代任务重叠。[容量核算讨论](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1983329580)\n\n## 2. H2 的版本交接规则\n\n**恢复的事实**\n\n- `v1.30.0` 上游内置控制器在 `enactJobFinished` 检查 `uncountedTerminatedPods`。2024 年 7 月合并的 #125510 扩展提前条件的用途，失败判据满足时可先发布 `FailureTarget=True`，成功判据满足时可先发布 `SuccessCriteriaMet=True`。对应终态分别是 `Failed=True` 和 `Complete=True`。见 H2 和 J3。[v1.30.0 完成分支](https://github.com/kubernetes/kubernetes/blob/7c48c2bd72b9bf5c44d21d7338cc7bea77d0ad2a/pkg/controller/job/job_controller.go#L1350-L1369) · [#125510](https://github.com/kubernetes/kubernetes/pull/125510)\n- 在上游 `v1.31.9` 与 `v1.32.7` 的内置控制器，`JobManagedBy` 或 `JobPodReplacementPolicy` 任一启用就采用等待终止中 Pod 的分支。`v1.32.7` 在已有拟发布的终态时，先检查待记账的成功及失败 UID。任一类仍有 UID 就退出；采用延后分支时，内部终止中 Pod 计数大于零也会退出。两项检查均在写终态之前，待记账检查独立于延后门控。见 H2、J2 和 J4。[v1.31.9 门控](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/controller/job/job_controller.go#L999-L1002) · [v1.32.7 门控](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1082-L1086) · [v1.32.7 终态分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501)\n- API 的 `terminating` 统计有删除时间戳且仍为 `Pending` 或 `Running` 的 Pod。对已终止 Pod，Job 记账依次登记 UID、移除跟踪 finalizer，再移出 UID 并累计对应计数。见 H2。[终止中计数](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L546-L552) · [Job 记账步骤](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L579-L594)\n\n**判断及边界**\n\n- **成立。** 在上述延后分支适用时，提前条件可用于交接判据已满足的结果。到 `v1.32.7` 上游内置控制器写终态，须有待发布的终态结果、无待记账 UID，且延后分支要求内部终止中计数为零。确认终态已发布要看 API 中持久化的终态条件。[提前条件变更](https://github.com/kubernetes/kubernetes/pull/125510) · [v1.32.7 终态分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501)\n- **不成立。** 单独的 `terminating=0` 只给出该状态快照中特定类别的 Pod 数。它无法判定终态写入是否已发生、UID 是否已记账、Pod 对象是否已删除，或节点资源与调度配额是否已归还。若只有这一个值，须取得 Job 状态序列、对应 UID 的 Pod 生命周期记录，以及所讨论资源的运行时或配额记录。[API 计数及记账](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L546-L594)\n\n## 3. H3 的 Running 回归\n\n**恢复的事实**\n\n- #132144 使用 `completions: 0` 且 `suspend: true`。报告人记录 `v1.31.9` 有 `SuccessCriteriaMet=True`、`Complete=True` 和 `completionTime`，表格为 `Complete`。其 `v1.32.0+k3s1` 表格在约 2 秒时显示 `Running`，所贴状态只有 `SuccessCriteriaMet=True`。早期评论怀疑仍有 Pod 正在终止。见 H3 和 J7。[原报告](https://github.com/kubernetes/kubernetes/issues/132144) · [初始猜测](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2954740579)\n- 独立复现者记录两个版本均未创建 Pod。其 `v1.32` 复现约 10 分钟后仍显示 `Running`，控制器日志有 `status.startTime: Required value: startTime is required for finished job`。上游 `v1.32.0` 的 Job 表格打印器在最终兜底分支写 `Running`。报告人称其 Flux 工作流因此停在后续依赖之前。见 H3 和 J8。[独立复现及日志](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2957408192) · [打印器](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/printers/internalversion/printers.go#L1209-L1226) · [Flux 工作流](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2966466616)\n- 上游 `JobManagedBy` 从 `v1.31.9` 的 Alpha、默认关闭，变为 `v1.32.0` 的 Beta、默认开启。两版的 `JobPodReplacementPolicy` 均为 Beta、默认开启。两个发行提交的 `strategy.go` 是同一个 blob。启用 `JobManagedBy` 才配置增强状态校验，其中 `RejectFinishedJobWithoutStartTime` 由 `isJobFinishedChanged || isStartTimeChanged` 决定。该选项生效且拟写入的 Job 已进入终态、`StartTime` 为空时，`v1.32.0` 的校验会拒绝更新。见 H3、J5 和 J6。[v1.31.9 门控](https://github.com/kubernetes/kubernetes/blob/8f3800390d488f54f74111f22973059e133f9cba/pkg/features/kube_features.go#L1094-L1100) · [v1.32.0 门控](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/features/versioned_kube_features.go#L430-L444) · [v1.32.0 状态策略](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/registry/batch/job/strategy.go#L344-L405) · [状态校验](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/apis/batch/validation/validation.go#L530-L539)\n- #132614 及 `release-1.32` 的回移 #132727 让 `suspend=true` 且 `completions=0` 的组合跳过这项缺少 `startTime` 的终态拒绝检查。新增的集成用例验证该配置可出现 `SuccessCriteriaMet` 和 `Complete`。维护者在 kind 中用原配置观察到 `Complete`，报告人后来确认 `1.32.7` 和 `1.33.3` 解决其回归。见 H4 和 J9。[主线修复](https://github.com/kubernetes/kubernetes/pull/132614) · [1.32 回移](https://github.com/kubernetes/kubernetes/pull/132727) · [v1.32.7 状态策略](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/registry/batch/job/strategy.go#L377-L400) · [kind 观察](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-3036731203) · [报告人确认](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-3088832393)\n\n**判断及边界**\n\n- **独立复现中的终止中 Pod 解释不成立，终态写入因缺少 `startTime` 被拒成立。** 约 2 秒的首次快照只支持提出假设。独立复现同时给出了无 Pod 的观察和精确的更新拒绝日志。打印器的兜底状态解释了无 Pod 时仍显示 `Running`。默认门控的变化解释了为何相同的状态策略在上游两版默认配置下表现不同，实际部署覆盖门控时需按实测配置判断。[独立复现](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-2957408192) · [状态策略](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/registry/batch/job/strategy.go#L344-L405)\n- **修复在所示组合及构建范围内成立。** 上游 `v1.32.7` 的回移代码、集成用例、维护者观察和报告人确认分别给出实现与行为证据。豁免要求暂停和零完成数同时成立，范围是这一项终态状态校验。[v1.32.7 源码](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/registry/batch/job/strategy.go#L377-L400) · [报告人确认](https://github.com/kubernetes/kubernetes/issues/132144#issuecomment-3088832393)\n\n## 4. 对 T1 的三种解释\n\n**恢复的事实**\n\n- #133903 报告 Helm pre-install/pre-upgrade Hook 的 Job 未达到 `Complete`，后续 Deployment 未创建，服务器版本为 `v1.32.7-eks-ace6451`。复现片段给出 `restartPolicy: Never` 和 `backoffLimit: 2`，未展示 `successPolicy`、`suspend: true` 或 `completions: 0`。状态片段给出 `SuccessCriteriaMet=True`，原因为 `CompletionsReached`，其 `lastTransitionTime` 为 `2025-09-05T06:10:23Z`，`startTime` 为 `2025-09-05T06:10:09Z`。同一片段有 `terminating=0` 和一条待记账的成功 UID `ccbd79bb-77f2-44d5-b460-34a06d87fc26`，未显示 `Complete`。这是报告人提供的快照和行为陈述。见 T1。[EKS 原报告](https://github.com/kubernetes/kubernetes/issues/133903)\n- 上游 `v1.32.7` 内置控制器的普通完成计数路径在延后分支和 `JobSuccessPolicy` 门控启用时，可产生原因是 `CompletionsReached` 的 `SuccessCriteriaMet`。命中显式 `spec.successPolicy` 的分支使用 `SuccessPolicy` 原因。另有待记账 UID 的前置检查。H3 的拒绝要求拟写入终态时缺少 `startTime`，H4 的回移对暂停且零完成数的组合豁免该项。见 H2–H4、J4、J6、J9、J10。[普通完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L993-L1012) · [条件原因](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1069-L1079) · [显式策略分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L965-L969) · [待记账检查](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501) · [H3 拒绝条件](https://github.com/kubernetes/kubernetes/blob/70d3cc986aa8221cd1dfb1121852688902d3bf53/pkg/apis/batch/validation/validation.go#L530-L539) · [H4 回移](https://github.com/kubernetes/kubernetes/pull/132727)\n\n**判断及边界**\n\n1. **报告证明启用了 Job `successPolicy`，不成立。** `CompletionsReached` 符合上游普通完成计数路径。字段是否实际配置，需要完整的持久化 Job 规格；若问 EKS 的 `JobSuccessPolicy` 特性门控是否开启，需要发行构建或生效配置的证据。上游源码只能在 EKS 实现相符的前提下用于解释这条条件。\n2. **单凭 `terminating=0` 应立即发布 `Complete`，不成立。** 按上游 `v1.32.7` 的前置检查，T1 快照中的一条成功 UID 即足以阻止本轮终态发布。此比较由固定版本源码和报告快照支撑。要判定 EKS 控制器是否一直卡在这一步、为何未移出该 UID，需要该构建的实现或生效配置、同一 UID 的状态和 finalizer 变化，以及控制器状态更新记录。\n3. **可以直接套用暂停且零完成数 Job 的 `startTime` 回归，不成立。** T1 快照已经有 `startTime`，复现片段未给出 H3 的两个规格字段，包中也无本案发生同类 API 拒绝的日志。H4 证明上游 `v1.32.7` 包含对特定组合的回移。认定这个 EKS 构建的行为仍需核对发行实现和实际 Job 规格，若怀疑后续有终态更新被拒，需要拟更新的状态及相应控制器或 API Server 错误。\n\n## 5. T2 的根因、资源及交接修订\n\n**恢复的事实**\n\n- 关闭前，报告人把故障归因于一个持续修改 Pod 的 Kyverno 策略，并称它阻碍了终止中 Pod 的删除。T1 的公开快照只有一个待记账成功 UID。包内未附 Kyverno 策略定义、策略命中或请求审计、此 UID 的后续 Pod/Job 状态和资源回收记录。见 T1、T2。[T1 原报告](https://github.com/kubernetes/kubernetes/issues/133903) · [T2 关闭说明](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422)\n\n**判断及边界**\n\n- **报告人提出了根因陈述，因果链证据不足。** `terminating=0` 可与已经进入终态而仍未删除或尚待记账的 Pod 并存。现有材料无法把策略操作、删除受阻、该成功 UID 的记账以及 Hook 等待连成一条已验证的链。需要同一 Job 和 Pod UID 的完整时间序列，包括生效策略及 Kyverno 命中日志、API Server 对 Pod 更新与删除的审计、Pod 的阶段和 finalizer 变化、Job 控制器状态更新，以及 Helm 等待记录。若有策略调整前后的对照，可进一步判断策略操作是否影响这条链。[计数与记账定义](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/staging/src/k8s.io/api/batch/v1/types.go#L546-L594) · [报告人归因](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422)\n- **资源归还证据不足。** Pod 对象删除、运行时释放资源和配额重新可用各有观测点。需要 Pod 删除完成记录、同一节点上该 UID 的容器退出及资源释放记录，以及相应配额或调度器的释放记录，才能为所关心的资源确认时点。[容量核算风险](https://github.com/kubernetes/kubernetes/issues/123775#issuecomment-1983329580)\n\n**交接修订建议（候选，待确认）**\n\n- 在 Job 交接条目中写明，上游 `v1.32.7` 内置控制器的终态依赖待记账 UID 清空；启用 `JobManagedBy` 或 `JobPodReplacementPolicy` 时还等待内部终止中计数归零。交接时记录 Job 实际持久化的终态条件，并为依赖容量的交接记录对应的运行时或配额释放事件。对 `v1.32.7-eks-ace6451`，把 Kyverno 归因注明为报告人陈述。由 EKS 集群维护方确认构建、控制器及门控适用性，并与 Kyverno 策略维护方一起按 UID 核对审计与重现记录；资源释放时点由对应的运行时或配额维护方确认。依据 H2/J2/J4、T1/T2。[上游完成分支](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1476-L1501) · [上游门控](https://github.com/kubernetes/kubernetes/blob/158eee9fac884b429a92465edd0d88a43f81de34/pkg/controller/job/job_controller.go#L1082-L1086) · [EKS 报告](https://github.com/kubernetes/kubernetes/issues/133903) · [关闭说明](https://github.com/kubernetes/kubernetes/issues/133903#issuecomment-3285025422)\n\n## 材料、工具和可见限制\n\n实际查阅 `task.md`、`sources.md` 和 `history-note.md`。使用本地命令执行工具，以 `rg --files --hidden` 枚举文件，用 `cat` 读取材料并写入 `response.md`，用 `shasum` 核对输入完整性。所有命令均在本包目录执行。未联网，链接仅用于定位。未运行 Kubernetes 或复现实验，也未取得原始审计、实时集群状态、发行商实现细节或资源回收遥测。报告与评论的观测按包内所载转述。\n",
+      "review": {
+        "alias": "F",
+        "ratings": {
+          "R1": "met",
+          "R2": "met",
+          "R3": "met",
+          "R4": "met",
+          "R5": "met",
+          "R6": "met",
+          "V1": "met",
+          "V2": "met",
+          "V3": "met",
+          "V4": "met",
+          "V5": "met",
+          "V6": "met",
+          "V7": "met",
+          "V8": "met",
+          "V9": "met",
+          "V10": "met"
+        },
+        "notes": [],
+        "unsupported": [],
+        "boundary": "F.md 第 51–53、59、63–64、68 行区分上游检查与 EKS 实际行为，并将 Kyverno 保留为报告人归因。待记账 UID 足以触发上游检查，现场仍缺把策略作用、Pod 请求及 finalizer、UID 记账和 Helm 等待串起来的时间线。资源归还时点仍无法判定，需按同 UID 取得运行时和实际配额记账方的释放记录。"
+      },
+      "final_ratings": {
+        "R1": "met",
+        "R2": "met",
+        "R3": "met",
+        "R4": "met",
+        "R5": "met",
+        "R6": "met",
+        "V1": "met",
+        "V2": "met",
+        "V3": "met",
+        "V4": "met",
+        "V5": "met",
+        "V6": "met",
+        "V7": "met",
+        "V8": "met",
+        "V9": "met",
+        "V10": "partial"
+      },
+      "counts_by_dimension": {
+        "R": {
+          "met": 6
+        },
+        "V": {
+          "met": 9,
+          "partial": 1
+        }
+      }
+    }
+  ]
+}

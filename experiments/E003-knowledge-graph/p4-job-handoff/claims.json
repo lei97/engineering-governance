@@ -1,0 +1,12 @@
+[
+  {"id":"J1","subject":"Job 终态发布","relation":"早于","object":"最后一个 Pod 的终态记录","scope":"H1 的 2024-05-16 复现，Job 终态为 Failed，具体构建未给出","status":"历史观测","source":"H1 · 5 月时间轴"},
+  {"id":"J2","subject":"Job 终态发布","relation":"受限于","object":"终态延后分支","scope":"上游 v1.31.9 与 v1.32.7 的内置控制器，JobManagedBy 或 JobPodReplacementPolicy 任一启用且仍有终止中 Pod 时延后","status":"固定版本源码","source":"H2 · 两个门控函数与完成分支"},
+  {"id":"J3","subject":"SuccessCriteriaMet","relation":"可先于","object":"Job 终态发布","scope":"#125510 扩展后的内置控制器，提前公布成功判据；失败时对应的提前条件是 FailureTarget","status":"已合并变更","source":"H2 · #125510 发布说明"},
+  {"id":"J4","subject":"非空 uncountedTerminatedPods","relation":"阻止","object":"Job 终态发布","scope":"上游 v1.32.7 内置控制器执行 enactJobFinished，成功或失败 UID 计数大于零","status":"固定版本源码","source":"H2 · 完成分支与 API 字段"},
+  {"id":"J5","subject":"JobManagedBy","relation":"控制","object":"增强的 Job 状态校验","scope":"上游 v1.32.0 的默认值是启用，v1.31.9 是禁用，JobPodReplacementPolicy 两版均默认启用","status":"固定版本源码","source":"H3 · 门控定义和状态校验选项"},
+  {"id":"J6","subject":"增强的 Job 状态校验","relation":"可拒绝","object":"Job 终态发布","scope":"上游 v1.32.0，JobManagedBy 启用，进入终态或 startTime 发生变化，拟更新状态为终态且 StartTime 为 nil，触发 RejectFinishedJobWithoutStartTime 检查","status":"固定版本源码","source":"H3 · 状态校验选项和拒绝条件"},
+  {"id":"J7","subject":"早期评论者","relation":"怀疑","object":"Pod 仍在终止导致 Running","scope":"#132144 的首次约 2 秒状态片段","status":"历史假设","source":"H3 · 早期评论"},
+  {"id":"J8","subject":"v1.32 的独立复现","relation":"记录","object":"无 Pod 且终态更新因缺 startTime 被拒","scope":"#132144 的暂停、零完成数 Job，约 10 分钟仍显示 Running","status":"历史复现日志","source":"H3 · 独立复现及日志"},
+  {"id":"J9","subject":"上游 v1.32.7 的回移修复","relation":"限定","object":"增强的 Job 状态校验","scope":"suspend=true 且 completions=0 时，豁免缺 startTime 的终态更新检查","status":"已合并变更","source":"H4 · #132727 与固定源码"},
+  {"id":"J10","subject":"普通完成计数路径","relation":"可以产生","object":"SuccessCriteriaMet","scope":"上游 v1.32.7 内置控制器，延后分支和 JobSuccessPolicy 门控开启，此时原因是 CompletionsReached；匹配显式 successPolicy 的分支使用 SuccessPolicy 原因","status":"固定版本源码","source":"H2 · 普通完成条件和策略匹配分支"}
+]

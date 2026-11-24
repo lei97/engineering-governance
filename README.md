@@ -25,6 +25,7 @@ python -m unittest discover -s tests -v
 - `examples/valid/` 与 `examples/invalid/`：正反样例。
 - E001 首轮的任务、评阅方法和记录模板见[需求解释对照](experiments/E001/README.md)。
 - 真实开发中值得回查的知识问题记录在[工程观察](observations/README.md)。
+- 工程知识维护的候选方向及讨论原文见[工程知识与软件的共同演进](research/engineering-knowledge-coevolution.md)。
 - `scripts/validate_truth.py`：确定性检查，不调用 LLM。
 - `research/references.md`：外部资料与采用边界。
 

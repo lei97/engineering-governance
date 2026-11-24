@@ -24,6 +24,7 @@ python -m unittest discover -s tests -v
 - 本仓库已确认的目标与首轮范围存于 `truth/`，各自引用作者原话。[表达目标 REQ-100](truth/REQ-100.yaml) · [首轮范围 REQ-101](truth/REQ-101.yaml)
 - `examples/valid/` 与 `examples/invalid/`：正反样例。
 - E001 首轮的任务、评阅方法和记录模板见[需求解释对照](experiments/E001/README.md)。
+- 真实开发中值得回查的知识问题记录在[工程观察](observations/README.md)。
 - `scripts/validate_truth.py`：确定性检查，不调用 LLM。
 - `research/references.md`：外部资料与采用边界。
 

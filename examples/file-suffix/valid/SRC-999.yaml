@@ -1,0 +1,6 @@
+id: SRC-999
+kind: source
+title: 文件后缀校验样例
+status: proposed
+statement: 此样例使用相同的记录内容对比不同的文件后缀。
+location: specifications/yaml-profile.md

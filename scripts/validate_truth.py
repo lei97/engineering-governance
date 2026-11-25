@@ -2,6 +2,7 @@
 """Validate restricted engineering YAML records."""
 import argparse
 import json
+import stat
 import sys
 from pathlib import Path
 import yaml
@@ -48,14 +49,29 @@ def validate_path(directory):
     schema = json.loads((ROOT/'schemas/knowledge.schema.json').read_text(encoding='utf-8'))
     validator = Draft202012Validator(schema)
     files = sorted(directory.rglob('*.yaml'))
+    count = len(files)
     errors = []
+    for path in sorted(directory.rglob('*.yml')):
+        if not path.name.endswith('.yml'):
+            continue
+        try:
+            if not stat.S_ISREG(path.stat().st_mode):
+                continue
+        except OSError:
+            # The suffix remains reportable even if the entry cannot be inspected.
+            pass
+        errors.append(f'{path}: unsupported .yml file extension; use .yaml')
     records = []
     kind_by_id = {}
-    if not files:
-        return ['no .yaml files found'], 0
     for path in files:
         try:
+            if not stat.S_ISREG(path.stat().st_mode):
+                count -= 1
+                continue
             record = load_restricted(path)
+        except OSError as exc:
+            errors.append(f'{path}: cannot read YAML file: {exc.strerror or exc}')
+            continue
         except (ValueError, yaml.YAMLError, UnicodeError) as exc:
             errors.append(f'{path}: {exc}')
             continue
@@ -100,7 +116,9 @@ def validate_path(directory):
                     errors.append(f'{path}: missing relation target {target}')
                 elif target.split('-')[0] not in TARGETS[rel]:
                     errors.append(f'{path}: invalid {rel} target {target}')
-    return errors, len(files)
+    if not count and not errors:
+        errors.append('no .yaml files found')
+    return errors, count
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)

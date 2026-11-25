@@ -31,7 +31,7 @@ python -m unittest discover -s tests -v
 
 ## 使用于其他项目
 
-将 `skills/engineering-governance/` 安装/链接到所用 Agent 支持的 Skill 目录，并在项目中自行建立 `truth/`；不要把本仓库 `examples/` 当成项目真源。不同 Agent 宿主的发现/安装路径可能不同，请按其官方文档配置。
+v0.1.1 试用候选提供两种分发包。轻量包用于在 Agent 中使用 Skill，完整包附带权威规范、Schema 和校验器。项目自行维护 `truth/`。构建、安装和验证步骤见[外部项目使用指南](docs/install.md)。
 
 ## 设计边界
 

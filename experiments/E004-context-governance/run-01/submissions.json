@@ -1,0 +1,647 @@
+[
+  {
+    "chain": "184",
+    "stage": 1,
+    "packet_sha256": {
+      ".history/r012-fanout-receipt.log": "c673912947c416bf44e22beffea03cd1e5af06b758f78e213161f15628e2ae46",
+      ".history/r019-w2-checkpoint.log": "ad11637ff93870caab62757785cfdbed87c3b4bafdd31b9c3008ac80238cb502",
+      ".history/r027-w1-checkpoint.log": "f61099019bc25eb87279402d0d922d2f26d975a551ca7e0135fc48b583c1f7a6",
+      ".history/r031-export-sort.diff": "8abc6a25c15f6749bd1557f3c74ee4be4b8951802b94861de61a97c665786134",
+      ".history/r034-formatter.log": "f8652bd2aa7a1aae6c8053ff3fedeb36a1a8dccfd80fb1136c6306a5fe8ea4d3",
+      ".packet.json": "e0cccf323186ed83519d98714a6799ec7ed153a334ff596ee3b00593b47b276c",
+      "dispatch.py": "d943540c63c9095a1c9a4668f7946cd91d0c6fbb626d8ba27e231553fc3a14c3",
+      "instructions.md": "f2a65aa19645775df2ebce6dba14ad6a3a8693034c900cd750bd6b0401c4732e",
+      "task.md": "e1921f1d2d171782106fd416f5f5aaf1683342ea2853445913c4c0b034f349fe",
+      "test_dispatch.py": "32432c6ea1dc611d0d90bd60fd9005f78a5689782630d53950913557227ba6c9",
+      "trace.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trace.py": "2bb39976a4b8d253028bfddba409cccf22e0b707b9b03d1c5a0c3609e0bdf507"
+    },
+    "forecast": "# 按仓交付影响预测\n\n1. **推断**。东仓首批收到本仓发货，后续批次只有同一出库记录的撤销、其他仓的发货和审计事件时，后续批次应只投递该撤销，累计回放后的东仓活动记录应与全量交付一致且为空。依据是 `task.md` 的跨批要求、`dispatch.py` 中接收端按出库记录应用撤销的行为，以及 `r012-fanout-receipt.log` 中无仓号撤销被按仓号直接过滤时产生的对账差异。\n2. **推断**。输入是无序、序号有间隔的一次性迭代器，同时包含两个仓的发货、撤销及审计事件时，指定仓的结果应保留该仓发货和全部撤销，省略仓号或显式传入 `None` 时应保留全部发货和撤销。两种结果均应按原序号升序返回原事件对象。依据是现有 `export` 的排序和审计过滤，以及 `test_dispatch.py` 的全量交付测试。\n\n沿用单次排序，过滤审计事件，并在指定仓时过滤其他仓的发货。用定向探针比较逐批及累计回放、事件顺序和对象身份，再运行公开测试。\n",
+    "source": "from collections.abc import Iterable\nfrom dataclasses import dataclass\n\n\n@dataclass(frozen=True)\nclass Event:\n    seq: int\n    kind: str\n    movement: str\n    depot: str | None = None\n\n\ndef export(events: Iterable[Event], *, depot: str | None = None) -> list[Event]:\n    \"\"\"Deliver events in sequence order, optionally limiting shipments to one depot.\"\"\"\n    ordered = sorted(events, key=lambda event: event.seq)\n    # A void may cancel a shipment delivered in an earlier batch.\n    return [\n        event\n        for event in ordered\n        if event.kind != \"note\"\n        and (depot is None or event.kind != \"ship\" or event.depot == depot)\n    ]\n\n\ndef active_movements(depot: str, delivered: Iterable[Event]) -> set[str]:\n    active = set()\n    for event in delivered:\n        if event.kind == \"ship\" and event.depot == depot:\n            active.add(event.movement)\n        elif event.kind == \"void\":\n            active.discard(event.movement)\n    return active\n",
+    "report": "# 按仓交付结果\n\n在 `dispatch.py` 的 `export` 中增加仅限关键字的 `depot` 参数。指定仓时投递该仓的发货和全部撤销，因撤销可能对应先前批次。省略仓号或传入 `None` 时投递全部发货和撤销。所有交付均按序号排序、过滤审计事件并返回原事件对象。\n\n公开测试 2 项均通过。定向探针在改动前因缺少 `depot` 参数失败，改动后通过，验证了两个仓的过滤、跨批撤销、保留当前批次无对应发货的撤销、全量兼容性、事件顺序与对象身份，以及空流。另枚举由发货、撤销和审计组成的四事件流及其所有两批切分，对两个仓在接收每批后分别比较按仓交付与全量交付，48,020 次比较均一致。两项封存预测均得到验证。\n\n依据为任务说明、原有发送端和接收端代码、公开测试及 `r012-fanout-receipt.log` 的撤销回放。查阅的 `r019-w2-checkpoint.log` 描述扫描游标推进，交付接口未涉及游标。验证使用本地接收端和有限输入枚举，实际下游服务的集成行为未测。\n",
+    "trace": [
+      {
+        "action": "launch",
+        "utc_ns": 1795692731941631345
+      },
+      {
+        "action": "index",
+        "utc_ns": 1795692745194007421,
+        "bytes": 131
+      },
+      {
+        "action": "read",
+        "utc_ns": 1795692749474593158,
+        "name": "r012-fanout-receipt.log",
+        "bytes": 488,
+        "sha256": "c673912947c416bf44e22beffea03cd1e5af06b758f78e213161f15628e2ae46"
+      },
+      {
+        "action": "read",
+        "utc_ns": 1795692749518434913,
+        "name": "r019-w2-checkpoint.log",
+        "bytes": 459,
+        "sha256": "ad11637ff93870caab62757785cfdbed87c3b4bafdd31b9c3008ac80238cb502"
+      },
+      {
+        "action": "rejected_read",
+        "utc_ns": 1795692749552727859,
+        "name": "r027-w1-checkpoint.log",
+        "reason": "unknown file or read limit"
+      },
+      {
+        "action": "forecast",
+        "utc_ns": 1795692767766449581,
+        "sha256": "7de684b1e2df386e638c0da4a0019d2ea50b5432f1c133039ab8b84f84b0a2f0",
+        "source_sha256": "d943540c63c9095a1c9a4668f7946cd91d0c6fbb626d8ba27e231553fc3a14c3"
+      },
+      {
+        "action": "test",
+        "utc_ns": 1795692788447959408,
+        "exit": 0,
+        "output": "test_full_delivery_excludes_audit_notes_and_sorts (test_dispatch.DispatchTests.test_full_delivery_excludes_audit_notes_and_sorts) ... ok\ntest_receiver_applies_revocations (test_dispatch.DispatchTests.test_receiver_applies_revocations) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+        "source_sha256": "a116757756c23be8cf1df389abdaf77016931e44d651f4585097cd38266e53ed"
+      },
+      {
+        "action": "finish",
+        "utc_ns": 1795692805758527100,
+        "source_sha256": "a116757756c23be8cf1df389abdaf77016931e44d651f4585097cd38266e53ed",
+        "report_sha256": "435859edcb96deb4c3ffb201f069bff2ac153cdbaf316ff43a4247fbb1613daa"
+      }
+    ],
+    "evaluation": {
+      "public_exit": 0,
+      "holdout_exit": 0,
+      "checks": {
+        "unscoped_export": {
+          "passed": true
+        },
+        "scoped_shipment": {
+          "passed": true
+        },
+        "depotless_void": {
+          "passed": true
+        },
+        "receiver_reconciliation": {
+          "passed": true
+        }
+      }
+    }
+  },
+  {
+    "chain": "327",
+    "stage": 1,
+    "packet_sha256": {
+      ".packet.json": "1c09d21589adfae7ffde4043ffaec127f11d9e47d156bee5d778a85fd2d0ffed",
+      "dispatch.py": "d943540c63c9095a1c9a4668f7946cd91d0c6fbb626d8ba27e231553fc3a14c3",
+      "instructions.md": "f2a65aa19645775df2ebce6dba14ad6a3a8693034c900cd750bd6b0401c4732e",
+      "task.md": "e1921f1d2d171782106fd416f5f5aaf1683342ea2853445913c4c0b034f349fe",
+      "test_dispatch.py": "32432c6ea1dc611d0d90bd60fd9005f78a5689782630d53950913557227ba6c9",
+      "trace.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trace.py": "2bb39976a4b8d253028bfddba409cccf22e0b707b9b03d1c5a0c3609e0bdf507"
+    },
+    "forecast": "# 变更预测\n\n1. **待验证，基于现有排序和事件过滤逻辑的推断。** 对含乱序、非连续序号、东西两仓发货及审计事件的一次性输入，指定东仓应去掉西仓发货和审计事件，保留其余原事件并按序号升序投递。同一输入省略仓参数或显式传入 `None` 时，应按原规则投递两仓发货。\n2. **待验证，基于接收端会按出库编号应用所有撤销的推断。** 如果东仓发货在第一批，第二批只有该编号的撤销、其他仓发货或审计事件，第二批的定仓交付仍应保留撤销。将两批投递拼接后，东仓的活动记录应与拼接全量交付的结果相同，且已撤销编号应消失。\n\n实现时复用现有排序和审计过滤，在指定仓时只对发货施加仓号条件。使用定向探针检查事件身份、序号、一次性输入、默认行为以及跨批撤销，并通过交付工具运行公开测试。\n",
+    "source": "from collections.abc import Iterable\nfrom dataclasses import dataclass\n\n\n@dataclass(frozen=True)\nclass Event:\n    seq: int\n    kind: str\n    movement: str\n    depot: str | None = None\n\n\ndef export(events: Iterable[Event], *, depot: str | None = None) -> list[Event]:\n    ordered = sorted(events, key=lambda event: event.seq)\n    # A void can revoke a shipment delivered in an earlier batch.\n    return [\n        event\n        for event in ordered\n        if event.kind != \"note\"\n        and (depot is None or event.kind != \"ship\" or event.depot == depot)\n    ]\n\n\ndef active_movements(depot: str, delivered: Iterable[Event]) -> set[str]:\n    active = set()\n    for event in delivered:\n        if event.kind == \"ship\" and event.depot == depot:\n            active.add(event.movement)\n        elif event.kind == \"void\":\n            active.discard(event.movement)\n    return active\n",
+    "report": "# 交付报告\n\n- `dispatch.py` 为 `export` 增加仅限关键字的可选参数 `depot`。指定仓时过滤其他仓的发货，并保留所有撤销，使接收端可以清除早先批次的记录。交付仍按序号排序、过滤审计事件并传递原事件对象。省略仓参数或传入 `None` 时继续全量交付。\n- `python3 -B trace.py test` 的两项公开测试均通过。定向探针在修改前因缺少仓参数而失败，修改后通过。探针覆盖一次性乱序输入、非连续序号、事件对象身份、默认和显式 `None`、空字符串仓号，以及第二批仅含其他仓发货、撤销和审计事件的场景。拼接两批定仓交付和全量交付后，东仓均只剩活动记录 `K`。两项预测均获验证。\n- 依据 `task.md`、原 `dispatch.py` 的接收端逻辑和 `test_dispatch.py`。证据索引为空。验证范围为公开套件及定向探针，其他批次组合依靠同一条接收规则：其他仓发货对指定仓的活动集合无影响，每条撤销均参与处理。\n",
+    "trace": [
+      {
+        "action": "launch",
+        "utc_ns": 1795692731975215238
+      },
+      {
+        "action": "index",
+        "utc_ns": 1795692758667205268,
+        "bytes": 13
+      },
+      {
+        "action": "forecast",
+        "utc_ns": 1795692768320860386,
+        "sha256": "e021e75bad768cc25234660a2fb158994bad76fd03f632c329dbfd3d85d1d3fd",
+        "source_sha256": "d943540c63c9095a1c9a4668f7946cd91d0c6fbb626d8ba27e231553fc3a14c3"
+      },
+      {
+        "action": "test",
+        "utc_ns": 1795692787018916566,
+        "exit": 0,
+        "output": "test_full_delivery_excludes_audit_notes_and_sorts (test_dispatch.DispatchTests.test_full_delivery_excludes_audit_notes_and_sorts) ... ok\ntest_receiver_applies_revocations (test_dispatch.DispatchTests.test_receiver_applies_revocations) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+        "source_sha256": "3c0fecbb2223f42b2e32256c7a4086bf6668a525cbab8db82a2f8b370987c5f1"
+      },
+      {
+        "action": "finish",
+        "utc_ns": 1795692796843954454,
+        "source_sha256": "3c0fecbb2223f42b2e32256c7a4086bf6668a525cbab8db82a2f8b370987c5f1",
+        "report_sha256": "eb48d5d5694183e3b5123cad962f286c6c90c6379b005bafb162d34180543e9b"
+      }
+    ],
+    "evaluation": {
+      "public_exit": 0,
+      "holdout_exit": 0,
+      "checks": {
+        "unscoped_export": {
+          "passed": true
+        },
+        "scoped_shipment": {
+          "passed": true
+        },
+        "depotless_void": {
+          "passed": true
+        },
+        "receiver_reconciliation": {
+          "passed": true
+        }
+      }
+    }
+  },
+  {
+    "chain": "596",
+    "stage": 1,
+    "packet_sha256": {
+      ".packet.json": "1c09d21589adfae7ffde4043ffaec127f11d9e47d156bee5d778a85fd2d0ffed",
+      "dispatch.py": "d943540c63c9095a1c9a4668f7946cd91d0c6fbb626d8ba27e231553fc3a14c3",
+      "instructions.md": "f2a65aa19645775df2ebce6dba14ad6a3a8693034c900cd750bd6b0401c4732e",
+      "task.md": "e1921f1d2d171782106fd416f5f5aaf1683342ea2853445913c4c0b034f349fe",
+      "test_dispatch.py": "32432c6ea1dc611d0d90bd60fd9005f78a5689782630d53950913557227ba6c9",
+      "trace.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trace.py": "2bb39976a4b8d253028bfddba409cccf22e0b707b9b03d1c5a0c3609e0bdf507"
+    },
+    "forecast": "# 变更前预测\n\n1. **推断**。指定 `depot=\"east\"`，传入无序且序号不连续的一次性迭代器，若其中包含东西两仓的发货、撤销和审计记录，返回结果应只保留东仓发货及全部撤销，沿用原事件对象并按序号升序排列。依据是 `task.md` 的投递约束，以及 `dispatch.py` 中接收端只处理目标仓的发货。\n2. **推断**。第一批若激活东仓的某个出库记录，第二批即使只有该记录的撤销和其他仓的发货，两批按仓交付的结果合在一起交给东仓接收端时，该记录也应从活动集合中消失。依据是 `task.md` 允许跨批撤销，而接收端对任何 `void` 都移除对应记录。\n\n扩展现有排序与过滤逻辑，指定仓时基于仓号过滤发货，继续投递全部撤销。用公开测试检查默认行为，并用 Python 探针对照按仓和全量投递的接收结果。\n",
+    "source": "from collections.abc import Iterable\nfrom dataclasses import dataclass\n\n\n@dataclass(frozen=True)\nclass Event:\n    seq: int\n    kind: str\n    movement: str\n    depot: str | None = None\n\n\ndef export(events: Iterable[Event], *, depot: str | None = None) -> list[Event]:\n    ordered = sorted(events, key=lambda event: event.seq)\n    # A void can revoke a movement shipped in an earlier batch.\n    return [\n        event\n        for event in ordered\n        if event.kind != \"note\"\n        and (depot is None or event.kind != \"ship\" or event.depot == depot)\n    ]\n\n\ndef active_movements(depot: str, delivered: Iterable[Event]) -> set[str]:\n    active = set()\n    for event in delivered:\n        if event.kind == \"ship\" and event.depot == depot:\n            active.add(event.movement)\n        elif event.kind == \"void\":\n            active.discard(event.movement)\n    return active\n",
+    "report": "# 交付报告\n\n在 `dispatch.py` 中为 `export` 增加了仅限关键字的 `depot` 参数。指定仓时滤除其他仓的发货，并投递全部撤销，使接收端能清除更早批次的活动记录。默认调用继续全量投递。两种调用都按序号升序返回原事件对象并过滤审计记录。\n\n公开测试共两项，全部通过。针对性探针在修改前因缺少 `depot` 参数失败，修改后通过，验证了无序、序号不连续的一次性输入、事件对象身份、仓号过滤、默认兼容性和跨批撤销。探针对照了同批及连续两批时按仓投递和全量投递的接收结果，两项预测均得到验证。\n\n依据为 `instructions.md`、`task.md`、`dispatch.py` 和 `test_dispatch.py`。通过 `trace.py index` 查到的历史为空。验证范围为公开测试和本地探针，未运行外部接收程序。\n",
+    "trace": [
+      {
+        "action": "launch",
+        "utc_ns": 1795692732006404731
+      },
+      {
+        "action": "index",
+        "utc_ns": 1795692761065065684,
+        "bytes": 13
+      },
+      {
+        "action": "forecast",
+        "utc_ns": 1795692773258000062,
+        "sha256": "d4833c8e4bf30eb65495df5dc855889d4b8ff61abf41204bfd8a0f381355bdee",
+        "source_sha256": "d943540c63c9095a1c9a4668f7946cd91d0c6fbb626d8ba27e231553fc3a14c3"
+      },
+      {
+        "action": "test",
+        "utc_ns": 1795692794811255902,
+        "exit": 0,
+        "output": "test_full_delivery_excludes_audit_notes_and_sorts (test_dispatch.DispatchTests.test_full_delivery_excludes_audit_notes_and_sorts) ... ok\ntest_receiver_applies_revocations (test_dispatch.DispatchTests.test_receiver_applies_revocations) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+        "source_sha256": "4d2f19144be642f7247a662aae397c1b0e6880269841398485121ee1e4e48ac5"
+      },
+      {
+        "action": "finish",
+        "utc_ns": 1795692803058827832,
+        "source_sha256": "4d2f19144be642f7247a662aae397c1b0e6880269841398485121ee1e4e48ac5",
+        "report_sha256": "be5f0215280293e0afab99a49e47464279d0082a5c34bf1f60fc76c4f1fca57c"
+      }
+    ],
+    "evaluation": {
+      "public_exit": 0,
+      "holdout_exit": 0,
+      "checks": {
+        "unscoped_export": {
+          "passed": true
+        },
+        "scoped_shipment": {
+          "passed": true
+        },
+        "depotless_void": {
+          "passed": true
+        },
+        "receiver_reconciliation": {
+          "passed": true
+        }
+      }
+    }
+  },
+  {
+    "chain": "842",
+    "stage": 1,
+    "packet_sha256": {
+      ".history/r012-fanout-receipt.log": "c673912947c416bf44e22beffea03cd1e5af06b758f78e213161f15628e2ae46",
+      ".history/r019-w2-checkpoint.log": "ad11637ff93870caab62757785cfdbed87c3b4bafdd31b9c3008ac80238cb502",
+      ".history/r027-w1-checkpoint.log": "f61099019bc25eb87279402d0d922d2f26d975a551ca7e0135fc48b583c1f7a6",
+      ".history/r031-export-sort.diff": "8abc6a25c15f6749bd1557f3c74ee4be4b8951802b94861de61a97c665786134",
+      ".history/r034-formatter.log": "f8652bd2aa7a1aae6c8053ff3fedeb36a1a8dccfd80fb1136c6306a5fe8ea4d3",
+      ".packet.json": "e0cccf323186ed83519d98714a6799ec7ed153a334ff596ee3b00593b47b276c",
+      "dispatch.py": "d943540c63c9095a1c9a4668f7946cd91d0c6fbb626d8ba27e231553fc3a14c3",
+      "instructions.md": "f2a65aa19645775df2ebce6dba14ad6a3a8693034c900cd750bd6b0401c4732e",
+      "task.md": "e1921f1d2d171782106fd416f5f5aaf1683342ea2853445913c4c0b034f349fe",
+      "test_dispatch.py": "32432c6ea1dc611d0d90bd60fd9005f78a5689782630d53950913557227ba6c9",
+      "trace.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trace.py": "2bb39976a4b8d253028bfddba409cccf22e0b707b9b03d1c5a0c3609e0bdf507"
+    },
+    "forecast": "# 影响预测\n\n1. **推断。** 对只含无仓号撤销的后续批次做 east 定向交付时，即使本批没有对应发货，也会交付撤销原事件。把此批接在先前 east 发货批次后，接收端将清空该活动记录，与连续全量交付的结果一致。依据是 `active_movements` 按 movement 应用所有撤销，且 `r012-fanout-receipt.log` 观察到仓号相等过滤会漏掉撤销并留下活动记录。\n2. **推断。** 对乱序且序号有间隔的一次性输入，若包含 east 和 west 的发货、撤销和审计事件，east 定向交付会原样保留 east 发货和全部撤销，并按序号递增输出。省略 depot 时还会保留 west 发货。依据是当前 `export` 的排序和审计过滤，以及任务要求。\n\n增加仅关键字参数，在既有排序和审计过滤中按仓筛选发货。先用跨批探针确认当前缺口，再运行公开测试，并用探针核对跨批活动状态、事件对象、落仓筛选和全量交付。\n",
+    "source": "from collections.abc import Iterable\nfrom dataclasses import dataclass\n\n\n@dataclass(frozen=True)\nclass Event:\n    seq: int\n    kind: str\n    movement: str\n    depot: str | None = None\n\n\ndef export(events: Iterable[Event], *, depot: str | None = None) -> list[Event]:\n    ordered = sorted(events, key=lambda event: event.seq)\n    # Unscoped voids may revoke shipments from earlier batches.\n    return [\n        event\n        for event in ordered\n        if event.kind != \"note\"\n        and (depot is None or event.kind != \"ship\" or event.depot == depot)\n    ]\n\n\ndef active_movements(depot: str, delivered: Iterable[Event]) -> set[str]:\n    active = set()\n    for event in delivered:\n        if event.kind == \"ship\" and event.depot == depot:\n            active.add(event.movement)\n        elif event.kind == \"void\":\n            active.discard(event.movement)\n    return active\n",
+    "report": "# 交付报告\n\n## 改动\n\n`export(events, *, depot=None)` 在按序号排序后过滤审计事件。指定仓时，只投递该仓的发货和全部撤销。省略 depot 或传入 None 时，投递所有仓的发货和全部撤销。投递使用原事件对象。\n\n接收端会忽略其他仓的发货，并按 movement 应用每次撤销。因此，在每批保留目标仓发货和全部撤销及其相对顺序，可以保留接收端在连续批次中的活动状态。\n\n## 验证\n\n- `python3 -B trace.py test` 的两项公开测试均通过。\n- 跨批探针在修改前因缺少 depot 参数失败，修改后通过。首批 east 发货在仅包含撤销的后续批次中被清除，结果与全量交付一致。\n- 一次性迭代器探针确认了乱序输入、非连续序号、审计过滤、空输入、无匹配仓及事件对象身份。枚举探针在 61,440 个批次切分与目标仓组合中确认了投递内容和接收端状态。\n\n## 材料和验证范围\n\n使用了 `task.md`、`dispatch.py`、`test_dispatch.py` 和历史回放 `r012-fanout-receipt.log`，其中仓号相等过滤漏掉撤销。另参考了 `r019-w2-checkpoint.log` 中跳过其他仓发货和审计事件的投递结果。验证使用仓库中的接收端函数，外部接收程序的运行与检查点行为未做集成验证。\n",
+    "trace": [
+      {
+        "action": "launch",
+        "utc_ns": 1795692732037220932
+      },
+      {
+        "action": "index",
+        "utc_ns": 1795692768854085706,
+        "bytes": 131
+      },
+      {
+        "action": "read",
+        "utc_ns": 1795692772623274885,
+        "name": "r012-fanout-receipt.log",
+        "bytes": 488,
+        "sha256": "c673912947c416bf44e22beffea03cd1e5af06b758f78e213161f15628e2ae46"
+      },
+      {
+        "action": "read",
+        "utc_ns": 1795692772640507182,
+        "name": "r019-w2-checkpoint.log",
+        "bytes": 459,
+        "sha256": "ad11637ff93870caab62757785cfdbed87c3b4bafdd31b9c3008ac80238cb502"
+      },
+      {
+        "action": "rejected_read",
+        "utc_ns": 1795692772643382044,
+        "name": "r031-export-sort.diff",
+        "reason": "unknown file or read limit"
+      },
+      {
+        "action": "rejected_read",
+        "utc_ns": 1795692772660645447,
+        "name": "r027-w1-checkpoint.log",
+        "reason": "unknown file or read limit"
+      },
+      {
+        "action": "rejected_read",
+        "utc_ns": 1795692772673615216,
+        "name": "r034-formatter.log",
+        "reason": "unknown file or read limit"
+      },
+      {
+        "action": "forecast",
+        "utc_ns": 1795692783978048660,
+        "sha256": "b18d0952a6e6556e796accca19c7724a8d7eed9266dbe9f032c67d97e28a2236",
+        "source_sha256": "d943540c63c9095a1c9a4668f7946cd91d0c6fbb626d8ba27e231553fc3a14c3"
+      },
+      {
+        "action": "test",
+        "utc_ns": 1795692810106084584,
+        "exit": 0,
+        "output": "test_full_delivery_excludes_audit_notes_and_sorts (test_dispatch.DispatchTests.test_full_delivery_excludes_audit_notes_and_sorts) ... ok\ntest_receiver_applies_revocations (test_dispatch.DispatchTests.test_receiver_applies_revocations) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+        "source_sha256": "05c241bc18609e6be7635df9b6716f9d8f78be6c2858fbd946ef1e3a75014e91"
+      },
+      {
+        "action": "finish",
+        "utc_ns": 1795692823184647056,
+        "source_sha256": "05c241bc18609e6be7635df9b6716f9d8f78be6c2858fbd946ef1e3a75014e91",
+        "report_sha256": "688255c1ee6a67474e253083a72620fda220f60fd5e8c93b1b1975771b376429"
+      }
+    ],
+    "evaluation": {
+      "public_exit": 0,
+      "holdout_exit": 0,
+      "checks": {
+        "unscoped_export": {
+          "passed": true
+        },
+        "scoped_shipment": {
+          "passed": true
+        },
+        "depotless_void": {
+          "passed": true
+        },
+        "receiver_reconciliation": {
+          "passed": true
+        }
+      }
+    }
+  },
+  {
+    "chain": "184",
+    "stage": 2,
+    "packet_sha256": {
+      ".history/r012-fanout-receipt.log": "c673912947c416bf44e22beffea03cd1e5af06b758f78e213161f15628e2ae46",
+      ".history/r019-w2-checkpoint.log": "ad11637ff93870caab62757785cfdbed87c3b4bafdd31b9c3008ac80238cb502",
+      ".history/r027-w1-checkpoint.log": "f61099019bc25eb87279402d0d922d2f26d975a551ca7e0135fc48b583c1f7a6",
+      ".history/r031-export-sort.diff": "8abc6a25c15f6749bd1557f3c74ee4be4b8951802b94861de61a97c665786134",
+      ".history/r034-formatter.log": "f8652bd2aa7a1aae6c8053ff3fedeb36a1a8dccfd80fb1136c6306a5fe8ea4d3",
+      ".history/r040-predecessor.diff": "fbcce1d5492709beb1e23feaeba706bf468427498298109fe8600b1f05239b4a",
+      ".packet.json": "b8050c9529ff72b5de26a261f24fd73324cb189349dfe989ba59932cf1f6b924",
+      "dispatch.py": "a116757756c23be8cf1df389abdaf77016931e44d651f4585097cd38266e53ed",
+      "instructions.md": "f2a65aa19645775df2ebce6dba14ad6a3a8693034c900cd750bd6b0401c4732e",
+      "task.md": "faa96da1cbbf4877c0c41e15eaf33606b026f93e6e6159799322770ea3f43d3c",
+      "test_dispatch.py": "32432c6ea1dc611d0d90bd60fd9005f78a5689782630d53950913557227ba6c9",
+      "trace.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trace.py": "2bb39976a4b8d253028bfddba409cccf22e0b707b9b03d1c5a0c3609e0bdf507"
+    },
+    "forecast": "# 影响预测\n\n1. **推断**。依据 `task.md` 和 `r019-w2-checkpoint.log` 中 w2 对源事件的确认记录。当 `after=2`、`limit=2`、`depot=\"east\"` 且无序输入含序号 8 的审计、19 的西仓发货和 33 的东仓发货时，首页返回 `([], 19)`。按新检查点轮询会交付 33 并返回检查点 33，源事件耗尽后继续返回 `([], 33)`。\n2. **推断**。依据 `dispatch.py` 的 `export` 筛选条件和 `r012-fanout-receipt.log` 的 w2 收件记录。当 `depot=\"east\"` 且跨页源事件依次为 4 的东仓发货、7 的西仓发货和 9 的无仓撤销时，用 `limit=1` 轮询会依次交付发货、空列表、撤销，检查点依次是 4、7、9。拼接交付与同仓 `export` 一致，东仓接收方的活跃运单集合最终为空。\n\n先按序号筛选并排序 `after` 之后的源事件，取至多 `limit` 条，再共享 `export` 的投递筛选规则。检查点取本批最后一个源序号，源批为空时保留 `after`。用公开测试验证完整交付，并用针对性探针验证预测、一次性输入、无仓参数和严格排除 `after`。\n",
+    "source": "from collections.abc import Iterable\nfrom dataclasses import dataclass\n\n\n@dataclass(frozen=True)\nclass Event:\n    seq: int\n    kind: str\n    movement: str\n    depot: str | None = None\n\n\ndef export(events: Iterable[Event], *, depot: str | None = None) -> list[Event]:\n    \"\"\"Deliver events in sequence order, optionally limiting shipments to one depot.\"\"\"\n    ordered = sorted(events, key=lambda event: event.seq)\n    return _deliver(ordered, depot=depot)\n\n\ndef page(\n    events: Iterable[Event], *, after: int, limit: int, depot: str | None = None\n) -> tuple[list[Event], int]:\n    \"\"\"Deliver a batch and return the last source sequence scanned.\"\"\"\n    ordered = sorted(\n        (event for event in events if event.seq > after), key=lambda event: event.seq\n    )\n    batch = ordered[:limit]\n    checkpoint = batch[-1].seq if batch else after\n    return _deliver(batch, depot=depot), checkpoint\n\n\ndef _deliver(ordered: Iterable[Event], *, depot: str | None) -> list[Event]:\n    # A void may cancel a shipment delivered in an earlier batch.\n    return [\n        event\n        for event in ordered\n        if event.kind != \"note\"\n        and (depot is None or event.kind != \"ship\" or event.depot == depot)\n    ]\n\n\ndef active_movements(depot: str, delivered: Iterable[Event]) -> set[str]:\n    active = set()\n    for event in delivered:\n        if event.kind == \"ship\" and event.depot == depot:\n            active.add(event.movement)\n        elif event.kind == \"void\":\n            active.discard(event.movement)\n    return active\n",
+    "report": "# 交付报告\n\n只修改 `dispatch.py`。新增 `page`，按序号选出严格大于 `after` 的前 `limit` 条源事件，以其中最后一条的序号作为检查点。源批为空时保留 `after`。`page` 与 `export` 共用投递筛选，保留原事件对象，审计备注被排除，仓别仅筛选发货，撤销仍交付给各仓。\n\n`python3 -B trace.py test` 的 2 项公开测试全部通过。针对性 Python 探针在实现前确认分页入口缺失，实现后全部通过。无序一次性输入在东仓轮询时产生空页并推进到 19，随后交付 33，耗尽后检查点保持 33。跨页发货、空页、撤销依次推进到 4、7、9，拼接结果与 `export` 一致，东仓活跃运单最终为空。探针也覆盖无仓参数、空输入、排除等于 `after` 的事件及大整数 `limit`。\n\n采用 `task.md`、原 `dispatch.py` 和公开测试，以及 `r019-w2-checkpoint.log` 的 w2 检查点记录和 `r012-fanout-receipt.log` 的撤销分发记录。工具未能读取 `r027-w1-checkpoint.log`，未采用该记录。未接入实际消费者进行端到端验证，也未测量大输入的性能。当前实现每次遍历输入，并在截取原始批次前排序所有符合 `after` 条件的事件。\n",
+    "trace": [
+      {
+        "action": "launch",
+        "utc_ns": 1795692839279229984
+      },
+      {
+        "action": "index",
+        "utc_ns": 1795692856084254592,
+        "bytes": 157
+      },
+      {
+        "action": "read",
+        "utc_ns": 1795692862767386057,
+        "name": "r019-w2-checkpoint.log",
+        "bytes": 459,
+        "sha256": "ad11637ff93870caab62757785cfdbed87c3b4bafdd31b9c3008ac80238cb502"
+      },
+      {
+        "action": "read",
+        "utc_ns": 1795692862801711471,
+        "name": "r012-fanout-receipt.log",
+        "bytes": 488,
+        "sha256": "c673912947c416bf44e22beffea03cd1e5af06b758f78e213161f15628e2ae46"
+      },
+      {
+        "action": "rejected_read",
+        "utc_ns": 1795692862832011794,
+        "name": "r027-w1-checkpoint.log",
+        "reason": "unknown file or read limit"
+      },
+      {
+        "action": "forecast",
+        "utc_ns": 1795692875202878670,
+        "sha256": "a9138361f524691e2fd529dc69157d57b07f202afd5ca7431ba3877df4faebda",
+        "source_sha256": "a116757756c23be8cf1df389abdaf77016931e44d651f4585097cd38266e53ed"
+      },
+      {
+        "action": "test",
+        "utc_ns": 1795692905242736018,
+        "exit": 0,
+        "output": "test_full_delivery_excludes_audit_notes_and_sorts (test_dispatch.DispatchTests.test_full_delivery_excludes_audit_notes_and_sorts) ... ok\ntest_receiver_applies_revocations (test_dispatch.DispatchTests.test_receiver_applies_revocations) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+        "source_sha256": "6f5ad06a803eb4c540c18b4fcbd97e6533f6a7c66a2e9dfbac7ac454d3a1998a"
+      },
+      {
+        "action": "finish",
+        "utc_ns": 1795692917292020147,
+        "source_sha256": "6f5ad06a803eb4c540c18b4fcbd97e6533f6a7c66a2e9dfbac7ac454d3a1998a",
+        "report_sha256": "dfe1d29216497dc5f8d9656a03bbdc31fa78dc18ff2155b2f313d99d6f147a9a"
+      }
+    ],
+    "evaluation": {
+      "public_exit": 0,
+      "holdout_exit": 0,
+      "checks": {
+        "raw_scan_limit": {
+          "passed": true
+        },
+        "empty_page_advances": {
+          "passed": true
+        },
+        "exhausted_checkpoint": {
+          "passed": true
+        },
+        "paged_stream_continuity": {
+          "passed": true
+        },
+        "scoped_export_retained": {
+          "passed": true
+        }
+      }
+    }
+  },
+  {
+    "chain": "327",
+    "stage": 2,
+    "packet_sha256": {
+      ".packet.json": "94bc751caf6af291215b42ed532d1d2ec0c9ad2963acf5972dffd377cbf776c8",
+      "dispatch.py": "3c0fecbb2223f42b2e32256c7a4086bf6668a525cbab8db82a2f8b370987c5f1",
+      "instructions.md": "f2a65aa19645775df2ebce6dba14ad6a3a8693034c900cd750bd6b0401c4732e",
+      "task.md": "faa96da1cbbf4877c0c41e15eaf33606b026f93e6e6159799322770ea3f43d3c",
+      "test_dispatch.py": "32432c6ea1dc611d0d90bd60fd9005f78a5689782630d53950913557227ba6c9",
+      "trace.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trace.py": "2bb39976a4b8d253028bfddba409cccf22e0b707b9b03d1c5a0c3609e0bdf507"
+    },
+    "forecast": "# 分页变更预测\n\n1. **推断，待验证。** 给东仓传入乱序且序号不连续的一次性事件流，其中大于 `after=1` 的最早两条分别是序号 4 的审计备注和序号 9 的西仓出库，另有序号 13 的东仓出库。以 `limit=2` 调用应返回 `([], 9)`，再以 9 为检查点对同一批源数据重建迭代器，应交付序号 13 并返回检查点 13。依据是任务将分页额度定义为原始事件数，并要求空交付也能推进。\n2. **观察及推断，待验证。** 现有 `export` 排除备注，只按仓过滤出库事件，仍会交付撤销。若东仓出库与无仓撤销跨页，撤销页应保留原事件，依序合并各页的交付应与 `export` 一致，继续轮询已到末尾的源数据应返回空列表和原检查点。依据是现有 `export`、`active_movements` 和公开测试，以及任务规定的序号边界。\n\n我会先按序号选定本页原始事件，再应用共用的交付过滤，并用本页最后一条原始事件确定检查点。封存后用针对性探针检查上述场景，再运行公开测试。\n",
+    "source": "from collections.abc import Iterable\nfrom dataclasses import dataclass\nfrom heapq import nsmallest\n\n\n@dataclass(frozen=True)\nclass Event:\n    seq: int\n    kind: str\n    movement: str\n    depot: str | None = None\n\n\ndef _deliver(events: Iterable[Event], depot: str | None) -> list[Event]:\n    # A void can revoke a shipment delivered in an earlier batch.\n    return [\n        event\n        for event in events\n        if event.kind != \"note\"\n        and (depot is None or event.kind != \"ship\" or event.depot == depot)\n    ]\n\n\ndef export(events: Iterable[Event], *, depot: str | None = None) -> list[Event]:\n    return _deliver(sorted(events, key=lambda event: event.seq), depot)\n\n\ndef page(\n    events: Iterable[Event], *, after: int, limit: int, depot: str | None = None\n) -> tuple[list[Event], int]:\n    \"\"\"Return deliveries and the checkpoint for a window of source events.\"\"\"\n    batch = nsmallest(\n        limit,\n        (event for event in events if event.seq > after),\n        key=lambda event: event.seq,\n    )\n    checkpoint = batch[-1].seq if batch else after\n    return _deliver(batch, depot), checkpoint\n\n\ndef active_movements(depot: str, delivered: Iterable[Event]) -> set[str]:\n    active = set()\n    for event in delivered:\n        if event.kind == \"ship\" and event.depot == depot:\n            active.add(event.movement)\n        elif event.kind == \"void\":\n            active.discard(event.movement)\n    return active\n",
+    "report": "# 有检查点的分页交付\n\n`dispatch.py` 新增 `page`。它从序号大于 `after` 的事件中按序号选取最多 `limit` 条原始事件，再应用与 `export` 共用的交付过滤。检查点取所选原始事件的最后一个序号，即使整页都被过滤也会推进。候选为空时返回原检查点。交付保留原事件对象。\n\n`python3 -B trace.py test` 通过全部 2 项公开测试。分页探针在代码修改前因缺少分页接口失败，修改后通过。探针覆盖了乱序和不连续序号、一次性迭代器、仓库筛选、空交付推进、跨页撤销、原事件对象保留、末尾和空输入检查点，以及多页交付与完整交付的一致性。两项封存预测均得到验证。\n\n采用了 `task.md`、原始 `dispatch.py` 和 `test_dispatch.py`。证据目录无历史记录。验证覆盖本地事件流，w2 运行环境没有参与验证。对于无序输入，每次调用要遍历传入的有限事件流来确定最早的候选事件，分页额度适用于按序号选定的原始批次。\n",
+    "trace": [
+      {
+        "action": "launch",
+        "utc_ns": 1795692839309855633
+      },
+      {
+        "action": "index",
+        "utc_ns": 1795692865483897196,
+        "bytes": 13
+      },
+      {
+        "action": "forecast",
+        "utc_ns": 1795692877130163110,
+        "sha256": "a533fe9b0f140cfb7a907de0f9362a90639d90d6959c44333d9dd1203c95aa36",
+        "source_sha256": "3c0fecbb2223f42b2e32256c7a4086bf6668a525cbab8db82a2f8b370987c5f1"
+      },
+      {
+        "action": "test",
+        "utc_ns": 1795692910647270510,
+        "exit": 0,
+        "output": "test_full_delivery_excludes_audit_notes_and_sorts (test_dispatch.DispatchTests.test_full_delivery_excludes_audit_notes_and_sorts) ... ok\ntest_receiver_applies_revocations (test_dispatch.DispatchTests.test_receiver_applies_revocations) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+        "source_sha256": "c0c33187e042ef986dcca9ca71d9d764c13b2ad26120b4ca3a488211c009fd6b"
+      },
+      {
+        "action": "finish",
+        "utc_ns": 1795692921420061059,
+        "source_sha256": "c0c33187e042ef986dcca9ca71d9d764c13b2ad26120b4ca3a488211c009fd6b",
+        "report_sha256": "0baa6804b329169ff88bd8cff98939d381c525fa11302be071b8324fb81a4a64"
+      }
+    ],
+    "evaluation": {
+      "public_exit": 0,
+      "holdout_exit": 0,
+      "checks": {
+        "raw_scan_limit": {
+          "passed": true
+        },
+        "empty_page_advances": {
+          "passed": true
+        },
+        "exhausted_checkpoint": {
+          "passed": true
+        },
+        "paged_stream_continuity": {
+          "passed": true
+        },
+        "scoped_export_retained": {
+          "passed": true
+        }
+      }
+    }
+  },
+  {
+    "chain": "596",
+    "stage": 2,
+    "packet_sha256": {
+      ".packet.json": "2dc1d6d09a87ee084b5114e61cc20ebfb4679de64b0aa749e8a8b47c5f2bb3ea",
+      "dispatch.py": "4d2f19144be642f7247a662aae397c1b0e6880269841398485121ee1e4e48ac5",
+      "instructions.md": "f2a65aa19645775df2ebce6dba14ad6a3a8693034c900cd750bd6b0401c4732e",
+      "task.md": "faa96da1cbbf4877c0c41e15eaf33606b026f93e6e6159799322770ea3f43d3c",
+      "test_dispatch.py": "32432c6ea1dc611d0d90bd60fd9005f78a5689782630d53950913557227ba6c9",
+      "trace.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trace.py": "2bb39976a4b8d253028bfddba409cccf22e0b707b9b03d1c5a0c3609e0bdf507"
+    },
+    "forecast": "# 变更预测\n\n1. **推断，待验证。** 依据 `task.md` 对原始事件扫描上限和空批续读的要求，若 `after=3`、`limit=2` 且按序号排列的下一批是序号 8 的审计事件和序号 13 的异仓出库，东仓应收到空列表，检查点应推进到 13。再次调用应能收到序号 21 的出库。\n2. **推断，待验证。** 依据 `dispatch.py` 中完整交付保留撤销事件的规则，若序号 21 的东仓出库和序号 35 的撤销落在不同页，东仓消费者应能应用撤销，按页拼接的事件应与 `export` 一致。所有源事件处理完后，再次轮询应返回空列表及原检查点 35。\n\n分页先选取 `after` 之后按序号排序的原始窗口，再复用完整交付的过滤规则。将使用乱序的一次性输入逐页验证上述场景，并运行公开测试验证既有接口。\n",
+    "source": "from collections.abc import Iterable\nfrom dataclasses import dataclass\n\n\n@dataclass(frozen=True)\nclass Event:\n    seq: int\n    kind: str\n    movement: str\n    depot: str | None = None\n\n\ndef _deliverable(events: Iterable[Event], depot: str | None) -> list[Event]:\n    # A void can revoke a movement shipped in an earlier batch.\n    return [\n        event\n        for event in events\n        if event.kind != \"note\"\n        and (depot is None or event.kind != \"ship\" or event.depot == depot)\n    ]\n\n\ndef export(events: Iterable[Event], *, depot: str | None = None) -> list[Event]:\n    ordered = sorted(events, key=lambda event: event.seq)\n    return _deliverable(ordered, depot)\n\n\ndef page(\n    events: Iterable[Event], *, after: int, limit: int, depot: str | None = None\n) -> tuple[list[Event], int]:\n    \"\"\"Return deliveries and the checkpoint for the next window of source events.\"\"\"\n    window = sorted(\n        (event for event in events if event.seq > after), key=lambda event: event.seq\n    )[:limit]\n    checkpoint = window[-1].seq if window else after\n    return _deliverable(window, depot), checkpoint\n\n\ndef active_movements(depot: str, delivered: Iterable[Event]) -> set[str]:\n    active = set()\n    for event in delivered:\n        if event.kind == \"ship\" and event.depot == depot:\n            active.add(event.movement)\n        elif event.kind == \"void\":\n            active.discard(event.movement)\n    return active\n",
+    "report": "# 交付报告\n\n- 在 `dispatch.py` 新增 `page`。从 `after` 之后的事件中按序号选取至多 `limit` 条，再与 `export` 共用交付过滤逻辑。检查点取该窗口最后一条原始事件的序号。窗口无源事件时沿用 `after`。\n- `python3 -B trace.py test` 的两项公开测试均通过。针对性探针在修改前因缺少 `page` 失败，修改后通过。乱序的一次性输入产生空交付批后，检查点仍推进到 13，后续收到序号 21 的出库和序号 35 的撤销，拼接结果与完整交付一致。探针也覆盖了源事件耗尽、空输入、无仓库筛选和可重复迭代输入。\n- 采用 `task.md`、原 `dispatch.py` 和 `test_dispatch.py`。`trace.py index` 未返回历史材料。\n- 为确定乱序输入中的当前窗口，每次调用会遍历传入的输入并排序检查点之后的事件。尚未测量大规模输入上的耗时和内存占用。\n",
+    "trace": [
+      {
+        "action": "launch",
+        "utc_ns": 1795692839342214637
+      },
+      {
+        "action": "index",
+        "utc_ns": 1795692870514027194,
+        "bytes": 13
+      },
+      {
+        "action": "forecast",
+        "utc_ns": 1795692881981385856,
+        "sha256": "d7078b1a4450719dd5dcc426948876cc830a9f34a765df19fbe708511c89a042",
+        "source_sha256": "4d2f19144be642f7247a662aae397c1b0e6880269841398485121ee1e4e48ac5"
+      },
+      {
+        "action": "test",
+        "utc_ns": 1795692906400108937,
+        "exit": 0,
+        "output": "test_full_delivery_excludes_audit_notes_and_sorts (test_dispatch.DispatchTests.test_full_delivery_excludes_audit_notes_and_sorts) ... ok\ntest_receiver_applies_revocations (test_dispatch.DispatchTests.test_receiver_applies_revocations) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nOK\n",
+        "source_sha256": "0a08016391ad06743229a5ed34e68823574346b7e72b4f8fa65cab93d266ac2e"
+      },
+      {
+        "action": "finish",
+        "utc_ns": 1795692917706651985,
+        "source_sha256": "0a08016391ad06743229a5ed34e68823574346b7e72b4f8fa65cab93d266ac2e",
+        "report_sha256": "d9f63f4a847ce778ab88d8568011ece61cb1642c0bdedb72762226d696be40ac"
+      }
+    ],
+    "evaluation": {
+      "public_exit": 0,
+      "holdout_exit": 0,
+      "checks": {
+        "raw_scan_limit": {
+          "passed": true
+        },
+        "empty_page_advances": {
+          "passed": true
+        },
+        "exhausted_checkpoint": {
+          "passed": true
+        },
+        "paged_stream_continuity": {
+          "passed": true
+        },
+        "scoped_export_retained": {
+          "passed": true
+        }
+      }
+    }
+  },
+  {
+    "chain": "842",
+    "stage": 2,
+    "packet_sha256": {
+      ".history/r012-fanout-receipt.log": "c673912947c416bf44e22beffea03cd1e5af06b758f78e213161f15628e2ae46",
+      ".history/r019-w2-checkpoint.log": "ad11637ff93870caab62757785cfdbed87c3b4bafdd31b9c3008ac80238cb502",
+      ".history/r027-w1-checkpoint.log": "f61099019bc25eb87279402d0d922d2f26d975a551ca7e0135fc48b583c1f7a6",
+      ".history/r031-export-sort.diff": "8abc6a25c15f6749bd1557f3c74ee4be4b8951802b94861de61a97c665786134",
+      ".history/r034-formatter.log": "f8652bd2aa7a1aae6c8053ff3fedeb36a1a8dccfd80fb1136c6306a5fe8ea4d3",
+      ".history/r040-predecessor.diff": "3afe3f899a8055d3ef5414ccaa94c0f572f8f90994aa88cbd87bc2ad4007efa9",
+      ".packet.json": "dabf39756a41e0c86269cd3c31c583675cacaffa732fda308638449162044f01",
+      "dispatch.py": "05c241bc18609e6be7635df9b6716f9d8f78be6c2858fbd946ef1e3a75014e91",
+      "instructions.md": "f2a65aa19645775df2ebce6dba14ad6a3a8693034c900cd750bd6b0401c4732e",
+      "task.md": "faa96da1cbbf4877c0c41e15eaf33606b026f93e6e6159799322770ea3f43d3c",
+      "test_dispatch.py": "32432c6ea1dc611d0d90bd60fd9005f78a5689782630d53950913557227ba6c9",
+      "trace.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "trace.py": "2bb39976a4b8d253028bfddba409cccf22e0b707b9b03d1c5a0c3609e0bdf507"
+    },
+    "forecast": "# 变更前预测\n\n1. **观察**（`r019-w2-checkpoint.log`）。东仓从检查点 2 以 `limit=2` 读取序号 8 的审计记录、19 的西仓发货和 33 的东仓发货时，第一页返回 `([], 19)`，下一页交付 33 并返回检查点 33，耗尽后再次调用仍返回检查点 33。\n2. **推断**（`dispatch.py` 的完整交付行为和 `r012-fanout-receipt.log` 的对账结果）。东仓消费一批无序、一次性输入，其中序号 4 是东仓发货、7 是西仓发货、9 是无仓撤销时，以 `after=0` 和 `limit=3` 调用将按顺序交付原事件 4 和 9，返回检查点 9。接收方应用这批事件后没有活跃调拨。\n\n先选出检查点之后序号最小的至多 `limit` 条源事件，按其中最后一条计算检查点，随后应用与 `export` 共享的过滤规则。运行公开测试并用针对性探针检查这两种情况及无新事件时的行为。\n",
+    "source": "from collections.abc import Iterable\nfrom dataclasses import dataclass\nfrom heapq import nsmallest\n\n\n@dataclass(frozen=True)\nclass Event:\n    seq: int\n    kind: str\n    movement: str\n    depot: str | None = None\n\n\ndef _filter_delivery(events: Iterable[Event], depot: str | None) -> list[Event]:\n    # Unscoped voids may revoke shipments from earlier batches.\n    return [\n        event\n        for event in events\n        if event.kind != \"note\"\n        and (depot is None or event.kind != \"ship\" or event.depot == depot)\n    ]\n\n\ndef export(events: Iterable[Event], *, depot: str | None = None) -> list[Event]:\n    ordered = sorted(events, key=lambda event: event.seq)\n    return _filter_delivery(ordered, depot)\n\n\ndef page(\n    events: Iterable[Event], *, after: int, limit: int, depot: str | None = None\n) -> tuple[list[Event], int]:\n    \"\"\"Deliver a page and return the checkpoint of its last scanned source event.\"\"\"\n    eligible = (event for event in events if event.seq > after)\n    scanned = nsmallest(limit, eligible, key=lambda event: event.seq)\n    checkpoint = scanned[-1].seq if scanned else after\n    return _filter_delivery(scanned, depot), checkpoint\n\n\ndef active_movements(depot: str, delivered: Iterable[Event]) -> set[str]:\n    active = set()\n    for event in delivered:\n        if event.kind == \"ship\" and event.depot == depot:\n            active.add(event.movement)\n        elif event.kind == \"void\":\n            active.discard(event.movement)\n    return active\n",
+    "report": "# 交付报告\n\n在 `dispatch.py` 新增 `page`。它从单次遍历的输入中选出 `after` 之后序号最小的至多 `limit` 条源事件，以末条源事件序号推进检查点。没有新源事件时保留 `after`。分页和 `export` 共用审计和按仓过滤，按序交付原事件，包括无仓撤销。\n\n`python3 -B trace.py test` 的两项公开测试均通过。针对性探针验证了空交付页仍推进到 19，下一页交付 33，耗尽后检查点保持 33。探针也验证了无序一次性输入中的两条东仓交付是原发货与撤销对象，应用后没有活跃调拨。另有 480 组组合验证连续分页与同一输入范围的 `export` 结果一致，并逐页核对源检查点。\n\n采用了 `task.md`、原 `dispatch.py`、`test_dispatch.py`、`r019-w2-checkpoint.log` 和 `r012-fanout-receipt.log`。验证使用了本地输入和历史回放记录，w2 消费者的现场集成仍待验证。\n",
+    "trace": [
+      {
+        "action": "launch",
+        "utc_ns": 1795692839370864386
+      },
+      {
+        "action": "index",
+        "utc_ns": 1795692871762337889,
+        "bytes": 157
+      },
+      {
+        "action": "read",
+        "utc_ns": 1795692878089256138,
+        "name": "r012-fanout-receipt.log",
+        "bytes": 488,
+        "sha256": "c673912947c416bf44e22beffea03cd1e5af06b758f78e213161f15628e2ae46"
+      },
+      {
+        "action": "read",
+        "utc_ns": 1795692878150715725,
+        "name": "r019-w2-checkpoint.log",
+        "bytes": 459,
+        "sha256": "ad11637ff93870caab62757785cfdbed87c3b4bafdd31b9c3008ac80238cb502"
+      },
+      {
+        "action": "rejected_read",
+        "utc_ns": 1795692878186879814,
+        "name": "r027-w1-checkpoint.log",
+        "reason": "unknown file or read limit"
+      },
+      {
+        "action": "forecast",
+        "utc_ns": 1795692889199352159,
+        "sha256": "4329f37c250b5f0abe9ca29d7707c17fb48e7478bd7b65264eaf1f1f7397baff",
+        "source_sha256": "05c241bc18609e6be7635df9b6716f9d8f78be6c2858fbd946ef1e3a75014e91"
+      },
+      {
+        "action": "test",
+        "utc_ns": 1795692911959622660,
+        "exit": 0,
+        "output": "test_full_delivery_excludes_audit_notes_and_sorts (test_dispatch.DispatchTests.test_full_delivery_excludes_audit_notes_and_sorts) ... ok\ntest_receiver_applies_revocations (test_dispatch.DispatchTests.test_receiver_applies_revocations) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+        "source_sha256": "05c241bc18609e6be7635df9b6716f9d8f78be6c2858fbd946ef1e3a75014e91"
+      },
+      {
+        "action": "test",
+        "utc_ns": 1795692925398003142,
+        "exit": 0,
+        "output": "test_full_delivery_excludes_audit_notes_and_sorts (test_dispatch.DispatchTests.test_full_delivery_excludes_audit_notes_and_sorts) ... ok\ntest_receiver_applies_revocations (test_dispatch.DispatchTests.test_receiver_applies_revocations) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+        "source_sha256": "c231844b2c9ce61ec76d1f6662edf82682162b9a523f45feff7c964ed16de61f"
+      },
+      {
+        "action": "finish",
+        "utc_ns": 1795692944373414913,
+        "source_sha256": "c231844b2c9ce61ec76d1f6662edf82682162b9a523f45feff7c964ed16de61f",
+        "report_sha256": "f4a805408026ab9837342338bf2f519e04b44358ff7c42343e4635b022f546a0"
+      }
+    ],
+    "evaluation": {
+      "public_exit": 0,
+      "holdout_exit": 0,
+      "checks": {
+        "raw_scan_limit": {
+          "passed": true
+        },
+        "empty_page_advances": {
+          "passed": true
+        },
+        "exhausted_checkpoint": {
+          "passed": true
+        },
+        "paged_stream_continuity": {
+          "passed": true
+        },
+        "scoped_export_retained": {
+          "passed": true
+        }
+      }
+    }
+  }
+]

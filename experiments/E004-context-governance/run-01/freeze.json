@@ -1,0 +1,151 @@
+{
+  "experiment": "E004/run-01",
+  "frozen_at_utc": "2026-11-26T11:32:11+00:00",
+  "repository_base": "2663dda62e0ed4b3cec2e649d5a1fe661f8dbdae",
+  "model": "gpt-6.2-sol",
+  "reasoning_effort": "medium",
+  "python": "3.12.14",
+  "allocation_seed": 20261126,
+  "groups": {
+    "184": "B",
+    "327": "A",
+    "596": "A",
+    "842": "B"
+  },
+  "launch_order": [
+    "184",
+    "327",
+    "596",
+    "842"
+  ],
+  "stage_limit_seconds": 480,
+  "launch_prompt": "你负责一份独立交付。唯一工作目录是 {packet}。每次执行命令时将 workdir 设为该目录，并先读取其中的 instructions.md，再按约定完成 task.md。所有输入与交付路径均相对于该目录。现在执行任务并封存交付。",
+  "files": {
+    "case/dispatch.py": "d943540c63c9095a1c9a4668f7946cd91d0c6fbb626d8ba27e231553fc3a14c3",
+    "case/history/r012-fanout-receipt.log": "c673912947c416bf44e22beffea03cd1e5af06b758f78e213161f15628e2ae46",
+    "case/history/r019-w2-checkpoint.log": "ad11637ff93870caab62757785cfdbed87c3b4bafdd31b9c3008ac80238cb502",
+    "case/history/r027-w1-checkpoint.log": "f61099019bc25eb87279402d0d922d2f26d975a551ca7e0135fc48b583c1f7a6",
+    "case/history/r031-export-sort.diff": "8abc6a25c15f6749bd1557f3c74ee4be4b8951802b94861de61a97c665786134",
+    "case/history/r034-formatter.log": "f8652bd2aa7a1aae6c8053ff3fedeb36a1a8dccfd80fb1136c6306a5fe8ea4d3",
+    "case/instructions.md": "f2a65aa19645775df2ebce6dba14ad6a3a8693034c900cd750bd6b0401c4732e",
+    "case/task-1.md": "e1921f1d2d171782106fd416f5f5aaf1683342ea2853445913c4c0b034f349fe",
+    "case/task-2.md": "faa96da1cbbf4877c0c41e15eaf33606b026f93e6e6159799322770ea3f43d3c",
+    "case/test_dispatch.py": "32432c6ea1dc611d0d90bd60fd9005f78a5689782630d53950913557227ba6c9",
+    "holdout.py": "9843b2e1734949d93ca83d16dedfdabf3a787d38e3d3df9ef480961993baf7f8",
+    "prepare.py": "5664bd83a9a22ce1d735fcefe5ea8749601e2836465f28be0149594a196070d7",
+    "protocol.md": "01dc6fa867128307d49f3a1db0179cd8d6828ce3c1d5efa7d0b67c3edc381b94",
+    "replay.py": "27a24b6cdbe50ee747d2c13d4bf65658e225600465a77a61f612a6cff939a62b",
+    "trace.py": "2bb39976a4b8d253028bfddba409cccf22e0b707b9b03d1c5a0c3609e0bdf507"
+  },
+  "calibration": {
+    "before_change": {
+      "public_exit": 0,
+      "holdout_exit": 1,
+      "checks": {
+        "unscoped_export": {
+          "passed": true
+        },
+        "scoped_shipment": {
+          "passed": false,
+          "error": "TypeError: export() got an unexpected keyword argument 'depot'"
+        },
+        "depotless_void": {
+          "passed": false,
+          "error": "TypeError: export() got an unexpected keyword argument 'depot'"
+        },
+        "receiver_reconciliation": {
+          "passed": false,
+          "error": "TypeError: export() got an unexpected keyword argument 'depot'"
+        }
+      }
+    },
+    "equality_only": {
+      "public_exit": 0,
+      "holdout_exit": 1,
+      "checks": {
+        "unscoped_export": {
+          "passed": true
+        },
+        "scoped_shipment": {
+          "passed": true
+        },
+        "depotless_void": {
+          "passed": false,
+          "expected": "[[Event(seq=26, kind='void', movement='P1', depot=None)], [Event(seq=26, kind='void', movement='P1', depot=None)]]",
+          "actual": "[[], []]"
+        },
+        "receiver_reconciliation": {
+          "passed": false,
+          "expected": "[['P3'], ['P2']]",
+          "actual": "[['P1', 'P3'], ['P2']]"
+        }
+      }
+    },
+    "valid_routing": {
+      "public_exit": 0,
+      "holdout_exit": 0,
+      "checks": {
+        "unscoped_export": {
+          "passed": true
+        },
+        "scoped_shipment": {
+          "passed": true
+        },
+        "depotless_void": {
+          "passed": true
+        },
+        "receiver_reconciliation": {
+          "passed": true
+        }
+      }
+    },
+    "delivered_checkpoint": {
+      "public_exit": 0,
+      "holdout_exit": 1,
+      "checks": {
+        "raw_scan_limit": {
+          "passed": false,
+          "expected": "([Event(seq=5, kind='ship', movement='P1', depot='east')], 8)",
+          "actual": "([Event(seq=5, kind='ship', movement='P1', depot='east')], 5)"
+        },
+        "empty_page_advances": {
+          "passed": false,
+          "expected": "(([], 19), ([Event(seq=26, kind='void', movement='P1', depot=None), Event(seq=33, kind='ship', movement='P3', depot='east')], 33))",
+          "actual": "(([], 5), ([], 5))"
+        },
+        "exhausted_checkpoint": {
+          "passed": true
+        },
+        "paged_stream_continuity": {
+          "passed": false,
+          "expected": "[([Event(seq=5, kind='ship', movement='P1', depot='east'), Event(seq=19, kind='ship', movement='P2', depot='west'), Event(seq=26, kind='void', movement='P1', depot=None), Event(seq=33, kind='ship', movement='P3', depot='east')], 33), ([Event(seq=5, kind='ship', movement='P1', depot='east'), Event(seq=26, kind='void', movement='P1', depot=None), Event(seq=33, kind='ship', movement='P3', depot='east')], 33), ([Event(seq=19, kind='ship', movement='P2', depot='west'), Event(seq=26, kind='void', movement='P1', depot=None)], 33)]",
+          "actual": "[([Event(seq=5, kind='ship', movement='P1', depot='east')], 5), ([Event(seq=5, kind='ship', movement='P1', depot='east')], 5), ([], 0)]"
+        },
+        "scoped_export_retained": {
+          "passed": true
+        }
+      }
+    },
+    "valid_paging": {
+      "public_exit": 0,
+      "holdout_exit": 0,
+      "checks": {
+        "raw_scan_limit": {
+          "passed": true
+        },
+        "empty_page_advances": {
+          "passed": true
+        },
+        "exhausted_checkpoint": {
+          "passed": true
+        },
+        "paged_stream_continuity": {
+          "passed": true
+        },
+        "scoped_export_retained": {
+          "passed": true
+        }
+      }
+    }
+  }
+}

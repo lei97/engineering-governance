@@ -1,0 +1,8 @@
+diff --git a/dispatch.py b/dispatch.py
+--- a/dispatch.py
++++ b/dispatch.py
+@@ -16,4 +16,4 @@ def export(events):
+-    eligible = [event for event in events if event.kind != "note"]
+-    return sorted(eligible, key=lambda event: event.seq)
++    ordered = sorted(events, key=lambda event: event.seq)
++    return [event for event in ordered if event.kind != "note"]

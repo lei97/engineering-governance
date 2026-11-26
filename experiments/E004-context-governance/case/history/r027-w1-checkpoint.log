@@ -1,0 +1,4 @@
+$ migrate --from=w1 --dry-run
+w1 delivery journal last_acknowledged_delivery=15
+w1 heartbeat raw_seq=18 delivered=[] journal=15
+skipped w1 delivery journal during w2 scan-checkpoint migration

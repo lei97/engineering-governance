@@ -1,0 +1,8 @@
+$ consume --protocol=w2 --depot=east --limit=2 --checkpoint=2 --input short-feed.fixture
+{"seq":8,"kind":"note","movement":"R294","depot":null}
+{"seq":19,"kind":"ship","movement":"R412","depot":"west"}
+{"seq":33,"kind":"ship","movement":"R355","depot":"east"}
+tick after=2 scanned=[8,19] delivered=[] saved_checkpoint=19
+tick after=19 scanned=[33] delivered=[33] saved_checkpoint=33
+tick after=33 scanned=[] delivered=[] saved_checkpoint=33
+OK forwarded=[33]

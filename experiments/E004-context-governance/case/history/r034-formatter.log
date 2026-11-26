@@ -1,0 +1,5 @@
+$ delivery-dashboard check --locale zh-CN
+field=observed_at display=24h
+field=raw_sequence display=integer
+rows_rendered=23
+OK

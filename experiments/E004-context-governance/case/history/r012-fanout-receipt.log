@@ -1,0 +1,9 @@
+$ replay --protocol=w2 --input depot-void.fixture --receiver east --receiver west
+{"seq":4,"kind":"ship","movement":"R034","depot":"east"}
+{"seq":7,"kind":"ship","movement":"R077","depot":"west"}
+{"seq":9,"kind":"void","movement":"R034","depot":null}
+east delivery=[4,9] active=[]
+west delivery=[7,9] active=["R077"]
+$ replay --protocol=w2 --input depot-void.fixture --receiver east --route depot-equals
+east delivery=[4] active=["R034"]
+FAIL reconcile expected active=[] actual=["R034"]
